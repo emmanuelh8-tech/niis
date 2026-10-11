@@ -1077,7 +1077,7 @@
     var M = window.__PROGRAM_MEDIA__, wrap = qs('#lbWrap');
     if (!M || !wrap) return;
     initCounters(qs('.pg'));
-    initInView('.pg-stages, .pg-events, .pg-train');
+    initInView('.pg-train');
     var box = qs('.lb', wrap), stage = qs('.lb-stage', wrap), cap = qs('.lb-cap', wrap), cur = null, from = null, hideT = 0;
     function show(kind, i) {
       var list = M[kind], n = list.length; i = (i + n) % n; cur = { kind: kind, i: i };
@@ -1138,33 +1138,33 @@
       });
     });
 
-    // ---- the talent pool: four rows of four in reading order, filtered by field
-    var tTrack = qs('#tpTrack');
-    if (tTrack) {
-      var tCards = qsa('.tp-card', tTrack), chips = qsa('[data-tp-field]');
-      // the first sixteen fill the view row by row; the rest follow a column at a time
+    // ---- the talent pool: a league table in white columns, filtered by field. The rows still shown
+    // are shared out evenly across the columns, in order, and numbered from one.
+    var tlBox = qs('#tlCols');
+    if (tlBox) {
+      var cols = qsa('.tl-col', tlBox), items = qsa('.tl-item', tlBox), chips = qsa('[data-tp-field]');
       var lay = function () {
-        tCards.filter(function (c) { return !c.hidden; }).sort(function (a, b) { return a.dataset.i - b.dataset.i; }).forEach(function (c, k) {
-          var r = k < 16 ? Math.floor(k / 4) : (k - 16) % 4, col = k < 16 ? k % 4 : 4 + Math.floor((k - 16) / 4);
-          c.style.gridRow = r + 1; c.style.gridColumn = col + 1;
+        var shown = items.filter(function (it) { return !it.hidden; }).sort(function (a, b) { return a.dataset.i - b.dataset.i; });
+        // a short list fills fewer columns (about four rows each) rather than one row per column
+        var c = Math.max(1, Math.min(cols.length, Math.ceil(shown.length / 4))), base = Math.floor(shown.length / c), extra = shown.length % c, k = 0;
+        cols.forEach(function (col, ci) {
+          var take = ci < c ? base + (ci < extra ? 1 : 0) : 0;
+          shown.slice(k, k + take).forEach(function (it, j) { col.appendChild(it); qs('.tl-n', it).textContent = k + j + 1; });
+          col.hidden = !take;
+          k += take;
         });
+        items.filter(function (it) { return it.hidden; }).forEach(function (it) { cols[cols.length - 1].appendChild(it); });
       };
-      lay();
-      var row = rowCarousel(tTrack, {
-        item: '.tp-card', at: qs('[data-tp-at]'), total: qs('[data-tp-total]'), bar: qs('.tp-progress i'),
-        prev: qs('[data-tp="-1"]'), next: qs('[data-tp="1"]'), onTap: openCard,
-      });
+      qsa('.tl-row', tlBox).forEach(function (b) { b.addEventListener('click', function () { openCard(b); }); });
       chips.forEach(function (b) {
         b.addEventListener('click', function () {
           var f = b.dataset.tpField, k = 0;
           pressOnly(chips, 'data-tp-field', f);
-          tCards.forEach(function (c) {
-            var show = !f || c.dataset.field === f;
-            c.hidden = !show;
-            if (show && !REDUCE) c.animate([{ opacity: 0, transform: 'translateY(12px) scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: Math.min(k++, 8) * 35, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' });
-          });
+          items.forEach(function (it) { it.hidden = !!f && it.dataset.field !== f; });
           lay();
-          row.reset();
+          if (!REDUCE) items.forEach(function (it) {
+            if (!it.hidden) it.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 360, delay: Math.min(k++, 10) * 30, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' });
+          });
         });
       });
     }

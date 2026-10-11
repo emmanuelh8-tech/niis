@@ -5425,3 +5425,116 @@ input[type=range]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px #10141
 .lg-submit.pearl:disabled { cursor: progress; }
 .lg-submit.pearl .lg-spin { width: 14px; height: 14px; }
 body:has(.lg-brand) .footer-dh { margin-top: 0; }
+
+/* ============ PROGRAMS: EVENTS AS TICKETS ============
+   Each event is a printed ticket: a main part with a photograph, the kind, the title, and the date,
+   venue and time; and a stub along a perforation, with "admit one", the day, the ticket number and
+   a real Code 39 barcode of it. Half-round notches are cut where the stub tears off. Three styles
+   take turns (after the owner's references): paper with a navy stub, the blue-to-green pass, and the
+   navy pass with a red stub. On hover the ticket lifts and the stub starts to tear away. */
+.pg-tickets .tk, .pg-tickets .tk :is(h3, p, dd) { text-align: left; hyphens: manual; }
+.pg-tickets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.7rem 1.5rem; margin: 0; padding: 0; list-style: none; }
+.tk { --r: 13px; --rad: 18px;
+  position: relative; display: flex; min-height: 262px; color: #0E1420;
+  filter: drop-shadow(0 16px 20px rgba(7,26,62,.16)) drop-shadow(0 2px 3px rgba(7,26,62,.12)); transition: transform .45s var(--ui-ease); }
+.tk-main, .tk-stub { position: relative; isolation: isolate; overflow: hidden; }
+.tk-main { flex: 1 1 auto; min-width: 0; display: flex; border-radius: var(--rad) 0 0 var(--rad);
+  -webkit-mask: radial-gradient(circle at 100% 0, #0000 var(--r), #000 calc(var(--r) + .5px)) top / 100% 51% no-repeat, radial-gradient(circle at 100% 100%, #0000 var(--r), #000 calc(var(--r) + .5px)) bottom / 100% 51% no-repeat;
+          mask: radial-gradient(circle at 100% 0, #0000 var(--r), #000 calc(var(--r) + .5px)) top / 100% 51% no-repeat, radial-gradient(circle at 100% 100%, #0000 var(--r), #000 calc(var(--r) + .5px)) bottom / 100% 51% no-repeat; }
+.tk-stub { flex: 0 0 160px; display: grid; grid-template-columns: minmax(0, 1fr) 36px; grid-template-rows: auto 1fr auto auto; column-gap: .75rem;
+  padding: 1.15rem .95rem 1.1rem 1.2rem; border-radius: 0 var(--rad) var(--rad) 0; transform-origin: 0 100%; transition: transform .55s var(--ui-ease);
+  -webkit-mask: radial-gradient(circle at 0 0, #0000 var(--r), #000 calc(var(--r) + .5px)) top / 100% 51% no-repeat, radial-gradient(circle at 0 100%, #0000 var(--r), #000 calc(var(--r) + .5px)) bottom / 100% 51% no-repeat;
+          mask: radial-gradient(circle at 0 0, #0000 var(--r), #000 calc(var(--r) + .5px)) top / 100% 51% no-repeat, radial-gradient(circle at 0 100%, #0000 var(--r), #000 calc(var(--r) + .5px)) bottom / 100% 51% no-repeat; }
+/* the perforation: a column of punched dots down the stub's edge */
+.tk-stub::before { content: ''; position: absolute; left: 0; top: calc(var(--r) + 7px); bottom: calc(var(--r) + 7px); width: 3px; z-index: 1;
+  background: radial-gradient(circle, var(--perf) 1.3px, transparent 1.7px) center top / 3px 9px repeat-y; }
+/* a fine grain over the card stock */
+.tk-main::after, .tk-stub::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: var(--grain, .2); mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.tk-photo { position: absolute; top: 0; right: 0; bottom: 0; width: 46%; background-size: cover; background-position: center 30%;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 52%); mask-image: linear-gradient(90deg, transparent 0%, #000 52%); }
+.tk-content { position: relative; z-index: 1; display: flex; flex-direction: column; gap: .5rem; width: 64%; padding: 1.2rem 1.1rem 1.15rem 1.35rem; }
+.tk-top { display: flex; align-items: center; flex-wrap: wrap; gap: .55rem; margin: 0; }
+.tk-org { font-family: var(--font-label); font-size: .62rem; letter-spacing: .18em; text-transform: uppercase; opacity: .75; }
+.tk-kind { padding: .22rem .6rem .2rem; border: 1.5px solid currentColor; border-radius: 999px; font-family: var(--font-label); font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; line-height: 1; }
+.tk-title { margin: .15rem 0 0; font: 800 clamp(1.15rem, .95rem + .55vw, 1.45rem)/1 var(--sans); letter-spacing: -.005em; text-transform: uppercase; text-wrap: balance; color: inherit; }
+.tk-body { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 0; font-size: .78rem; line-height: 1.45; text-align: left; hyphens: manual; opacity: .78; }
+.tk-info { display: flex; flex-wrap: wrap; gap: .3rem 1.1rem; margin: auto 0 0; padding-top: .7rem; border-top: 1px dashed var(--rule); }
+.tk-info div { display: grid; gap: .15rem; }
+.tk-info dt { font-family: var(--font-label); font-size: .58rem; letter-spacing: .18em; text-transform: uppercase; opacity: .65; }
+.tk-info dd { margin: 0; font-size: .8rem; font-weight: 700; white-space: nowrap; }
+.tk-admit { grid-column: 1; font-family: var(--font-label); font-size: .6rem; letter-spacing: .22em; text-transform: uppercase; opacity: .85; }
+.tk-day { grid-column: 1; align-self: end; font: 400 3.1rem/1 var(--num); letter-spacing: .02em; }
+.tk-mon { grid-column: 1; margin-top: .35rem; font-family: var(--font-label); font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; }
+.tk-no { grid-column: 1; margin-top: .7rem; font: 600 .66rem var(--sans); letter-spacing: .08em; opacity: .75; }
+.tk-code { grid-column: 2; grid-row: 1 / -1; display: grid; padding: 6px 5px; border-radius: 4px; background: #fff; }
+.tk-bars { display: block; width: 100%; height: 100%; fill: #0E1420; }
+.tk-bars.is-across { display: none; }
+/* the three styles */
+.tk.is-paper .tk-main { --rule: rgba(11,44,99,.28); background: #FBFBF9; color: #0E1420; }
+.tk.is-paper .tk-main::after { mix-blend-mode: multiply; opacity: .1; }
+.tk.is-paper .tk-title, .tk.is-paper .tk-kind { color: #0B2C63; }
+.tk.is-paper .tk-stub { --perf: rgba(255,255,255,.55); background: #0B2C63; color: #fff; }
+.tk.is-vip .tk-main { --rule: rgba(255,255,255,.35); background: linear-gradient(118deg, #0B2C63 0%, #1747A6 46%, #13A27E 100%); color: #fff; }
+.tk.is-vip .tk-photo { mix-blend-mode: luminosity; opacity: .55; }
+.tk.is-vip .tk-kind { background: #fff; border-color: #fff; color: #0B2C63; }
+.tk.is-vip .tk-stub { --perf: rgba(7,42,58,.45); background: linear-gradient(165deg, #17B88B 0%, #7FE3BF 100%); color: #072A3A; }
+.tk.is-pass .tk-main { --rule: rgba(255,255,255,.3); color: #fff;
+  background: repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 2px, transparent 2px 9px), radial-gradient(120% 90% at 0% 0%, #163E86 0%, #0B2C63 45%, #071A3E 100%); }
+.tk.is-pass .tk-photo { opacity: .75; }
+.tk.is-pass .tk-kind { color: #FFCC00; }
+.tk.is-pass .tk-stub { --perf: rgba(255,255,255,.55); background: linear-gradient(165deg, #D7193A 0%, #A30B24 100%); color: #fff; }
+/* lift, and the stub starts to tear */
+.tk:hover, .tk:focus-within { transform: translateY(-4px); }
+.tk:hover .tk-stub, .tk:focus-within .tk-stub { transform: rotate(2.6deg) translate(3px, -2px); }
+@media (max-width: 1180px) { .pg-tickets { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+  .tk { flex-direction: column; min-height: 0; }
+  .tk-main { flex-direction: column; border-radius: var(--rad) var(--rad) 0 0;
+    -webkit-mask: radial-gradient(circle at 0 100%, #0000 var(--r), #000 calc(var(--r) + .5px)) left / 51% 100% no-repeat, radial-gradient(circle at 100% 100%, #0000 var(--r), #000 calc(var(--r) + .5px)) right / 51% 100% no-repeat;
+            mask: radial-gradient(circle at 0 100%, #0000 var(--r), #000 calc(var(--r) + .5px)) left / 51% 100% no-repeat, radial-gradient(circle at 100% 100%, #0000 var(--r), #000 calc(var(--r) + .5px)) right / 51% 100% no-repeat; }
+  .tk-photo { position: relative; width: auto; height: 150px; flex: none; -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent); mask-image: linear-gradient(180deg, #000 45%, transparent); }
+  .tk-content { width: auto; margin-top: -2.4rem; padding: 0 1.15rem 1.1rem; }
+  .tk-stub { flex: none; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto auto; column-gap: 1rem; padding: 1rem 1.15rem 1.05rem; border-radius: 0 0 var(--rad) var(--rad); transform-origin: 0 0;
+    -webkit-mask: radial-gradient(circle at 0 0, #0000 var(--r), #000 calc(var(--r) + .5px)) left / 51% 100% no-repeat, radial-gradient(circle at 100% 0, #0000 var(--r), #000 calc(var(--r) + .5px)) right / 51% 100% no-repeat;
+            mask: radial-gradient(circle at 0 0, #0000 var(--r), #000 calc(var(--r) + .5px)) left / 51% 100% no-repeat, radial-gradient(circle at 100% 0, #0000 var(--r), #000 calc(var(--r) + .5px)) right / 51% 100% no-repeat; }
+  .tk-stub::before { left: calc(var(--r) + 7px); right: calc(var(--r) + 7px); top: 0; bottom: auto; width: auto; height: 3px; background: radial-gradient(circle, var(--perf) 1.3px, transparent 1.7px) left center / 9px 3px repeat-x; }
+  .tk-admit { grid-column: 1; grid-row: 1; }
+  .tk-day { grid-column: 1; grid-row: 2; font-size: 2.6rem; }
+  .tk-mon { grid-column: 1; grid-row: 3; }
+  .tk-no { grid-column: 2; grid-row: 3; margin-top: .35rem; text-align: right; }
+  .tk-code { grid-column: 2; grid-row: 1 / 3; height: 64px; align-self: center; }
+  .tk-bars.is-down { display: none; }
+  .tk-bars.is-across { display: block; }
+  .tk:hover .tk-stub, .tk:focus-within .tk-stub { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) { .tk, .tk-stub { transition: none; } .tk:hover, .tk:hover .tk-stub, .tk:focus-within, .tk:focus-within .tk-stub { transform: none; } }
+
+/* ============ THE TALENT POOL AS A LEAGUE TABLE ============
+   Three white columns on the grey panel, a row per talent: the number, a square photograph, the name in
+   bold and, beneath it, the field's mark in its colour beside the profession (after the stats tables
+   the owner chose). A row opens the talent's profile. */
+.tl-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 14px; margin-top: 1.5rem; }
+.tl-col { display: grid; gap: 2px; margin: 0; padding: .5rem .4rem; list-style: none; background: #fff; border-radius: 6px; box-shadow: 0 1px 2px rgba(14,20,32,.06); }
+.tl-col[hidden] { display: none; }
+.tl-item[hidden] { display: none; }
+.tl-row { display: grid; grid-template-columns: 1.7rem 56px minmax(0, 1fr) 24px; align-items: center; gap: .8rem; width: 100%; padding: .5rem .55rem .5rem .3rem; border: 0; border-radius: 6px;
+  background: none; color: #10172A; font: inherit; text-align: left; cursor: pointer; transition: background-color .2s ease; }
+.tl-row:hover { background: #F2F4F7; }
+.tl-row:focus-visible { outline: none; background: #F2F4F7; box-shadow: inset 0 0 0 2px #0B2C63; }
+.tl-n { font: 500 .92rem/1 var(--sans); color: #4A5160; text-align: center; }
+.tl-ph { width: 56px; height: 56px; overflow: hidden; border-radius: 8px; background: #E3E7EC; }
+.tl-ph img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; transition: transform .45s var(--ui-ease); }
+.tl-row:hover .tl-ph img { transform: scale(1.07); }
+.tl-who { display: grid; gap: .3rem; min-width: 0; }
+.tl-name { overflow: hidden; font: 700 .98rem/1.15 var(--sans); white-space: nowrap; text-overflow: ellipsis; color: #10172A; }
+.tl-role { display: flex; align-items: center; gap: .4rem; min-width: 0; font-size: .8rem; line-height: 1.2; color: #5A6273; }
+.tl-role .icn { flex: none; width: 15px; height: 15px; color: var(--c); }
+.tl-role span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.tl-go { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 999px; color: #A0A8B6; transition: transform .25s var(--ui-ease), color .2s, background-color .2s; }
+.tl-go .icn { width: 13px; height: 13px; }
+.tl-row:hover .tl-go, .tl-row:focus-visible .tl-go { color: #fff; background: #0B2C63; transform: translateX(2px); }
+.tl-note { margin-top: 1rem; }
+@media (max-width: 1180px) { .tl-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .tl-cols { grid-template-columns: minmax(0, 1fr); gap: 10px; } .tl-row { grid-template-columns: 1.5rem 52px minmax(0, 1fr) 22px; gap: .7rem; } .tl-ph { width: 52px; height: 52px; } }
+@media (prefers-reduced-motion: reduce) { .tl-row, .tl-ph img, .tl-go { transition: none; } }

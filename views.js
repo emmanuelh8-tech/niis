@@ -3719,20 +3719,27 @@ exports.team = (ctx) => {
         </div>
       </div>
     </section>`;
-  const tPlace = (i) => (i < 16 ? `grid-row:${Math.floor(i / 4) + 1};grid-column:${(i % 4) + 1}` : `grid-row:${((i - 16) % 4) + 1};grid-column:${5 + Math.floor((i - 16) / 4)}`);
-  const tCard = (t, i) => `<article class="tp-card" data-person="talent" data-i="${i}" data-field="${esc(t.field)}" style="--k:${Math.min(i, 7)};${tPlace(i)}" tabindex="0" role="button" aria-label="${esc(t.name)}, ${esc(t.role)}, ${esc(t.county)}. Open profile">
-            <img class="tp-photo" src="/img/talent/${t.img}.jpg?v=${ASSET_V}" alt="" width="600" height="800" loading="lazy" decoding="async">
-            <span class="tp-field">${esc(t.field)}</span>
-            <div class="tp-body">
-              <h3 class="tp-name">${esc(t.name)}</h3>
-              <p class="tp-role">${esc(t.role)}</p>
-              <p class="tp-place">${icon('pin')}<span>${esc(t.county)}</span></p>
-              <div class="tp-more"><div>
-                <p class="tp-note">${esc(t.note)}</p>
-                <ul class="tp-skills">${t.skills.map((k) => `<li>${esc(k)}</li>`).join('')}</ul>
-              </div></div>
-            </div>
-          </article>`;
+  // the talent pool as a league table: three white columns of rows (number, photo, name, and the field's
+  // mark beside the profession); a row opens the profile window
+  const FIELD_MARK = { Software: ['code', '#1C5BB8'], 'Data & AI': ['chart', '#12A57E'], Cybersecurity: ['shield', '#C8102E'], Hardware: ['gauge', '#D9730D'],
+    Networks: ['wifi', '#0B2C63'], Design: ['image', '#8E44AD'], Fintech: ['coin', '#1A5C38'], 'Digital media': ['camera', '#D6336C'] };
+  const tRow = (t, i) => {
+    const [ic, col] = FIELD_MARK[t.field] || ['sparkle', '#4A5160'];
+    return `<li class="tl-item" data-i="${i}" data-field="${esc(t.field)}">
+              <button type="button" class="tl-row" data-person="talent" data-i="${i}" style="--c:${col}" aria-label="${esc(t.name)}, ${esc(t.role)}, ${esc(t.county)}. Open profile">
+                <span class="tl-n">${i + 1}</span>
+                <span class="tl-ph"><img src="/img/talent/${t.img}.jpg?v=${ASSET_V}" alt="" width="600" height="800" loading="lazy" decoding="async"></span>
+                <span class="tl-who"><span class="tl-name">${esc(t.name)}</span><span class="tl-role">${icon(ic)}<span>${esc(t.role)}</span></span></span>
+                <span class="tl-go" aria-hidden="true">${icon('arrow')}</span>
+              </button>
+            </li>`;
+  };
+  const TL_COLS = 3;
+  const tlCols = Array.from({ length: TL_COLS }, (_, c) => {
+    const base = Math.floor(TALENTS.length / TL_COLS), extra = TALENTS.length % TL_COLS;
+    const start = c * base + Math.min(c, extra), take = base + (c < extra ? 1 : 0);
+    return TALENTS.slice(start, start + take).map((t, j) => tRow(t, start + j)).join('');
+  });
   // what the profile window shows
   const people = {
     team: TEAM_MEMBERS.map((m) => ({ name: m.name, role: m.role, img: `/img/team/${m.img}.jpg?v=${ASSET_V}`, bio: m.bio, ...(PERSON_MORE[m.name] || {}) })),
@@ -3757,23 +3764,15 @@ exports.team = (ctx) => {
             <h2 id="tp-h" class="tp-title">National ICT <em>Talent Pool</em></h2>
             <p class="tp-lede">Young Liberians we have found building, designing and securing the country’s digital future.</p>
           </div>
-          <div class="tp-ctrl">
-            <span class="tp-count" aria-hidden="true"><b data-tp-at>${pad(Math.min(16, TALENTS.length))}</b> / <span data-tp-total>${pad(TALENTS.length)}</span></span>
-            <button type="button" class="tp-arrow skip" data-tp="-1" aria-label="Previous talents">${icon('chevrons', 'icn ui-flip')}</button>
-            <button type="button" class="tp-arrow skip" data-tp="1" aria-label="Next talents">${icon('chevrons')}</button>
-          </div>
         </div>
         <div class="tp-chips" role="group" aria-label="Filter by field">
           <button type="button" class="is-on" data-tp-field="" aria-pressed="true">All <b>${TALENTS.length}</b></button>
           ${[...new Set(TALENTS.map((t) => t.field))].map((f) => `<button type="button" data-tp-field="${esc(f)}" aria-pressed="false">${esc(f)} <b>${TALENTS.filter((t) => t.field === f).length}</b></button>`).join('')}
         </div>
-        <div class="tp-track" id="tpTrack" role="region" aria-label="ICT talents" tabindex="-1">
-          ${TALENTS.map(tCard).join('')}
+        <div class="tl-cols" id="tlCols" role="region" aria-label="ICT talents">
+          ${tlCols.map((rows) => `<ol class="tl-col">${rows}</ol>`).join('')}
         </div>
-        <div class="tp-foot">
-          <div class="tp-progress" aria-hidden="true"><i></i></div>
-          <p class="tp-note-s">Sample profiles with AI-generated placeholder photos.</p>
-        </div>
+        <p class="tp-note-s tl-note">Sample profiles with AI-generated placeholder photos.</p>
       </div>
     </section>
   </div>
@@ -3807,32 +3806,22 @@ exports.team = (ctx) => {
 };
 
 // ============ PROGRAMS (/careers/programs) ============
-// The programme, what is coming up, trainings and bootcamps, and the work on film and in pictures.
-// The programme's numbers and stages are the data mining phase design (docs/DATA-MINING-PHASE.md).
+// What is coming up (as event tickets), trainings and bootcamps, and the work on film and in pictures.
 // The field trainings are the ones Careers describes; the events, the other bootcamps and their dates
 // are a sample schedule (the owner asked for the page before the calendar exists) and the page says so.
 // The films and photographs are the site's own media.
-const PROGRAMME_STAGES = [
-  ['Design, sampling frame and enumeration-area selection', 2, 'weeks'],
-  ['Questionnaires built and programmed for the tablets', 2, 'weeks, alongside stage 1'],
-  ['Recruitment and training of the field teams', 1, 'week'],
-  ['Pilot in two counties', 3, 'days'],
-  ['Main fieldwork, all 15 counties at once', 3, 'weeks'],
-  ['Cleaning, validation and weighting', 2, 'weeks'],
-  ['County estimates and upload to NIIS', 1, 'week'],
-];
 const PROGRAM_EVENTS = [
-  { d: 22, m: 'Oct', y: 2026, kind: 'Webinar', title: 'NIIS Data Explorer walkthrough', place: 'Online', time: '10:00 GMT',
+  { d: 22, m: 'Oct', y: 2026, kind: 'Webinar', title: 'NIIS Data Explorer walkthrough', place: 'Online', time: '10:00 GMT', img: '/img/about/analysts.jpg',
     body: 'A live tour of the Data Explorer, the Indicator Catalogue and the API, for researchers and journalists.' },
-  { d: 5, m: 'Nov', y: 2026, kind: 'Training', title: 'Enumerator training, Bong County wave', place: 'Gbarnga', time: 'Five days',
+  { d: 5, m: 'Nov', y: 2026, kind: 'Training', title: 'Enumerator training, Bong County wave', place: 'Gbarnga', time: 'Five days', img: '/img/about/field-tall.jpg',
     body: 'Paid training on the tablet questionnaire for the Bong field team, before the county wave opens.' },
-  { d: 18, m: 'Nov', y: 2026, kind: 'Workshop', title: 'Data journalism workshop', place: 'Monrovia', time: 'Two days',
+  { d: 18, m: 'Nov', y: 2026, kind: 'Workshop', title: 'Data journalism workshop', place: 'Monrovia', time: 'Two days', img: '/img/about/man-phone.jpg',
     body: 'Finding, checking and telling stories with Liberia’s ICT figures, with the people who collect them.' },
-  { d: 3, m: 'Dec', y: 2026, kind: 'Bootcamp', title: 'Girls in ICT coding day', place: 'Kakata', time: '09:00 to 16:00',
+  { d: 3, m: 'Dec', y: 2026, kind: 'Bootcamp', title: 'Girls in ICT coding day', place: 'Kakata', time: '09:00 to 16:00', img: '/img/about/analyst-sq.jpg',
     body: 'A first day of coding for secondary-school girls, with mentors from the NIIS team and its patrons.' },
-  { d: 14, m: 'Jan', y: 2027, kind: 'Forum', title: 'County data validation forum', place: 'Ganta', time: 'One day',
+  { d: 14, m: 'Jan', y: 2027, kind: 'Forum', title: 'County data validation forum', place: 'Ganta', time: 'One day', img: '/img/about/colleagues.jpg',
     body: 'County officials review the first estimates for their counties before they are published.' },
-  { d: 6, m: 'Mar', y: 2027, kind: 'Community', title: 'Open Data Day Monrovia', place: 'Monrovia', time: 'All day',
+  { d: 6, m: 'Mar', y: 2027, kind: 'Community', title: 'Open Data Day Monrovia', place: 'Monrovia', time: 'All day', img: '/img/programs/coding-class.jpg',
     body: 'Open talks and a hands-on hack session on Liberia’s public ICT data.' },
 ];
 const PROGRAM_TRAININGS = [
@@ -3867,49 +3856,73 @@ const PROGRAM_PHOTOS = [
   ['/img/about/wwd-cruiser.jpg', 'A field vehicle being loaded for the road.'],
   ['/img/about/hero.jpg', 'A telecom mast against the evening sky.'],
 ];
+// A real Code 39 barcode (it scans) for a ticket number, as SVG bars: across, or down the stub.
+const CODE39 = {
+  0: '000110100', 1: '100100001', 2: '001100001', 3: '101100000', 4: '000110001', 5: '100110000', 6: '001110000', 7: '000100101', 8: '100100100', 9: '001100100',
+  A: '100001001', B: '001001001', C: '101001000', D: '000011001', E: '100011000', F: '001011000', G: '000001101', H: '100001100', I: '001001100', J: '000011100',
+  K: '100000011', L: '001000011', M: '101000010', N: '000010011', O: '100010010', P: '001010010', Q: '000000111', R: '100000110', S: '001000110', T: '000010110',
+  U: '110000001', V: '011000001', W: '111000000', X: '010010001', Y: '110010000', Z: '011010000', '-': '010000101', '.': '110000100', ' ': '011000100', '*': '010010100',
+};
+function code39(text, down) {
+  const N = 2, W = 5;
+  let at = 0, bars = '';
+  for (const ch of `*${String(text).toUpperCase()}*`) {
+    const p = CODE39[ch];
+    if (!p) continue;
+    for (let k = 0; k < 9; k++) {
+      const w = p[k] === '1' ? W : N;
+      if (k % 2 === 0) bars += down ? `<rect y="${at}" width="40" height="${w}"/>` : `<rect x="${at}" width="${w}" height="40"/>`;
+      at += w;
+    }
+    at += N;
+  }
+  at -= N;
+  return `<svg class="tk-bars ${down ? 'is-down' : 'is-across'}" viewBox="0 0 ${down ? 40 : at} ${down ? at : 40}" preserveAspectRatio="none" aria-hidden="true">${bars}</svg>`;
+}
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+// An event as a ticket: the main part (photo, kind, title, date, venue and time) and a stub torn
+// along a perforation (admit one, the day, the ticket number and its barcode). Three ticket styles
+// take turns: paper, the blue-to-green pass and the navy pass with a red stub.
+function eventTicket(e, i) {
+  const dd = String(e.d).padStart(2, '0'), mm = String(MONTHS.indexOf(e.m) + 1).padStart(2, '0');
+  const no = `${String(e.y).slice(2)}${mm}${dd}`;
+  const style = ['paper', 'vip', 'pass'][i % 3];
+  return `<li class="tk is-${style}">
+          <div class="tk-main">
+            <span class="tk-photo" style="background-image:url('${e.img}?v=${ASSET_V}')" aria-hidden="true"></span>
+            <div class="tk-content">
+              <p class="tk-top"><span class="tk-org">NIIS Programmes</span><span class="tk-kind">${esc(e.kind)}</span></p>
+              <h3 class="tk-title">${esc(e.title)}</h3>
+              <p class="tk-body">${esc(e.body)}</p>
+              <dl class="tk-info">
+                <div><dt>Date</dt><dd>${dd} ${esc(e.m)} ${e.y}</dd></div>
+                <div><dt>Venue</dt><dd>${esc(e.place)}</dd></div>
+                <div><dt>Time</dt><dd>${esc(e.time)}</dd></div>
+              </dl>
+            </div>
+          </div>
+          <div class="tk-stub" aria-hidden="true">
+            <span class="tk-admit">Admit one</span>
+            <span class="tk-day">${dd}</span>
+            <span class="tk-mon">${esc(e.m)} ${e.y}</span>
+            <span class="tk-no">No. ${no}</span>
+            <span class="tk-code">${code39(no, true)}${code39(no, false)}</span>
+          </div>
+        </li>`;
+}
 exports.programs = (ctx) => {
-  const maxLen = Math.max(...PROGRAMME_STAGES.map(([, n, u]) => (u.startsWith('day') ? n / 7 : n)));
   const status = (s) => `<span class="pg-status is-${s.toLowerCase().replace(/\s+/g, '-')}">${esc(s)}</span>`;
   return publicLayout(ctx, {
     title: 'Programs', active: '/careers/programs', body: `
-  ${pageHeader('programs', 'Programs', 'The NIIS programme, its trainings and bootcamps, what is coming up, and the work on film and in pictures.')}
+  ${pageHeader('programs', 'Programs', 'What is coming up, the trainings and bootcamps, and the work on film and in pictures.')}
   <div class="pg">
-    <section class="pg-sec wrap" aria-labelledby="pg-prog-h">
-      <div class="pg-head">
-        <div>${eyebrow('The programme')}<h2 id="pg-prog-h" data-rise-head>The NIIS data mining phase</h2></div>
-        <p>Field teams in all 15 counties collect the household, school and price data that NIIS publishes. The counties run at the same time, so the whole cycle, from design to upload, takes about eleven weeks.</p>
-      </div>
-      <dl class="ui-stats">
-        <div><dt>Household interviews</dt><dd data-count="9980">9,980</dd></div>
-        <div><dt>Enumeration areas</dt><dd data-count="574">574</dd></div>
-        <div><dt>Field staff</dt><dd data-count="197">197</dd></div>
-        <div><dt>Weeks, design to upload</dt><dd data-count="11">11</dd></div>
-      </dl>
-      <ol class="pg-stages" data-rise-block>
-        ${PROGRAMME_STAGES.map(([what, n, unit], i) => `<li style="--k:${i};--w:${((unit.startsWith('day') ? n / 7 : n) / maxLen).toFixed(3)}">
-          <span class="pg-stage-n">${i + 1}</span>
-          <span class="pg-stage-t">${esc(what)}</span>
-          <span class="pg-stage-bar" aria-hidden="true"><i></i></span>
-          <span class="pg-stage-d"><b>${n}</b> ${esc(unit)}</span>
-        </li>`).join('')}
-      </ol>
-    </section>
-
     <section class="pg-sec wrap" aria-labelledby="pg-ev-h">
       <div class="pg-head">
         <div>${eyebrow('Coming up')}<h2 id="pg-ev-h" data-rise-head>Upcoming events</h2></div>
         <p>Trainings, workshops and open days across the counties.</p>
       </div>
-      <ol class="pg-events">
-        ${PROGRAM_EVENTS.map((e, i) => `<li class="pg-event" style="--k:${i}">
-          <div class="pg-date" aria-label="${e.d} ${e.m} ${e.y}"><b>${String(e.d).padStart(2, '0')}</b><span>${esc(e.m)} ${e.y}</span></div>
-          <div class="pg-event-in">
-            <span class="tag">${esc(e.kind)}</span>
-            <h3>${esc(e.title)}</h3>
-            <p>${esc(e.body)}</p>
-            <p class="pg-where">${icon('pin')}<span>${esc(e.place)}</span><span class="pg-dot" aria-hidden="true">·</span><span>${esc(e.time)}</span></p>
-          </div>
-        </li>`).join('')}
+      <ol class="pg-tickets">
+        ${PROGRAM_EVENTS.map(eventTicket).join('')}
       </ol>
       <p class="pg-note">Sample schedule: the events and their dates are placeholders until the programme calendar is confirmed.</p>
     </section>

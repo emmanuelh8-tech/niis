@@ -1,12 +1,9 @@
-// careers.js: motion and behaviour for /careers, /careers/apply/<role> and /about.
-// Letters decode in random order, the open roles light up one at a time, the FAQ opens with a
-// measured height, paragraph words fill as they pass (CSS scroll timelines), numbers count up,
-// blocks rise as they arrive, the apply form checks itself before sending, and one chrome seal
-// (Three.js, loaded from jsDelivr) travels the page. Everything is readable without this file;
-// with reduced motion it shows final states.
+// careers.js: behaviour for /careers, /careers/apply/<role> and /about.
+// The page arrives whole: headings, paragraphs, numbers and blocks are all in place from the start,
+// with nothing waiting to be scrolled to. The hero film plays, the open role at the centre of the
+// screen is marked, the FAQ opens with a measured height, the apply form checks itself before
+// sending, and one chrome seal (Three.js, loaded from jsDelivr) travels the page.
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const page = document.querySelector('.cs');
-if (page) page.classList.add('is-armed');
 
 // ---------- the careers hero film: fades in once it plays; held on its poster when motion is reduced ----------
 const film = document.querySelector('.cs-film');
@@ -20,44 +17,6 @@ if (film) {
   }
 }
 
-// ---------- letters arrive in random order ----------
-function prepDecode(el) {
-  if (el.dataset.ready) return;
-  el.dataset.ready = '1';
-  const text = el.textContent;
-  el.textContent = '';
-  for (const tok of text.split(/(\s+)/)) {
-    if (!tok) continue;
-    if (/^\s+$/.test(tok)) { el.appendChild(document.createTextNode(tok)); continue; }
-    const w = document.createElement('span');
-    w.className = 'cs-w';
-    for (const ch of tok) { const c = document.createElement('span'); c.className = 'cs-c'; c.textContent = ch; w.appendChild(c); }
-    el.appendChild(w);
-  }
-}
-function playDecode(el, span = 650) {
-  prepDecode(el);
-  el.classList.remove('is-in');
-  el.querySelectorAll('.cs-c').forEach((c) => { c.style.transitionDelay = Math.round(Math.random() * span) + 'ms'; });
-  void el.offsetWidth;
-  el.classList.add('is-in');
-}
-const decoders = [...document.querySelectorAll('[data-decode]')];
-if (!still && 'IntersectionObserver' in window && decoders.length) {
-  // role titles are left whole until their role is lit (below), so a dimmed role still reads
-  decoders.filter((el) => !el.closest('.cs-role')).forEach(prepDecode);
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((e) => {
-      if (!e.isIntersecting) return;
-      io.unobserve(e.target);
-      // the two lines of a two-tone heading arrive one after the other
-      const lag = e.target.previousElementSibling && e.target.previousElementSibling.matches('[data-decode]') ? 260 : 0;
-      setTimeout(() => playDecode(e.target), lag);
-    });
-  }, { rootMargin: '0px 0px -8% 0px' });
-  decoders.filter((el) => !el.closest('.cs-role')).forEach((el) => io.observe(el));
-}
-
 // ---------- the open roles: the one at the centre of the screen is the lit one ----------
 const roleEls = [...document.querySelectorAll('.cs-role')];
 window.csRole = 0;
@@ -68,8 +27,6 @@ if (roleEls.length && 'IntersectionObserver' in window) {
     el.dataset.seen = '1';
     roleEls.forEach((r) => r.classList.toggle('is-on', r === el));
     window.csRole = i;
-    const t = el.querySelector('[data-decode]');
-    if (t && !still) playDecode(t, 520);
   };
   const spy = new IntersectionObserver((entries) => {
     entries.forEach((e) => { if (e.isIntersecting) light(e.target); });
@@ -78,49 +35,6 @@ if (roleEls.length && 'IntersectionObserver' in window) {
     spy.observe(r);
     r.addEventListener('focusin', () => light(r));
   });
-}
-
-// ---------- paragraph words fill as they scroll through (CSS does the motion) ----------
-if (!still && window.CSS && CSS.supports('animation-timeline: view()')) {
-  document.querySelectorAll('[data-fill]').forEach((el) => {
-    const words = el.textContent.trim().split(/\s+/);
-    el.textContent = '';
-    words.forEach((w, i) => {
-      const s = document.createElement('span');
-      s.className = 'cs-fw';
-      s.style.setProperty('--p', (i / Math.max(1, words.length - 1)).toFixed(3));
-      s.textContent = w;
-      el.appendChild(s);
-      if (i < words.length - 1) el.appendChild(document.createTextNode(' '));
-    });
-  });
-}
-
-// ---------- numbers count up once, as they arrive ----------
-const counters = [...document.querySelectorAll('.cs [data-count]')];
-if (counters.length && !still && 'IntersectionObserver' in window) {
-  const run = (el) => {
-    const n = +el.dataset.count, t0 = performance.now(), dur = 1300;
-    const tick = (t) => { const p = Math.min(1, (t - t0) / dur); el.textContent = Math.round(n * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(tick); };
-    requestAnimationFrame(tick);
-  };
-  const ci = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { ci.unobserve(e.target); run(e.target); } }), { threshold: 0.6 });
-  counters.forEach((el) => { if (isFinite(+el.dataset.count)) { el.textContent = '0'; ci.observe(el); } });
-}
-
-// ---------- blocks rise into place as they arrive (staggered by --i) ----------
-const risers = [...document.querySelectorAll('.cs [data-rise]')];
-if (page && risers.length && !still && 'IntersectionObserver' in window) {
-  page.classList.add('can-rise');
-  const ri = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { ri.unobserve(e.target); e.target.classList.add('is-in'); } }), { rootMargin: '0px 0px -8% 0px' });
-  risers.forEach((el) => ri.observe(el));
-}
-
-// ---------- the closing wordmark rises into view ----------
-const outro = document.querySelector('.cs-outro');
-if (outro && 'IntersectionObserver' in window) {
-  const oi = new IntersectionObserver((es) => { if (es[0].isIntersecting) { outro.classList.add('is-in'); oi.disconnect(); } }, { threshold: 0.35 });
-  oi.observe(outro);
 }
 
 // ---------- FAQ: open and close with a measured height ----------

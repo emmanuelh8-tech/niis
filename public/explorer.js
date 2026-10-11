@@ -27,31 +27,14 @@
   var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ============================================================
-  // Motion: reveal-on-scroll
-  // IntersectionObserver does not fire in every embedding context, so every
-  // registered element also gets a timed fail-safe. The resting state of each
-  // component is its FINAL state, so a missed reveal can never strand content.
+  // Sections and charts are in place from the start: nothing waits to be
+  // scrolled to. (A re-render after a filter change still redraws its chart.)
   // ============================================================
-  var revealer = (function () {
-    var io = null;
-    function show(node) {
-      if (node.__shown) return;
-      node.__shown = true;
-      node.classList.add('is-in');
-    }
-    if (!REDUCED && 'IntersectionObserver' in window) {
-      io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) { if (e.isIntersecting) { show(e.target); io.unobserve(e.target); } });
-      }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
-    }
-    return function watch(node) {
-      if (!node) return;
-      node.__shown = false;
-      if (REDUCED || !io) { show(node); return; }
-      io.observe(node);
-      setTimeout(function () { show(node); }, 2200);   // fail-safe
-    };
-  })();
+  var revealer = function watch(node) {
+    if (!node) return;
+    node.__shown = true;
+    node.classList.add('is-in');
+  };
 
   // Re-arm a container so a re-render replays its entrance.
   function replay(node) {

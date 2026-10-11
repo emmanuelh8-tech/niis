@@ -486,33 +486,11 @@
       if (p < 1) requestAnimationFrame(tick);
     })(t0);
   }
-  function initCounters(scope) {
-    var nodes = qsa('[data-count]', scope);
-    if (!nodes.length) return;
-    if (REDUCE) return;
-    nodes.forEach(function (n) { n.textContent = '0'; });
-    var pending = nodes.slice(), queued = false;
-    function check() {
-      queued = false;
-      pending = pending.filter(function (n) {
-        if (n.getBoundingClientRect().top > innerHeight * 0.9) return true;
-        tweenNumber(n, Number(n.dataset.count), 900);
-        return false;
-      });
-      if (!pending.length) removeEventListener('scroll', onScroll);
-    }
-    function onScroll() { if (!queued) { queued = true; requestAnimationFrame(check); } }
-    addEventListener('scroll', onScroll, { passive: true });
-    check();
-  }
-  // sections that draw themselves in (bars, wires, timelines) when they come into view
+  // numbers are written in full from the start: the page arrives whole, nothing counts up
+  function initCounters() {}
+  // sections that draw themselves (bars, wires, timelines) are drawn from the start, not as they scroll in
   function initInView(sel) {
-    var els = qsa(sel);
-    if (REDUCE || !('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('is-in'); }); return; }
-    var io = new IntersectionObserver(function (es) {
-      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
-    }, { threshold: 0.18 });
-    els.forEach(function (e) { io.observe(e); });
+    qsa(sel).forEach(function (e) { e.classList.add('is-in'); });
   }
   // a search box with a clear button
   function wireSearch(box, onInput) {
@@ -1595,38 +1573,18 @@
   });
 })();
 
-// Section headings arrive: as a heading scrolls into view its words rise out of a mask one after
-// another, sharpening from a blur, and a short red rule draws in under it; the heading's links and
-// arrows follow. The cards and panels that open a section lift in just after. Text stays in the
-// page throughout (only wrapped, word by word), so readers and the bird still find it.
+// The red rule under each section heading: five segments that read as one line. When the heading
+// first comes into view, and every quarter minute or so after while it stays in view (or on hover),
+// they round into dots and run a loading wave for three seconds (styles.css .hx-rule). Headings and
+// the blocks under them are simply there: nothing waits to be scrolled to.
 (function () {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
-  var heads = [].slice.call(document.querySelectorAll('.sec-head-dh h2, [data-rise-head]'));
-  heads.forEach(function (h) {
-    if (h.classList.contains('hx')) return;
-    var i = 0;
-    [].slice.call(h.childNodes).forEach(function (n) {
-      if (n.nodeType !== 3 || !/\S/.test(n.data)) return;
-      var frag = document.createDocumentFragment();
-      n.data.split(/(\s+)/).forEach(function (part) {
-        if (!part) return;
-        if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
-        var w = document.createElement('span'); w.className = 'hw';
-        var inn = document.createElement('span'); inn.textContent = part; inn.style.setProperty('--i', i++);
-        w.appendChild(inn); frag.appendChild(w);
-      });
-      n.parentNode.replaceChild(frag, n);
-    });
-    h.classList.add('hx');
-    var head = h.closest('.sec-head-dh');
-    if (head) head.classList.add('hx-head');
-  });
-  // the red rule under each section heading: five segments that read as one line; when the heading
-  // first comes into view, and every quarter minute or so after while it stays in view (or on hover),
-  // they round into dots and run a loading wave for three seconds (styles.css .hx-rule)
   var rules = [];
-  heads.forEach(function (h) {
-    if (!h.closest('.sec-head-dh')) return;
+  [].slice.call(document.querySelectorAll('.sec-head-dh h2, [data-rise-head]')).forEach(function (h) {
+    var head = h.closest('.sec-head-dh');
+    if (!head) return;
+    h.classList.add('hx', 'is-in');
+    head.classList.add('hx-head', 'is-in');
     var r = document.createElement('span'); r.className = 'hx-rule'; r.setAttribute('aria-hidden', 'true');
     for (var k = 0; k < 5; k++) { var d = document.createElement('i'); d.style.setProperty('--d', k); r.appendChild(d); }
     h.appendChild(r);
@@ -1640,43 +1598,20 @@
     o.next = Date.now() + 15000 + Math.random() * 6000;
     setTimeout(function () { o.r.classList.remove('is-dots'); }, 3100);
   }
-  if (rules.length) {
-    var seenIO = new IntersectionObserver(function (es) {
-      es.forEach(function (e) {
-        var o = rules.filter(function (x) { return x.h === e.target; })[0];
-        o.on = e.isIntersecting;
-        if (o.on && !o.seen) { o.seen = true; setTimeout(function () { dots(o); }, 1500); }
-      });
-    }, { threshold: 0.6 });
-    rules.forEach(function (o) { seenIO.observe(o.h); });
-    setInterval(function () {
-      if (document.hidden) return;
-      var t = Date.now();
-      rules.forEach(function (o) { if (o.on && o.seen && t > o.next) dots(o); });
-    }, 1000);
-  }
-  var blocks = [].slice.call(document.querySelectorAll('#fpTrack, #rcStage, #homeVideo .vid-layout, #sqTrends, [data-rise-block]'));
-  blocks.forEach(function (b) { b.classList.add('hx-block'); });
-  var io = new IntersectionObserver(function (es) {
+  if (!rules.length) return;
+  var seenIO = new IntersectionObserver(function (es) {
     es.forEach(function (e) {
-      if (!e.isIntersecting) return;
-      var t = e.target.classList.contains('hx') ? (e.target.closest('.sec-head-dh') || e.target) : e.target;
-      t.classList.add('is-in'); e.target.classList.add('is-in');
-      io.unobserve(e.target);
+      var o = rules.filter(function (x) { return x.h === e.target; })[0];
+      o.on = e.isIntersecting;
+      if (o.on && !o.seen) { o.seen = true; setTimeout(function () { dots(o); }, 1500); }
     });
-  }, { threshold: 0.25, rootMargin: '0px 0px -6% 0px' });
-  heads.concat(blocks).forEach(function (el) { io.observe(el); });
-})();
-
-// ---------- the close above the footer: the name rises into view, as it does on Careers and About ----------
-(function () {
-  var o = document.querySelector('.site-outro');
-  if (!o || !('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  o.classList.add('is-armed');
-  var io = new IntersectionObserver(function (es) {
-    if (es[0].isIntersecting) { o.classList.add('is-in'); io.disconnect(); }
-  }, { threshold: 0.35 });
-  io.observe(o);
+  }, { threshold: 0.6 });
+  rules.forEach(function (o) { seenIO.observe(o.h); });
+  setInterval(function () {
+    if (document.hidden) return;
+    var t = Date.now();
+    rules.forEach(function (o) { if (o.on && o.seen && t > o.next) dots(o); });
+  }, 1000);
 })();
 
 // ---------- range sliders: the filled share of the track follows the value ----------

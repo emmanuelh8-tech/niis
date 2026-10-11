@@ -251,8 +251,8 @@ function mainNav(active, q) {
     // a menu's first row is its own section, so the name is always written out
     return `<div class="dock-item nav-has-sub">${link}
       <div class="nav-submenu">
-        <a href="${href}" class="nav-subitem nav-subhead ${active === href ? 'active' : ''}">${icon(ic)}<span>${esc(label)}</span></a>
-        ${sub.map(([h, l, i2]) => `<a href="${h}" class="nav-subitem ${active === h ? 'active' : ''}">${icon(i2)}<span>${l}</span></a>`).join('')}
+        <a href="${href}" class="nav-subitem nav-subhead ${active === href ? 'active' : ''}"><span>${esc(label)}</span></a>
+        ${sub.map(([h, l]) => `<a href="${h}" class="nav-subitem ${active === h ? 'active' : ''}"><span>${l}</span></a>`).join('')}
       </div>
     </div>`;
   };
@@ -690,17 +690,8 @@ const featuredPapersScript = `
   }
   window.__nictdMarquee = marquee;
 
-  // reveal-on-scroll entry animation for the card rows
-  var reveal = document.querySelectorAll('.reveal');
-  function showAll(){ reveal.forEach(function(el){ el.classList.add('in'); }); }
-  if('IntersectionObserver' in window){
-    var io=new IntersectionObserver(function(es){
-      es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
-    },{threshold:.15});
-    reveal.forEach(function(el){ io.observe(el); });
-    // fail-safe: never leave content hidden behind the animation
-    setTimeout(showAll, 1500);
-  } else { showAll(); }
+  // the card rows are in place from the start (no reveal on scroll)
+  document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in'); });
 
   var fp = marquee(document.getElementById('fpTrack'), 26);
   document.querySelectorAll('#featuredPapers .fp-arrow').forEach(function(b){
@@ -2575,9 +2566,6 @@ const submitPaperScript = `
       if(e.isIntersecting){ e.target.classList.add('is-in'); Object.keys(steps).forEach(function(s){ steps[s].classList.toggle('is-here', s===k); }); }
     }); },{ rootMargin:'-35% 0px -45% 0px' });
     [].forEach.call(f.querySelectorAll('[data-sec]'),function(sec){ io.observe(sec); });
-    // sections rise in as they arrive (they are visible without this)
-    var rise=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('is-risen'); rise.unobserve(e.target); } }); },{ threshold:0.08 });
-    if(!reduce) [].forEach.call(f.querySelectorAll('.sp2-sec'),function(sec){ sec.classList.add('will-rise'); rise.observe(sec); });
   }
   // the phone's bottom bar shows once the form is on screen
   var bar=document.querySelector('.sp2-bar');
@@ -3002,19 +2990,8 @@ exports.research = (ctx, { papers = [], canManage = false, canSubmit = false, no
   });
 };
 
-// The shelf arrives in order as it scrolls in (each paper a beat after the one before), and
-// the newest paper's cover settles into place. Without IntersectionObserver, or with reduced
-// motion, everything is simply there.
-const rpScript = `
-(function(){
-  var shelf=document.getElementById('rpShelf'); if(!shelf) return;
-  if(!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  shelf.classList.add('is-armed');
-  var io=new IntersectionObserver(function(es){
-    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('is-in'); io.unobserve(e.target); } });
-  },{ rootMargin:'0px 0px -10% 0px', threshold:0.12 });
-  [].forEach.call(shelf.querySelectorAll('.rp-item'), function(el){ io.observe(el); });
-})();`;
+// The shelf is in place from the start: nothing waits to be scrolled to.
+const rpScript = '';
 
 function statusPill(p) {
   if (p.deleted) return '<span class="tag" style="background:#F0DADA;color:#8a1f2f">Deleted</span>';
@@ -3149,8 +3126,6 @@ exports.updates = (ctx, items) => {
   return shell(ctx, {
     title: 'News & notices', body: `
   <div class="nn wrap" id="newsNotices">
-    <script>(function(r){ if(!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      r.classList.add('is-armed'); setTimeout(function(){ if(!r.hasAttribute('data-live')) r.classList.remove('is-armed'); }, 3000); })(document.currentScript.parentNode);</script>
     <nav class="upd-crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">News &amp; notices</span></nav>
     <header class="nn-head">
       <h1 class="nn-title" aria-label="News &amp; notices"><span aria-hidden="true">${riseWords('News & notices')}</span></h1>

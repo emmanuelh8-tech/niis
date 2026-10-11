@@ -268,7 +268,7 @@ function mainNav(active, q) {
         </li>`;
   };
   return `<nav class="gov-nav" aria-label="Main"><div class="nav-shell">
-    <a class="gov-wordmark nav-mapblock" href="/" aria-label="NIIS home"><img class="nav-logo" src="/img/brand/niis-mark.png?v=${ASSET_V}" alt="" width="328" height="132" decoding="async"></a>
+    <a class="gov-wordmark nav-mapblock" href="/" aria-label="NIIS home"><img class="nav-logo" src="/img/brand/niis-mark.webp?v=${ASSET_V}" alt="" width="852" height="341" decoding="async"></a>
     <form class="nav-search" action="/indicators" method="get" role="search">
       <input type="search" name="q" aria-label="Search indicators" autocomplete="off" value="${esc(q || '')}">
       <button type="button" class="nav-search-x" aria-label="Clear the search"${q ? '' : ' hidden'}>${icon('x')}</button>
@@ -350,7 +350,7 @@ ${extraHead}
 </head><body>
 ${mainNav(active, q)}
 <main>${body}</main>
-${/cs-outro/.test(body) ? '' : SITE_OUTRO}
+${/cs-outro|lg-brand/.test(body) ? '' : SITE_OUTRO}
 ${footerDh()}
 <script src="/assets/app.js?v=${ASSET_V}" defer></script></body></html>`;
 }
@@ -4271,13 +4271,7 @@ exports.login = (ctx, { error }) => publicLayout(ctx, {
           ${imgs.exists('brand', 'seal') ? `<img src="${esc(imgs.url('brand', 'seal'))}" alt="" width="54" height="58" decoding="async">` : sealLogo(54)}
           <span><strong>NIIS</strong><span>National ICT Intelligence System</span></span>
         </a>
-        <h2>The secured workspace for Liberia’s ICT data</h2>
-        <ul class="lg-list">
-          <li>${icon('database')}<span><b>Data Explorer</b>Map, trend and county table for every indicator your role can see.</span></li>
-          <li>${icon('sliders')}<span><b>Data Query</b>Build custom extracts, save them and download them again.</span></li>
-          <li>${icon('chat')}<span><b>Messages</b>A direct line to the ICT Statistics &amp; Policy Unit.</span></li>
-        </ul>
-        <p class="lg-note">Access is role-based: public users, stakeholders and administrators each see what their role permits.</p>
+        <h2>A secured system for Liberia’s ICT Data</h2>
       </div>
     </div>
     <div class="lg-side">

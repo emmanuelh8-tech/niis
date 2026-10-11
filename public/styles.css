@@ -4952,17 +4952,6 @@ button.skip:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px;
 @keyframes lgSpin { to { transform: rotate(360deg); } }
 .lg-alt { margin-top: 1.2rem; text-align: center; font-size: .9rem; color: var(--muted); }
 .lg-alt a { font-weight: 650; color: var(--teal-dark); }
-.lg-demo { margin-top: 1.6rem; background: #FBFCFE; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-.lg-demo summary { display: flex; align-items: center; justify-content: space-between; padding: .75rem .95rem; list-style: none; font-size: .86rem; font-weight: 650; color: var(--navy); cursor: pointer; }
-.lg-demo summary::-webkit-details-marker { display: none; }
-.lg-demo summary .icn { color: var(--faint); transform: rotate(90deg); transition: transform .25s var(--ui-ease); }
-.lg-demo[open] summary .icn { transform: rotate(-90deg); }
-.lg-demo ul { display: grid; gap: 1px; margin: 0; padding: 0; list-style: none; background: var(--line-soft); border-top: 1px solid var(--line-soft); }
-.lg-demo li { display: flex; align-items: center; justify-content: space-between; gap: .6rem; padding: .6rem .95rem; background: #FBFCFE; }
-.lg-demo-who { display: grid; gap: .1rem; min-width: 0; }
-.lg-demo-who b { font-size: .8rem; color: var(--navy); }
-.lg-demo code { font-size: .76rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.lg-demo > p { padding: .6rem .95rem .75rem; border-top: 1px solid var(--line-soft); font-size: .76rem; color: var(--faint); }
 
 /* ---------------- smaller screens ---------------- */
 @media (max-width: 1000px) {
@@ -5318,29 +5307,29 @@ input[type=range]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px #10141
    glare behind it, the label fading out toward its foot. On hover the sheen lifts, the glare drops;
    pressed, it sinks. (After the "Pearl Button" component the owner chose,
    scaled from its poster size to the nav bar.) */
-.nav-cta.pearl { --pearl-bg: #0B2C63; position: relative; padding: 0; border: 0; border-radius: 100px; background: var(--pearl-bg); filter: none; cursor: pointer;
+:is(.nav-cta, .lg-submit).pearl { --pearl-bg: #0B2C63; position: relative; padding: 0; border: 0; border-radius: 100px; background: var(--pearl-bg); filter: none; cursor: pointer;
   box-shadow: inset 0 .18rem .55rem rgba(255,255,255,.3), inset 0 -.06rem .2rem rgba(0,0,0,.7), inset 0 -.25rem .55rem rgba(255,255,255,.5),
     0 .7rem .9rem rgba(11,44,99,.22), 0 .35rem .35rem -.22rem rgba(11,44,99,.7);
   transition: box-shadow .2s ease, transform .2s ease; }
-.nav-cta.pearl .pearl-wrap { position: relative; display: block; overflow: hidden; padding: .58rem 1.05rem; border-radius: inherit;
+:is(.nav-cta, .lg-submit).pearl .pearl-wrap { position: relative; display: block; overflow: hidden; padding: .58rem 1.05rem; border-radius: inherit;
   color: rgba(255,255,255,.92); font: 600 .7rem/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
-.nav-cta.pearl .pearl-wrap::before, .nav-cta.pearl .pearl-wrap::after { content: ''; position: absolute; transition: all .3s ease; pointer-events: none; }
-.nav-cta.pearl .pearl-wrap::before { left: -15%; right: -15%; bottom: 25%; top: -100%; border-radius: 50%; background: rgba(255,255,255,.12); }
-.nav-cta.pearl .pearl-wrap::after { left: 6%; right: 6%; top: 12%; bottom: 40%; border-radius: 12px 12px 0 0;
+:is(.nav-cta, .lg-submit).pearl .pearl-wrap::before, :is(.nav-cta, .lg-submit).pearl .pearl-wrap::after { content: ''; position: absolute; transition: all .3s ease; pointer-events: none; }
+:is(.nav-cta, .lg-submit).pearl .pearl-wrap::before { left: -15%; right: -15%; bottom: 25%; top: -100%; border-radius: 50%; background: rgba(255,255,255,.12); }
+:is(.nav-cta, .lg-submit).pearl .pearl-wrap::after { left: 6%; right: 6%; top: 12%; bottom: 40%; border-radius: 12px 12px 0 0;
   box-shadow: inset 0 6px 5px -6px rgba(255,255,255,.8); background: linear-gradient(180deg, rgba(255,255,255,.3) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0) 100%); }
-.nav-cta.pearl .pearl-p { position: relative; display: flex; align-items: center; gap: .5rem; transform: translateY(2%); transition: transform .2s ease;
+:is(.nav-cta, .lg-submit).pearl .pearl-p { position: relative; display: flex; align-items: center; gap: .5rem; transform: translateY(2%); transition: transform .2s ease;
   -webkit-mask-image: linear-gradient(to bottom, #fff 40%, transparent); mask-image: linear-gradient(to bottom, #fff 40%, transparent); }
-.nav-cta.pearl:hover { text-decoration: none;
+:is(.nav-cta, .lg-submit).pearl:hover { text-decoration: none;
   box-shadow: inset 0 .18rem .3rem rgba(255,255,255,.4), inset 0 -.06rem .2rem rgba(0,0,0,.7), inset 0 -.25rem .55rem rgba(255,255,255,.7),
     0 .7rem .9rem rgba(11,44,99,.22), 0 .35rem .35rem -.22rem rgba(11,44,99,.7); }
-.nav-cta.pearl:hover .pearl-wrap::before { transform: translateY(-5%); }
-.nav-cta.pearl:hover .pearl-wrap::after { opacity: .4; transform: translateY(5%); }
-.nav-cta.pearl:hover .pearl-p { transform: translateY(-4%); }
-.nav-cta.pearl:active { transform: translateY(2px);
+:is(.nav-cta, .lg-submit).pearl:hover .pearl-wrap::before { transform: translateY(-5%); }
+:is(.nav-cta, .lg-submit).pearl:hover .pearl-wrap::after { opacity: .4; transform: translateY(5%); }
+:is(.nav-cta, .lg-submit).pearl:hover .pearl-p { transform: translateY(-4%); }
+:is(.nav-cta, .lg-submit).pearl:active { transform: translateY(2px);
   box-shadow: inset 0 .18rem .3rem rgba(255,255,255,.5), inset 0 -.06rem .2rem rgba(0,0,0,.8), inset 0 -.25rem .55rem rgba(255,255,255,.4),
     0 .5rem .7rem rgba(11,44,99,.2), 0 .28rem .28rem -.2rem rgba(11,44,99,.7); }
-.nav-cta.pearl:focus-visible { outline: 2px solid #FFCC00; outline-offset: 3px; }
-@media (prefers-reduced-motion: reduce) { .nav-cta.pearl, .nav-cta.pearl .pearl-p, .nav-cta.pearl .pearl-wrap::before, .nav-cta.pearl .pearl-wrap::after { transition: none; } }
+:is(.nav-cta, .lg-submit).pearl:focus-visible { outline: 2px solid #FFCC00; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { :is(.nav-cta, .lg-submit).pearl, :is(.nav-cta, .lg-submit).pearl .pearl-p, :is(.nav-cta, .lg-submit).pearl .pearl-wrap::before, :is(.nav-cta, .lg-submit).pearl .pearl-wrap::after { transition: none; } }
 
 /* ============ THE PAGE ARRIVES WHOLE ============
    Nothing waits to be scrolled to: every section, card, chart, heading and number is in its
@@ -5417,3 +5406,22 @@ input[type=range]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px #10141
   .lg-brand::before { inset: 0; background: linear-gradient(180deg, rgba(11,44,99,.15) 0%, rgba(11,44,99,.4) 45%, rgba(7,28,68,.92) 100%), url('/img/hero/slide-1.jpg') 60% 22% / cover no-repeat;
     -webkit-mask-image: none; mask-image: none; }
 }
+
+/* ============ LOG IN: THE FORM ============
+   Centred, without a label above it or the demonstration accounts. "Welcome back" and the field
+   labels are in the label face (Righteous standing in for Marvin Visions); the button is the same
+   navy pearl as Get Started, full width. The navy panel runs straight into the footer: no white
+   gap between them. */
+.lg-card { text-align: center; }
+.lg-card h1 { margin: 0 0 .45rem; font-family: var(--font-label); font-weight: 400; font-size: 2.3rem; letter-spacing: .02em; }
+.lg-sub, .lg-alt, .lg-err { text-align: center; }
+.lg-alert { justify-content: center; text-align: left; }
+.lg-field label { font-family: var(--font-label); font-weight: 400; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: #2B2F36; }
+.lg-field input { text-align: left; }
+.lg-submit.pearl { display: block; width: 100%; height: auto; margin-top: .6rem; padding: 0; overflow: visible; color: #fff; }
+.lg-submit.pearl::after { display: none; }
+.lg-submit.pearl .pearl-wrap { padding: 1.05rem 1.4rem; font-size: .8rem; letter-spacing: .14em; }
+.lg-submit.pearl .pearl-p { justify-content: center; gap: .6rem; }
+.lg-submit.pearl:disabled { cursor: progress; }
+.lg-submit.pearl .lg-spin { width: 14px; height: 14px; }
+body:has(.lg-brand) .footer-dh { margin-top: 0; }

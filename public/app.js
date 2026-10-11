@@ -1205,15 +1205,6 @@
       submit.classList.add('is-busy'); submit.disabled = true;
       qs('.lg-submit-t', submit).textContent = 'Signing in';
     });
-    // the demonstration accounts fill the form
-    qsa('[data-fill-email]', root).forEach(function (b) {
-      b.addEventListener('click', function () {
-        email.value = b.dataset.fillEmail; pass.value = b.dataset.fillPass;
-        fieldError(email, false); fieldError(pass, false);
-        [email, pass].forEach(function (i) { i.classList.remove('is-filled'); void i.offsetWidth; i.classList.add('is-filled'); });
-        submit.focus();
-      });
-    });
     // the brand panel's grid: a few cells light and fade at a time
     var cells = qsa('.lg-cells i', root);
     if (REDUCE || !cells.length) return;

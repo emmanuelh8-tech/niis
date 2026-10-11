@@ -4253,14 +4253,9 @@ exports.careerApply = (ctx, { role, counties = [], errors = [], values = {}, fai
 };
 
 // ============ AUTH ============
-// Log in: the national seal and what the workspace holds on a navy panel (its grid cells light up
-// one by one), the form on the right. The demonstration accounts fill the form with one tap.
+// Log in: the President's photo, the national seal and one line on a navy panel (its grid cells
+// light up one by one) that runs into the footer; the form, centred, on the right.
 // Logic: app.js, initLogin.
-const DEMO_ACCOUNTS = [
-  ['Administrator', 'admin@nictd.gov.lr', 'Admin!2026'],
-  ['Stakeholder', 'stakeholder@partner.org', 'Stake!2026'],
-  ['Researcher', 'researcher@example.com', 'Research!2026'],
-];
 exports.login = (ctx, { error }) => publicLayout(ctx, {
   title: 'Log In', body: `
   <section class="lg">
@@ -4276,7 +4271,6 @@ exports.login = (ctx, { error }) => publicLayout(ctx, {
     </div>
     <div class="lg-side">
       <div class="lg-card">
-        ${eyebrow('Log in')}
         <h1>Welcome back</h1>
         <p class="lg-sub">Use the email your account was created with.</p>
         <div class="lg-alert" role="alert"${error ? '' : ' hidden'}>${icon('info')}<span>${esc(error || '')}</span></div>
@@ -4294,19 +4288,9 @@ exports.login = (ctx, { error }) => publicLayout(ctx, {
             </div>
             <p class="lg-err" data-for="lg-pass" hidden>Enter your password.</p>
           </div>
-          <button class="lg-submit" type="submit"><span class="lg-submit-t">Log in</span><span class="lg-spin" aria-hidden="true"></span><i aria-hidden="true">${icon('arrow')}</i></button>
+          <button class="lg-submit pearl" type="submit"><span class="pearl-wrap"><span class="pearl-p"><span class="lg-submit-t">Log in</span><span class="lg-spin" aria-hidden="true"></span></span></span></button>
         </form>
         <p class="lg-alt">No account yet? <a href="/register">Request access</a></p>
-        <details class="lg-demo">
-          <summary><span>Demonstration accounts</span>${icon('chevron')}</summary>
-          <ul>
-            ${DEMO_ACCOUNTS.map(([role, email, pass]) => `<li>
-              <span class="lg-demo-who"><b>${role}</b><code>${esc(email)}</code><code>${esc(pass)}</code></span>
-              <button type="button" class="ui-chip" data-fill-email="${esc(email)}" data-fill-pass="${esc(pass)}">Use</button>
-            </li>`).join('')}
-          </ul>
-          <p>All 50 accounts: <code>docs/USER-CREDENTIALS.md</code></p>
-        </details>
       </div>
     </div>
   </section>

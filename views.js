@@ -183,7 +183,7 @@ const LOCAL_FONTS = (() => {
 })();
 const FONT_HEAD = `<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,400..900;1,400..700&family=Public+Sans:ital,wght@0,300..900;1,400..700&family=Righteous&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">${LOCAL_FONTS}`;
+<link href="https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,400..900;1,400..700&family=Public+Sans:ital,wght@0,300..900;1,400..700&family=Righteous&family=Source+Serif+4:opsz,wght@8..60,400..700&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">${LOCAL_FONTS}`;
 const FAVICON = `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(sealLogo(32))}">`;
 
 // ---------- shared shell pieces ----------
@@ -2867,95 +2867,52 @@ function riseWords(text, inner = 'rw-in') {
     .map((w, i) => `<span class="rw"><span class="${inner}" style="--i:${i}">${esc(w)}</span></span>`).join(' ');
 }
 
-// ============ NEWS & NOTICES (/updates) ============
-// Every update in the record, newest first. Each entry is ruled into the record and then written
-// as it scrolls in; its title (and photo) open the update's own page.
-const UPD_KINDS = [['news', 'News'], ['announcement', 'Announcements'], ['data_refresh', 'Data refresh']];
+// ============ NEWS & UPDATES (/updates) ============
+// In the format of the BBC News front page (the owner's reference): the newest update leads, a
+// full-width photograph over a large serif headline (a red "Latest" marker in front) and its
+// summary; under a rule, every other update is a row, a thumbnail beside a serif headline with
+// "3 days ago | Category" beneath. Updates carry a date, not a time, so the age is told in days.
+function updAgo(d) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(d || ''));
+  if (!m) return '';
+  const day = Date.UTC(+m[1], +m[2] - 1, +m[3]), now = new Date();
+  const n = Math.round((Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) - day) / 864e5);
+  if (n <= 0) return 'Today';
+  if (n === 1) return '1 day ago';
+  if (n < 7) return `${n} days ago`;
+  // within the year the day and month say it; older updates carry the year too
+  return `${+m[3]} ${UPD_MONTHS[+m[2] - 1]}${+m[1] === now.getUTCFullYear() ? '' : ' ' + m[1]}`;
+}
 exports.updates = (ctx, items) => {
-  const count = (c) => items.filter((u) => (u.category || 'news') === c).length;
-  const kinds = UPD_KINDS.filter(([c]) => count(c) > 0);
-  const filter = items.length > 1 && kinds.length > 1
-    ? `<div class="nn-filter" role="group" aria-label="Show updates by kind">
-        <button type="button" data-kind="" aria-pressed="true">All <span>${items.length}</span></button>
-        ${kinds.map(([c, label]) => `<button type="button" data-kind="${esc(c)}" aria-pressed="false">${esc(label)} <span>${count(c)}</span></button>`).join('')}
-      </div>` : '';
-  const entries = items.map((u, i) => {
-    const slug = updateSlug(u);
-    const href = '/updates/' + slug;
-    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(u.published_on || ''));
+  const meta = (u) => {
     const demo = STAT_FIGURE.test(String(u.title || '') + ' ' + String(u.body || ''));
-    return `<li class="nn-entry" data-kind="${esc(u.category || 'news')}" id="${updateAnchor(u)}" style="view-transition-name:nn-entry-${i}; view-transition-class:nn-entry">
-        <span class="nn-rule" aria-hidden="true"></span>
-        <article class="nn-art" aria-labelledby="nn-${esc(slug)}">
-          <div class="nn-rail">
-            <time class="nn-date" datetime="${m ? `${m[1]}-${m[2]}-${m[3]}` : ''}"><span class="nn-mask"><span class="nn-day">${m ? +m[3] : ''}</span></span> <span class="nn-my">${m ? `${UPD_MONTHS[+m[2] - 1]} ${m[1]}` : ''}</span></time>
-            <span class="nn-kind">${esc(updCategory(u.category))}</span>
-          </div>
-          <div class="nn-text">
-            <h2 class="nn-h"><a href="${esc(href)}" id="nn-${esc(slug)}" aria-label="${esc(String(u.title || ''))}">${riseWords(u.title, 'nw-in')}</a></h2>
-            <p class="nn-body">${esc(String(u.body || ''))}</p>
-            <p class="nn-foot">${demo ? `<span class="nn-demo">${icon('info')} Demonstration figures</span>` : ''}<a class="nn-read" href="${esc(href)}" tabindex="-1" aria-hidden="true">Read update ${icon('arrow')}</a></p>
-          </div>
-          <a class="nn-photo" href="${esc(href)}" tabindex="-1" aria-hidden="true"><img src="${esc(updPhoto(items, i))}" alt="" width="1200" height="675" loading="${i < 3 ? 'eager' : 'lazy'}" decoding="async"></a>
-        </article>
-      </li>`;
-  }).join('');
-  return shell(ctx, {
-    title: 'News & notices', body: `
-  <div class="nn wrap" id="newsNotices">
-    <nav class="upd-crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">News &amp; notices</span></nav>
-    <header class="nn-head">
-      <h1 class="nn-title" aria-label="News &amp; notices"><span aria-hidden="true">${riseWords('News & notices')}</span></h1>
-      <div class="nn-intro">
-        <p class="nn-lede">News, data refresh notices and project announcements.</p>
-        ${items.length ? `<p class="nn-count">${items.length} ${items.length === 1 ? 'update' : 'updates'} · latest ${esc(updDate(items[0].published_on))}</p>` : ''}
+    const iso = (/^(\d{4}-\d{2}-\d{2})/.exec(String(u.published_on || '')) || [])[1] || '';
+    return `<span class="bbc-meta"><time datetime="${iso}">${esc(updAgo(u.published_on))}</time><span class="bbc-sep" aria-hidden="true"></span><span>${esc(updCategory(u.category))}</span>${demo ? `<span class="bbc-sep" aria-hidden="true"></span><span title="Demonstration figures">Demo data</span>` : ''}</span>`;
+  };
+  const lead = items[0];
+  const leadHtml = lead ? `<article class="bbc-lead" aria-labelledby="bbc-lead-h">
+      <a class="bbc-lead-img" href="/updates/${esc(updateSlug(lead))}" tabindex="-1" aria-hidden="true"><img src="${esc(updPhoto(items, 0))}" alt="" width="1200" height="675" decoding="async"></a>
+      <div class="bbc-lead-in">
+        <h2 class="bbc-lead-h" id="bbc-lead-h"><a href="/updates/${esc(updateSlug(lead))}"><span class="bbc-flag"><i aria-hidden="true"></i>Latest</span> ${esc(String(lead.title || ''))}</a></h2>
+        <p class="bbc-lead-p">${esc(String(lead.body || ''))}</p>
+        ${STAT_FIGURE.test(String(lead.title || '') + ' ' + String(lead.body || '')) ? meta(lead) : ''}
       </div>
-    </header>
-    ${filter}
-    ${items.length ? `<ol class="nn-list">${entries}</ol>` : '<p class="nn-empty">No updates have been published yet.</p>'}
-  </div>
-  <script>${newsNoticesScript}</script>`,
+    </article>` : '';
+  const rows = items.slice(1).map((u, k) => `<li class="bbc-item" id="${updateAnchor(u)}">
+        <a class="bbc-row" href="/updates/${esc(updateSlug(u))}">
+          <span class="bbc-thumb"><img src="${esc(updPhoto(items, k + 1))}" alt="" width="480" height="270" loading="${k < 4 ? 'eager' : 'lazy'}" decoding="async"></span>
+          <span class="bbc-txt"><span class="bbc-h">${esc(String(u.title || ''))}</span>${meta(u)}</span>
+        </a>
+      </li>`).join('');
+  return shell(ctx, {
+    title: 'News & Updates', body: `
+  <div class="bbc" id="newsNotices">
+    <h1 class="sr-only">News &amp; Updates</h1>
+    ${items.length ? `${leadHtml}
+    ${rows ? `<ol class="bbc-list">${rows}</ol>` : ''}` : '<p class="bbc-empty">No updates have been published yet.</p>'}
+  </div>`,
   });
 };
-// Rules each entry into the record as it scrolls in, and filters by kind (inside a view
-// transition where the browser has one, so the list closes up smoothly).
-const newsNoticesScript = `
-(function(){
-  var root=document.getElementById('newsNotices'); if(!root) return;
-  var entries=[].slice.call(root.querySelectorAll('.nn-entry'));
-  if(root.classList.contains('is-armed')){
-    root.setAttribute('data-live','');
-    var batch=0, flush=null;
-    var io=new IntersectionObserver(function(list){
-      list.forEach(function(e){
-        if(!e.isIntersecting) return;
-        io.unobserve(e.target);
-        e.target.style.setProperty('--d', Math.min(batch++, 3)*110+'ms');
-        e.target.classList.add('is-in');
-        setTimeout(function(t){ t.classList.add('is-done'); }, 2400, e.target);   // then hover answers at once
-      });
-      clearTimeout(flush); flush=setTimeout(function(){ batch=0; }, 200);
-    },{ rootMargin:'0px 0px -8% 0px', threshold:0.12 });
-    entries.forEach(function(el){ io.observe(el); });
-  }
-  var buttons=[].slice.call(root.querySelectorAll('.nn-filter button'));
-  buttons.forEach(function(b){
-    b.addEventListener('click',function(){
-      var kind=b.getAttribute('data-kind');
-      var apply=function(){
-        buttons.forEach(function(x){ x.setAttribute('aria-pressed', String(x===b)); });
-        entries.forEach(function(el){
-          var show=!kind || el.getAttribute('data-kind')===kind;
-          el.hidden=!show; if(show) el.classList.add('is-in','is-done');
-        });
-      };
-      // a transition the browser skips (tab hidden, a second click mid-way) still applies the filter
-      if(document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches){ var t=document.startViewTransition(apply); if(t&&t.ready) t.ready.catch(function(){}); }
-      else apply();
-    });
-  });
-})();`;
-
 // ============ ONE UPDATE ============
 // The page an ICT News & Updates entry opens: a dated entry in NIIS's record, read like a changelog.
 // The date holds a rail of its own beside the entry; the record underneath lists every update

@@ -5752,3 +5752,55 @@ a.lg-submit.pearl { text-decoration: none; }
   .tl-swipe { display: flex; align-items: center; justify-content: flex-start; gap: .3rem; margin: .6rem .2rem 0; font-size: .75rem; font-weight: 600; color: #4A5160; }
   .tl-swipe .icn { width: 14px; height: 14px; }
 }
+
+/* ============ NEWS & UPDATES, IN THE BBC NEWS FORMAT ============
+   After the BBC News front page the owner chose: white, near-black text, a serif close to BBC Reith
+   Serif (Source Serif 4) for headlines and the summary, a plain sans for the meta line, BBC red for
+   the marker. The lead runs a full-width photograph; the rest are rows under a dark rule, a 16:9
+   thumbnail beside the headline, hairlines between. Numbers here stay in the text faces, as the
+   reference has them. */
+html:has(.bbc) { background-image: none; background-color: #fff; }
+.bbc { --bbc-ink: #141414; --bbc-grey: #545658; --bbc-line: #E6E8EA; --bbc-red: #B80000;
+  --bbc-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif; --bbc-sans: 'Public Sans', 'Helvetica Neue', Arial, sans-serif;
+  max-width: 840px; margin: 0 auto; padding: 0 0 3rem; background: #fff; color: var(--bbc-ink); }
+.bbc a { color: inherit; text-decoration: none; }
+/* the lead */
+.bbc-lead-img { display: block; }
+.bbc-lead-img img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: #EEF0F2; }
+.bbc-lead-in { padding: 1.4rem 15px 0; }
+.bbc-lead-h { margin: 0; font: 600 2.25rem/1.15 var(--bbc-serif); letter-spacing: -.005em; color: var(--bbc-ink); text-align: left; hyphens: manual; }
+.bbc-lead-h a:hover, .bbc-lead-h a:focus-visible { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.bbc-flag { display: inline-flex; align-items: center; gap: .18em; margin-right: .12em; font-family: var(--bbc-sans); font-weight: 700; text-transform: uppercase; letter-spacing: -.01em; color: var(--bbc-red); }
+.bbc-flag i { position: relative; width: .74em; height: .74em; border: .1em solid var(--bbc-red); border-radius: 50%; }
+.bbc-flag i::after { content: ''; position: absolute; inset: .12em; border-radius: 50%; background: var(--bbc-red); }
+.bbc-lead-p { margin: .9rem 0 0; font: 400 1.125rem/1.4 var(--bbc-serif); color: var(--bbc-ink); text-align: left; hyphens: manual;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+/* the rows */
+.bbc-list { margin: 2.6rem 15px 0; padding: 0; list-style: none; border-top: 1px solid var(--bbc-grey); }
+.bbc-item { margin: 0; text-align: left; border-bottom: 1px solid var(--bbc-line); }
+.bbc-row { display: grid; grid-template-columns: minmax(0, 36%) minmax(0, 1fr); gap: 1rem; align-items: start; padding: 1.4rem 0; }
+.bbc-thumb img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: #EEF0F2; }
+.bbc-txt { display: grid; gap: 1rem; min-width: 0; }
+.bbc-h { font: 600 1.5rem/1.2 var(--bbc-serif); color: var(--bbc-ink); }
+.bbc-row:hover .bbc-h, .bbc-row:focus-visible .bbc-h { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.bbc-row:focus-visible { outline: 2px solid var(--bbc-ink); outline-offset: 4px; }
+.bbc-meta { display: flex; flex-wrap: wrap; align-items: center; row-gap: .35rem; white-space: nowrap; margin-top: .2rem; font: 400 .95rem/1.2 var(--bbc-sans); color: var(--bbc-grey); }
+.bbc-lead-in .bbc-meta { margin-top: 1rem; }
+.bbc-sep { width: 1px; height: 1.25em; margin: 0 .75rem; background: var(--bbc-grey); }
+.bbc-empty { padding: 3rem 15px; font: 400 1.1rem var(--bbc-serif); color: var(--bbc-grey); }
+@media (min-width: 841px) {
+  .bbc { padding-top: 1.6rem; }
+  .bbc-lead-in, .bbc-list { padding-left: 0; padding-right: 0; margin-left: 0; margin-right: 0; }
+  .bbc-lead-h { font-size: 2.6rem; }
+  .bbc-row { grid-template-columns: 240px minmax(0, 1fr); gap: 1.4rem; }
+}
+@media (max-width: 640px) {
+  .bbc-lead-h { font-size: 1.75rem; line-height: 1.17; }
+  .bbc-lead-p { font-size: 1.05rem; }
+  .bbc-list { margin-top: 2.2rem; }
+  .bbc-row { gap: .9rem; padding: 1.25rem 0; }
+  .bbc-h { font-size: 1.25rem; line-height: 1.2; }
+  .bbc-txt { gap: .8rem; }
+  .bbc-meta { font-size: .82rem; }
+  .bbc-sep { margin: 0 .5rem; }
+}

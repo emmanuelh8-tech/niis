@@ -3625,9 +3625,9 @@ const LAPTOP = `<svg class="tc-laptop" viewBox="0 0 48 34" aria-hidden="true">
   <rect x="1.5" y="25.3" width="45" height="1.7" rx=".85" fill="#C7CCD3"/>
   <path d="M19.5 26.2h9l-.7 1.3h-7.6z" fill="#8A9099"/>
 </svg>`;
-// National ICT Patrons: individuals who support ICT in Liberia; each card names their cause. Sample profiles
-// (the owner asked for mock patrons), with AI-generated portraits in public/img/patrons of people
-// who do not exist; the page says so.
+// National ICT System Patrons: people who support ICT in Liberia. The first four are real (below);
+// the rest are sample profiles (the owner asked for mock patrons), with AI-generated portraits in
+// public/img/patrons of people who do not exist; the page says so.
 // The first four are the patrons the owner has named, with what the Executive Mansion, the Ministry
 // of Foreign Affairs and the press record, or (Director Burphy) what the owner gave: no social links,
 // nothing that sources disagree on. The rest are sample profiles. Photographs: the President's from
@@ -3754,7 +3754,7 @@ exports.team = (ctx) => {
   ${pageHeader('team', 'Our Team', 'The people who collect, check and publish Liberia’s ICT data.')}
   <div class="tm">
     ${studio({ id: 'pc', kind: 'patron', list: PATRONS, folder: 'patrons', mark: MEDAL, words: ['Our', 'patrons'], extra: 'is-patrons', anchor: 'patrons',
-      title: 'National ICT<br>Patrons.', label: 'Patrons', note: 'The first four are the patrons named so far; the others are sample profiles with AI-generated placeholder photos.' })}
+      title: 'National ICT System<br>Patrons', label: 'Patrons', note: 'The first four are the patrons named so far; the others are sample profiles with AI-generated placeholder photos.' })}
 
     ${studio({ id: 'tc', kind: 'team', list: TEAM_MEMBERS, folder: 'team', mark: LAPTOP, words: ['Who', 'we', 'are'],
       title: 'The people<br>behind NIIS.', label: 'Team members', note: 'Sample profiles with AI-generated placeholder photos, shown until appointments are confirmed.' })}

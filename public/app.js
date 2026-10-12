@@ -1006,7 +1006,7 @@
     var tpl = qs('#pmSocial'), cur = null, from = null, hideT = 0;
     var KIND = {
       team: function () { return 'NIIS team'; },
-      patron: function () { return 'National ICT Patron'; },
+      patron: function () { return 'National ICT System Patron'; },
       talent: function (p) { return 'ICT talent · ' + p.field + ' · ' + p.county; },
     };
     function li(text) { var l = document.createElement('li'); l.textContent = text; return l; }

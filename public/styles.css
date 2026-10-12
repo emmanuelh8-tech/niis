@@ -5031,7 +5031,7 @@ button.skip:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px;
 /* ============ NATIONAL ICT PATRONS ============
    The team's studio cards on a slightly deeper grey; each card names whether the person is an
    ambassador or a patron. */
-.tc.is-patrons { margin-top: 1.4rem; }
+.tc + .tc { margin-top: 1.4rem; }   /* the patrons come first, the team after them */
 .tc.is-patrons .tc-panel { background: #E2E5EA; }
 .tc.is-patrons .tc-card:focus-visible { box-shadow: 0 0 0 3px #E2E5EA, 0 0 0 5px #464B53; }
 .tc-badge { position: absolute; top: 8px; left: 8px; z-index: 1; max-width: calc(100% - 16px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: .24rem .58rem; border-radius: 999px; background: var(--gold); font: 700 .58rem/1.2 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: #fff; transition: opacity .3s; }

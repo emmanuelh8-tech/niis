@@ -3753,11 +3753,11 @@ exports.team = (ctx) => {
     title: 'Our Team', active: '/about/team', workspaceActive: 'about', body: `
   ${pageHeader('team', 'Our Team', 'The people who collect, check and publish Liberia’s ICT data.')}
   <div class="tm">
-    ${studio({ id: 'tc', kind: 'team', list: TEAM_MEMBERS, folder: 'team', mark: LAPTOP, words: ['Who', 'we', 'are'],
-      title: 'The people<br>behind NIIS.', label: 'Team members', note: 'Sample profiles with AI-generated placeholder photos, shown until appointments are confirmed.' })}
-
     ${studio({ id: 'pc', kind: 'patron', list: PATRONS, folder: 'patrons', mark: MEDAL, words: ['Our', 'patrons'], extra: 'is-patrons', anchor: 'patrons',
       title: 'National ICT<br>Patrons.', label: 'Patrons', note: 'The first four are the patrons named so far; the others are sample profiles with AI-generated placeholder photos.' })}
+
+    ${studio({ id: 'tc', kind: 'team', list: TEAM_MEMBERS, folder: 'team', mark: LAPTOP, words: ['Who', 'we', 'are'],
+      title: 'The people<br>behind NIIS.', label: 'Team members', note: 'Sample profiles with AI-generated placeholder photos, shown until appointments are confirmed.' })}
 
     <section class="tp wrap" id="talent" aria-labelledby="tp-h">
       <div class="tp-panel">

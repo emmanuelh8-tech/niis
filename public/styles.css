@@ -5593,3 +5593,6 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
 .m-pol-meta, .m-polbox-meta, .lsc-nat i, .lsc-natnote i, .lsc-an-pair label, .ui-eyebrow, .ui-k, .ui-stats dt, .ic-rail-h, .ic-flag,
 .ic-sheet-cat, .ic-facts dt, .ic-method li span, .qb-table th, .rx-tag, .tc-eyebrow b, .tc-name, .tc-bio-head b, .tp-eyebrow, .tp-field,
 .pm-kind, .pm-sec h3, .tc-badge, .pg-date span, .pg-facts dt { font-family: var(--font-label); font-weight: 400; }
+
+/* the profile hides an empty section (a patron with no education on record) and the social links of a real person */
+.pm-sec[hidden], .pm-social[hidden] { display: none; }

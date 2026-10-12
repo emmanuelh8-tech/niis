@@ -1006,7 +1006,7 @@
     var tpl = qs('#pmSocial'), cur = null, from = null, hideT = 0;
     var KIND = {
       team: function () { return 'NIIS team'; },
-      patron: function (p) { return 'National ICT Patron · ' + p.badge; },
+      patron: function () { return 'National ICT Patron'; },
       talent: function (p) { return 'ICT talent · ' + p.field + ' · ' + p.county; },
     };
     function li(text) { var l = document.createElement('li'); l.textContent = text; return l; }
@@ -1027,11 +1027,14 @@
         l.children[0].textContent = x[0]; l.children[1].textContent = x[1]; l.children[2].textContent = x[2];
         exp.appendChild(l);
       });
+      edu.closest('.pm-sec').hidden = !(p.edu && p.edu.length);
+      exp.closest('.pm-sec').hidden = !(p.exp && p.exp.length);
       var sk = qs('.pm-skills', pm); sk.innerHTML = '';
       (p.skills || []).forEach(function (t) { sk.appendChild(li(t)); });
       qs('[data-pm-skills]', pm).hidden = !(p.skills && p.skills.length);
       var soc = qs('.pm-social', pm);
-      soc.innerHTML = tpl.innerHTML;
+      soc.innerHTML = p.real ? '' : tpl.innerHTML;
+      soc.hidden = !!p.real;
       qsa('a', soc).forEach(function (a) { a.setAttribute('aria-label', p.name + a.getAttribute('aria-label')); });
       qs('.pm-count', pm).textContent = (i + 1) + ' / ' + list.length;
       qs('.pm-body', pm).scrollTop = 0; qs('.pm-in', pm).scrollTop = 0;

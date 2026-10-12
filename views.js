@@ -3628,36 +3628,40 @@ const LAPTOP = `<svg class="tc-laptop" viewBox="0 0 48 34" aria-hidden="true">
 // National ICT Patrons: individuals who support ICT in Liberia; each card names their cause. Sample profiles
 // (the owner asked for mock patrons), with AI-generated portraits in public/img/patrons of people
 // who do not exist; the page says so.
+// The first three are the patrons the owner has named, with what the Executive Mansion, the Ministry
+// of Foreign Affairs and the press record (no social links, nothing that sources disagree on); the
+// rest are sample profiles. Photographs: the President's from the Executive Mansion (the home slider);
+// the Vice President's and the Charge d'Affaires' are initials until real ones are sent.
 const PATRONS = [
-  { name: 'Dr. Miatta Gbanyan', img: 'miatta-gbanyan', role: 'Patron, Girls in ICT', badge: 'Girls in ICT',
-    bio: 'Champions digital skills for girls and women in all 15 counties.',
-    edu: ['PhD Education Technology, University of Cape Town', 'BA Education, University of Liberia'],
-    exp: [['Patron, Girls in ICT', 'NIIS', '2026 to now'], ['Director of digital learning', 'National education programme', '2015 to 2025'], ['Lecturer', 'University of Liberia', '2005 to 2015']] },
-  { name: 'Augustus Barkpor', img: 'augustus-barkpor', role: 'Patron, Diaspora Tech Network', badge: 'Diaspora tech',
-    bio: 'Connects Liberian engineers abroad with projects at home.',
-    edu: ['MSc Computer Engineering', 'BSc Physics, University of Liberia'],
-    exp: [['Patron, Diaspora Tech Network', 'NIIS', '2026 to now'], ['Engineering manager', 'Software company, United States', '2010 to now']] },
-  { name: 'Hawa Sackor', img: 'hawa-sackor', role: 'Patron, Rural Connectivity', badge: 'Rural connectivity',
-    bio: 'Funds solar-powered internet points for rural schools.',
-    edu: ['MBA, University of Liberia'],
-    exp: [['Patron, Rural Connectivity', 'NIIS', '2026 to now'], ['Founder', 'Family business group, Monrovia', '1995 to now']] },
-  { name: 'Edwin Toweh', img: 'edwin-toweh', role: 'Patron, Startup Fund', badge: 'Startups',
+  { name: 'H.E. Joseph Nyuma Boakai, Sr.', img: 'joseph-boakai', role: 'President of the Republic of Liberia', real: true,
+    bio: 'President of Liberia since 22 January 2024, and Vice President from 2006 to 2018. At the Liberia Technology Summit 2026 he set out investment in digital infrastructure, connectivity and cybersecurity.',
+    edu: ['University of Liberia', 'Kansas State University, 1976'],
+    exp: [['President of the Republic of Liberia', 'Government of Liberia', '2024 to now'], ['Vice President of Liberia', 'Government of Liberia', '2006 to 2018'], ['Minister of Agriculture', 'Government of Liberia', 'From 1983'], ['Managing Director', 'Liberia Produce Marketing Corporation', 'From 1980']] },
+  { name: 'H.E. Jeremiah Kpan Koung', img: 'jeremiah-koung', role: 'Vice President of the Republic of Liberia', real: true,
+    bio: 'Vice President of Liberia since 22 January 2024, and President of the Senate. Earlier a Senator and a Representative for Nimba County.',
+    edu: ['BA Business Administration, Cuttington University'],
+    exp: [['Vice President of Liberia', 'Government of Liberia', '2024 to now'], ['Senator, Nimba County', 'Senate of Liberia', '2021 to 2024'], ['Representative, Nimba County District 1', 'House of Representatives', 'From 2012']] },
+  { name: 'Lahoucine Rahmouni', img: 'lahoucine-rahmouni', role: 'Chargé d’Affaires, Embassy of the Kingdom of Morocco in Liberia', real: true,
+    bio: 'Leads the Embassy of the Kingdom of Morocco in Monrovia as Chargé d’Affaires.',
+    edu: [],
+    exp: [['Chargé d’Affaires', 'Embassy of the Kingdom of Morocco, Monrovia', 'Now']] },
+  { name: 'Edwin Toweh', img: 'edwin-toweh', role: 'Patron, Startup Fund',
     bio: 'Backs early-stage Liberian tech startups with seed grants.',
     edu: ['BBA Finance, University of Liberia', 'Executive MBA'],
     exp: [['Patron, Startup Fund', 'NIIS', '2026 to now'], ['Managing partner', 'Investment firm, Monrovia', '2012 to now']] },
-  { name: 'Dr. Fatumata Jalloh', img: 'fatumata-jalloh', role: 'Patron, Digital Health', badge: 'Digital health',
+  { name: 'Dr. Fatumata Jalloh', img: 'fatumata-jalloh', role: 'Patron, Digital Health',
     bio: 'Advocates for digital patient records in county hospitals.',
     edu: ['MD, A.M. Dogliotti College of Medicine', 'MPH, University of Liberia'],
     exp: [['Patron, Digital Health', 'NIIS', '2026 to now'], ['Physician', 'County referral hospital', '2008 to now']] },
-  { name: 'Thomas Gweh', img: 'thomas-gweh', role: 'Patron, Coding Clubs', badge: 'Coding clubs',
+  { name: 'Thomas Gweh', img: 'thomas-gweh', role: 'Patron, Coding Clubs',
     bio: 'Sponsors after-school coding clubs in Montserrado and Bong.',
     edu: ['BSc Electrical Engineering, University of Liberia'],
     exp: [['Patron, Coding Clubs', 'NIIS', '2026 to now'], ['Chief executive', 'Engineering services company', '2005 to now']] },
-  { name: 'Christiana Nimely', img: 'christiana-nimely', role: 'Patron, Women in Tech', badge: 'Women in tech',
+  { name: 'Christiana Nimely', img: 'christiana-nimely', role: 'Patron, Women in Tech',
     bio: 'Mentors young women starting careers in ICT.',
     edu: ['BSc Computer Science, Cuttington University', 'Certificate in Entrepreneurship'],
     exp: [['Patron, Women in Tech', 'NIIS', '2026 to now'], ['Founder', 'Software studio, Monrovia', '2016 to now']] },
-  { name: 'Joseph Gbeh', img: 'joseph-gbeh', role: 'Patron, Open Data', badge: 'Open data',
+  { name: 'Joseph Gbeh', img: 'joseph-gbeh', role: 'Patron, Open Data',
     bio: 'Supports open public access to Liberia’s ICT statistics.',
     edu: ['MA Public Administration, University of Liberia'],
     exp: [['Patron, Open Data', 'NIIS', '2026 to now'], ['Civil servant', 'Public administration', '1985 to 2022']] },
@@ -3681,7 +3685,7 @@ exports.team = (ctx) => {
   const card = (kind, list, folder) => (m) => {
     const i = list.indexOf(m), src = `/img/${folder}/${m.img}.jpg?v=${ASSET_V}`;
     return `<article class="tc-card" data-person="${kind}" data-i="${i}" style="--k:${Math.min(i, 7)}" tabindex="0" role="button" aria-label="${esc(m.name)}, ${esc(m.role)}. Open profile">
-          <div class="tc-media"><img class="tc-photo" src="${src}" alt="" width="600" height="600" loading="lazy" decoding="async">${m.badge ? `<span class="tc-badge">${esc(m.badge)}</span>` : ''}</div>
+          <div class="tc-media"><img class="tc-photo" src="${src}" alt="" width="600" height="600" loading="lazy" decoding="async"></div>
           <div class="tc-info">
             <span class="tc-name">${esc(m.name)}</span>
             <span class="tc-role">${esc(m.role)}</span>
@@ -3692,7 +3696,7 @@ exports.team = (ctx) => {
               <span><b>${esc(m.name)}</b><em>${esc(m.role)}</em></span>
             </div>
             <p>${esc(m.bio)}</p>
-            <div class="tc-social">${socialLinks(m.name)}</div>
+            ${m.real ? '' : `<div class="tc-social">${socialLinks(m.name)}</div>`}
           </div>
         </article>`;
   };
@@ -3743,7 +3747,7 @@ exports.team = (ctx) => {
   // what the profile window shows
   const people = {
     team: TEAM_MEMBERS.map((m) => ({ name: m.name, role: m.role, img: `/img/team/${m.img}.jpg?v=${ASSET_V}`, bio: m.bio, ...(PERSON_MORE[m.name] || {}) })),
-    patron: PATRONS.map((m) => ({ name: m.name, role: m.role, badge: m.badge, img: `/img/patrons/${m.img}.jpg?v=${ASSET_V}`, bio: m.bio, edu: m.edu, exp: m.exp })),
+    patron: PATRONS.map((m) => ({ name: m.name, role: m.role, real: !!m.real, img: `/img/patrons/${m.img}.jpg?v=${ASSET_V}`, bio: m.bio, edu: m.edu, exp: m.exp })),
     talent: TALENTS.map((t) => ({ name: t.name, role: t.role, img: `/img/talent/${t.img}.jpg?v=${ASSET_V}`, bio: t.note, county: t.county, field: t.field, skills: t.skills, ...(PERSON_MORE[t.name] || {}) })),
   };
   return shell(ctx, {
@@ -3754,7 +3758,7 @@ exports.team = (ctx) => {
       title: 'The people<br>behind NIIS.', label: 'Team members', note: 'Sample profiles with AI-generated placeholder photos, shown until appointments are confirmed.' })}
 
     ${studio({ id: 'pc', kind: 'patron', list: PATRONS, folder: 'patrons', mark: MEDAL, words: ['Our', 'patrons'], extra: 'is-patrons', anchor: 'patrons',
-      title: 'National ICT<br>Patrons.', label: 'Patrons', note: 'Sample profiles with AI-generated placeholder photos.' })}
+      title: 'National ICT<br>Patrons.', label: 'Patrons', note: 'The first three are the patrons named so far (two photographs to follow); the others are sample profiles with AI-generated placeholder photos.' })}
 
     <section class="tp wrap" id="talent" aria-labelledby="tp-h">
       <div class="tp-panel">

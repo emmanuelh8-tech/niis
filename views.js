@@ -3811,10 +3811,9 @@ exports.team = (ctx) => {
 };
 
 // ============ PROGRAMS (/careers/programs) ============
-// What is coming up (as event tickets), trainings and bootcamps, and the work on film and in pictures.
-// The field trainings are the ones Careers describes; the events, the other bootcamps and their dates
-// are a sample schedule (the owner asked for the page before the calendar exists) and the page says so.
-// The films and photographs are the site's own media.
+// What is coming up, as event tickets: a sample schedule (the owner asked for the page before the
+// calendar exists) and the page says so. The trainings and bootcamps, the films and the photographs
+// are off the page for now (the owner's call); their lists below are kept for when they return.
 const PROGRAM_EVENTS = [
   { d: 22, m: 'Oct', y: 2026, kind: 'Webinar', title: 'NIIS Data Explorer walkthrough', place: 'Online', time: '10:00 GMT', img: '/img/about/analysts.jpg',
     body: 'A live tour of the Data Explorer, the Indicator Catalogue and the API, for researchers and journalists.' },
@@ -3916,10 +3915,9 @@ function eventTicket(e, i) {
         </li>`;
 }
 exports.programs = (ctx) => {
-  const status = (s) => `<span class="pg-status is-${s.toLowerCase().replace(/\s+/g, '-')}">${esc(s)}</span>`;
   return publicLayout(ctx, {
     title: 'Programs', active: '/careers/programs', body: `
-  ${pageHeader('programs', 'Programs', 'What is coming up, the trainings and bootcamps, and the work on film and in pictures.')}
+  ${pageHeader('programs', 'Programs', 'Trainings, workshops and open days coming up across the counties.')}
   <div class="pg">
     <section class="pg-sec wrap" aria-labelledby="pg-ev-h">
       <div class="pg-head is-center">
@@ -3932,64 +3930,8 @@ exports.programs = (ctx) => {
       <p class="pg-note">Sample schedule: the events and their dates are placeholders until the programme calendar is confirmed.</p>
     </section>
 
-    <section class="pg-sec wrap" aria-labelledby="pg-tr-h">
-      <div class="pg-head">
-        <div>${eyebrow('Learn with us')}<h2 id="pg-tr-h" data-rise-head>Trainings and bootcamps</h2></div>
-        <p>Field training opens with each county wave. The bootcamps grow the people who will run the system.</p>
-      </div>
-      <div class="pg-train">
-        ${PROGRAM_TRAININGS.map((t, i) => `<article class="pg-course" style="--k:${i}">
-          <div class="pg-course-top"><span class="tag">${esc(t.kind)}</span>${status(t.status)}</div>
-          <h3>${esc(t.title)}</h3>
-          <p>${esc(t.body)}</p>
-          <dl class="pg-facts">
-            <div><dt>Length</dt><dd><b>${t.len}</b> ${esc(t.unit)}</dd></div>
-            <div><dt>Where</dt><dd>${esc(t.where)}</dd></div>
-            <div><dt>For</dt><dd>${esc(t.who)}</dd></div>
-          </dl>
-          ${t.href ? `<a class="ui-btn" href="${t.href}">See the field roles ${icon('arrow')}</a>` : ''}
-        </article>`).join('')}
-      </div>
-      <p class="pg-note">The bootcamps and workshops are planned; their details are placeholders until each one opens.</p>
-    </section>
-
-    <section class="pg-sec wrap" aria-labelledby="pg-vid-h">
-      <div class="pg-head">
-        <div>${eyebrow('Watch')}<h2 id="pg-vid-h" data-rise-head>Videos</h2></div>
-        <p>The programme on film.</p>
-      </div>
-      <div class="pg-films">
-        ${PROGRAM_FILMS.map((f, i) => `<button type="button" class="pg-film" data-lb="film" data-i="${i}" aria-label="Play: ${esc(f.title)}">
-          <span class="pg-film-img" style="background-image:url('${f.poster}')"><i class="pg-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></i></span>
-          <span class="pg-film-t">${esc(f.title)}</span>
-          <span class="pg-film-b">${esc(f.body)}</span>
-        </button>`).join('')}
-      </div>
-    </section>
-
-    <section class="pg-sec wrap" aria-labelledby="pg-img-h">
-      <div class="pg-head">
-        <div>${eyebrow('In pictures')}<h2 id="pg-img-h" data-rise-head>Images</h2></div>
-        <p>The field, the data team and the network.</p>
-      </div>
-      <div class="pg-photos">
-        ${PROGRAM_PHOTOS.map(([src, alt], i) => `<button type="button" class="pg-photo" data-lb="photo" data-i="${i}" aria-label="View: ${esc(alt)}"><img src="${src}" alt="${esc(alt)}" loading="lazy" decoding="async"></button>`).join('')}
-      </div>
-    </section>
   </div>
-  <div class="lb-wrap" id="lbWrap" hidden>
-    <div class="lb-scrim" data-lb-close></div>
-    <div class="lb" role="dialog" aria-modal="true" aria-label="Viewer" tabindex="-1">
-      <button type="button" class="lb-x" data-lb-close aria-label="Close">${icon('x')}</button>
-      <div class="lb-stage"></div>
-      <div class="lb-foot">
-        <button type="button" class="skip" data-lb-step="-1" aria-label="Previous">${icon('chevrons', 'icn ui-flip')}</button>
-        <p class="lb-cap"></p>
-        <button type="button" class="skip" data-lb-step="1" aria-label="Next">${icon('chevrons')}</button>
-      </div>
-    </div>
-  </div>
-  <script>window.__NICTD_PAGE__='programs';window.__PROGRAM_MEDIA__=${JSON.stringify({ film: PROGRAM_FILMS, photo: PROGRAM_PHOTOS.map(([src, alt]) => ({ src, alt })) })};</script>`,
+  <script>window.__NICTD_PAGE__='programs';</script>`,
   });
 };
 

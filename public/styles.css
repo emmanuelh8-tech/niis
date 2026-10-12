@@ -5607,7 +5607,7 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
    The same glass orbs as the nav (see NAV ICONS: GLASS ORBS): each field's mark in a blue orb over
    its name and count. On hover the water fills the orb and the icon pops up and bobs; the chosen
    field's orb holds its water and its name turns navy. The orb itself never moves. */
-.tp-orbs { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1rem 1.5rem; margin-top: 1.6rem; }
+.tp-orbs { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: 1rem 1.5rem; margin-top: 1.6rem; }
 .tp-orb { display: flex; flex-direction: column; align-items: center; gap: .4rem; padding: 4px 2px 2px; border: 0; background: none; color: #17233A; font: inherit; cursor: pointer; }
 .tp-orb-l { font: 700 .72rem/1 var(--sans); letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; transition: color .15s ease; }
 .tp-orb-l b { margin-left: .15rem; font-weight: 600; opacity: .5; }

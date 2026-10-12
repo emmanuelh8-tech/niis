@@ -3628,10 +3628,10 @@ const LAPTOP = `<svg class="tc-laptop" viewBox="0 0 48 34" aria-hidden="true">
 // National ICT Patrons: individuals who support ICT in Liberia; each card names their cause. Sample profiles
 // (the owner asked for mock patrons), with AI-generated portraits in public/img/patrons of people
 // who do not exist; the page says so.
-// The first three are the patrons the owner has named, with what the Executive Mansion, the Ministry
-// of Foreign Affairs and the press record (no social links, nothing that sources disagree on); the
-// rest are sample profiles. Photographs: the President's from the Executive Mansion (the home slider);
-// the Vice President's and the Charge d'Affaires' as the owner sent them.
+// The first four are the patrons the owner has named, with what the Executive Mansion, the Ministry
+// of Foreign Affairs and the press record, or (Director Burphy) what the owner gave: no social links,
+// nothing that sources disagree on. The rest are sample profiles. Photographs: the President's from
+// the Executive Mansion (the home slider); the others as the owner sent them.
 const PATRONS = [
   { name: 'H.E. Joseph Nyuma Boakai, Sr.', img: 'joseph-boakai', role: 'President of the Republic of Liberia', real: true,
     bio: 'President of Liberia since 22 January 2024, and Vice President from 2006 to 2018. At the Liberia Technology Summit 2026 he set out investment in digital infrastructure, connectivity and cybersecurity.',
@@ -3645,10 +3645,9 @@ const PATRONS = [
     bio: 'Leads the Embassy of the Kingdom of Morocco in Monrovia as Chargé d’Affaires.',
     edu: [],
     exp: [['Chargé d’Affaires', 'Embassy of the Kingdom of Morocco, Monrovia', 'Now']] },
-  { name: 'Edwin Toweh', img: 'edwin-toweh', role: 'Patron, Startup Fund',
-    bio: 'Backs early-stage Liberian tech startups with seed grants.',
-    edu: ['BBA Finance, University of Liberia', 'Executive MBA'],
-    exp: [['Patron, Startup Fund', 'NIIS', '2026 to now'], ['Managing partner', 'Investment firm, Monrovia', '2012 to now']] },
+  { name: 'Director Jarsea Burphy', img: 'jarsea-burphy', role: 'Communications Pioneer', real: true,
+    bio: 'Director, and a pioneer in communications.',
+    edu: [], exp: [] },
   { name: 'Dr. Fatumata Jalloh', img: 'fatumata-jalloh', role: 'Patron, Digital Health',
     bio: 'Advocates for digital patient records in county hospitals.',
     edu: ['MD, A.M. Dogliotti College of Medicine', 'MPH, University of Liberia'],
@@ -3758,7 +3757,7 @@ exports.team = (ctx) => {
       title: 'The people<br>behind NIIS.', label: 'Team members', note: 'Sample profiles with AI-generated placeholder photos, shown until appointments are confirmed.' })}
 
     ${studio({ id: 'pc', kind: 'patron', list: PATRONS, folder: 'patrons', mark: MEDAL, words: ['Our', 'patrons'], extra: 'is-patrons', anchor: 'patrons',
-      title: 'National ICT<br>Patrons.', label: 'Patrons', note: 'The first three are the patrons named so far; the others are sample profiles with AI-generated placeholder photos.' })}
+      title: 'National ICT<br>Patrons.', label: 'Patrons', note: 'The first four are the patrons named so far; the others are sample profiles with AI-generated placeholder photos.' })}
 
     <section class="tp wrap" id="talent" aria-labelledby="tp-h">
       <div class="tp-panel">

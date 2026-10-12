@@ -2883,6 +2883,31 @@ function updAgo(d) {
   // within the year the day and month say it; older updates carry the year too
   return `${+m[3]} ${UPD_MONTHS[+m[2] - 1]}${+m[1] === now.getUTCFullYear() ? '' : ' ' + m[1]}`;
 }
+// The advertisers in the news page's side rails. Each runs its own campaign artwork from its own site
+// (public/img/ads, downloaded with the owner's approval) and only words those campaigns or sites use.
+const NEWS_ADS = {
+  orange: { name: 'Orange Liberia', href: 'https://www.orange.com.lr/', site: 'orange.com.lr',
+    h: 'Get access to AI without data', p: 'Just call Lorpu on 2026 or text LAD to 2026 to subscribe.' },
+  lonestar: { name: 'Lonestar Cell MTN', href: 'https://lonestarcell.com/', site: 'lonestarcell.com',
+    h: 'Y’ello to the MTN Nation', p: 'Yor thank you plenty. Here’s to you, the people who make 300 million possible.' },
+  arcelormittal: { name: 'ArcelorMittal Liberia', href: 'https://liberia.arcelormittal.com/', site: 'liberia.arcelormittal.com',
+    h: 'Smarter steels for people and planet', p: 'Our mining operations in Liberia prioritize safety.' },
+  globalpharm: { name: 'Global Pharm', href: 'https://gpmlafrica.com/', site: 'gpmlafrica.com',
+    h: 'Better Medicines for Better Healthcare.', p: 'Quality pharmaceutical products, made in Liberia.' },
+};
+function newsAd(key, k) {
+  const a = NEWS_ADS[key];
+  return `<div class="ad-slot">
+      <p class="ad-tag">Advertisement</p>
+      <a class="ad ad--${key}" style="--d:${k}" href="${a.href}" target="_blank" rel="sponsored noopener noreferrer" aria-label="Advertisement: ${esc(a.name)}, ${esc(a.h)}. Opens ${esc(a.site)}">
+        <span class="ad-brand"><i aria-hidden="true"></i>${esc(a.name)}</span>
+        <span class="ad-media"><img src="/img/ads/${key}.webp?v=${ASSET_V}" alt="" loading="lazy" decoding="async"></span>
+        <span class="ad-copy"><b class="ad-h">${esc(a.h)}</b><span class="ad-p">${esc(a.p)}</span></span>
+        <span class="ad-cta"><span>${esc(a.site)}</span>${icon('arrow')}</span>
+        <span class="ad-timer" aria-hidden="true"></span>
+      </a>
+    </div>`;
+}
 exports.updates = (ctx, items) => {
   const meta = (u) => {
     const demo = STAT_FIGURE.test(String(u.title || '') + ' ' + String(u.body || ''));
@@ -2906,10 +2931,14 @@ exports.updates = (ctx, items) => {
       </li>`).join('');
   return shell(ctx, {
     title: 'News & Updates', body: `
+  <div class="bbc-page">
+  <aside class="bbc-rail is-left" aria-label="Advertisements">${newsAd('orange', 0)}${newsAd('arcelormittal', 2)}</aside>
   <div class="bbc" id="newsNotices">
     <h1 class="sr-only">News &amp; Updates</h1>
     ${items.length ? `${leadHtml}
     ${rows ? `<ol class="bbc-list">${rows}</ol>` : ''}` : '<p class="bbc-empty">No updates have been published yet.</p>'}
+  </div>
+  <aside class="bbc-rail is-right" aria-label="Advertisements">${newsAd('lonestar', 1)}${newsAd('globalpharm', 3)}</aside>
   </div>`,
   });
 };

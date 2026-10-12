@@ -5804,3 +5804,61 @@ html:has(.bbc) { background-image: none; background-color: #fff; }
   .bbc-meta { font-size: .82rem; }
   .bbc-sep { margin: 0 .5rem; }
 }
+
+/* ============ NEWS & UPDATES: ADVERTISEMENTS IN THE SIDE RAILS ============
+   Two rails flank the news column on wide screens, two adverts in each, the second set down the
+   page. Each advert is labelled, links to the advertiser's own site, and moves: its campaign
+   artwork pans slowly across the window (so the whole flyer passes by), a sheen sweeps the card,
+   a timer bar fills along its foot and the arrow nudges. The four run out of step. On narrower
+   screens the adverts sit two to a row under the news. Still with reduced motion. */
+.bbc-page { display: grid; grid-template-columns: minmax(0, 1fr); background: #fff; }
+.bbc-page > .bbc { order: -1; width: 100%; }
+.bbc-rail { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.4rem 16px; width: 100%; max-width: 840px; margin: 0 auto 2.6rem; padding: 0 15px; }
+.ad-slot { display: grid; gap: .45rem; align-content: start; }
+.ad-tag { margin: 0; font: 600 .62rem/1 'Public Sans', Arial, sans-serif; letter-spacing: .16em; text-transform: uppercase; color: #8A8D91; text-align: center; }
+.ad { --bg: #000; --ink: #fff; --acc: #FF7900; --soft: rgba(255,255,255,.72);
+  position: relative; isolation: isolate; display: flex; flex-direction: column; overflow: hidden; border-radius: 4px; background: var(--bg); color: var(--ink);
+  text-decoration: none; box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 10px 24px -14px rgba(0,0,0,.45); transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s; }
+.ad:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(0,0,0,.1), 0 18px 34px -16px rgba(0,0,0,.5); text-decoration: none; }
+.ad:focus-visible { outline: 3px solid #0B2C63; outline-offset: 3px; }
+.ad-brand { display: flex; align-items: center; gap: .5rem; padding: .7rem .8rem .6rem; font: 800 .82rem/1.1 'Public Sans', Arial, sans-serif; letter-spacing: .01em; color: var(--ink); }
+.ad-brand i { flex: none; width: 14px; height: 14px; background: var(--acc); }
+.ad-media { position: relative; display: block; overflow: hidden; aspect-ratio: 16 / 10; background: rgba(127,127,127,.15); }
+.ad-media img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 0% 50%;
+  animation: adPan 13s ease-in-out calc(var(--d, 0) * -3.1s) infinite alternate, adZoom 13s ease-in-out calc(var(--d, 0) * -2.3s) infinite alternate; }
+.ad-copy { display: grid; gap: .4rem; padding: .8rem .8rem .2rem; }
+.ad-h { font: 700 1.02rem/1.2 'Source Serif 4', Georgia, serif; color: var(--ink); text-wrap: balance; }
+.ad-p { font: 400 .78rem/1.42 'Public Sans', Arial, sans-serif; color: var(--soft); }
+.ad-cta { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin: .7rem .8rem .95rem; padding: .55rem .7rem; border-radius: 3px;
+  background: var(--acc); color: var(--bg); font: 700 .72rem/1 'Public Sans', Arial, sans-serif; letter-spacing: .02em; overflow: hidden; }
+.ad-cta span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ad-cta .icn { flex: none; width: 14px; height: 14px; stroke-width: 2.4; animation: adNudge 2.4s ease-in-out calc(var(--d, 0) * -.6s) infinite; }
+.ad-timer { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--acc); transform-origin: left; animation: adTimer 6s linear calc(var(--d, 0) * -1.5s) infinite; }
+.ad::after { content: ''; position: absolute; inset: -40% auto -40% -60%; z-index: 2; width: 45%; pointer-events: none; transform: rotate(18deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent); animation: adSheen 6s ease-in-out calc(var(--d, 0) * -1.5s) infinite; }
+/* each advertiser in its own colours */
+.ad--orange { --bg: #000; --ink: #fff; --acc: #FF7900; --soft: rgba(255,255,255,.74); }
+.ad--lonestar { --bg: #FFCB05; --ink: #111; --acc: #111; --soft: rgba(17,17,17,.78); }
+.ad--lonestar .ad-cta { color: #FFCB05; }
+.ad--arcelormittal { --bg: #fff; --ink: #1E1E1E; --acc: #F37021; --soft: #55585C; border: 1px solid #E3E5E8; }
+.ad--arcelormittal .ad-cta { color: #fff; }
+.ad--arcelormittal::after { background: linear-gradient(90deg, transparent, rgba(243,112,33,.16), transparent); }
+.ad--globalpharm { --bg: #0B3E8C; --ink: #fff; --acc: #E8336D; --soft: rgba(255,255,255,.78); }
+.ad--globalpharm .ad-cta { color: #fff; }
+@keyframes adPan { from { object-position: 0% 50%; } to { object-position: 100% 50%; } }
+@keyframes adZoom { from { transform: scale(1); } to { transform: scale(1.07); } }
+@keyframes adTimer { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes adSheen { 0%, 55% { left: -60%; } 85%, 100% { left: 130%; } }
+@keyframes adNudge { 0%, 60%, 100% { transform: none; } 75% { transform: translateX(4px); } }
+/* wide screens: the rails beside the news column, the second advert of each set down the page */
+@media (min-width: 1260px) {
+  .bbc-page { grid-template-columns: minmax(0, 1fr) 190px minmax(0, 840px) 190px minmax(0, 1fr); column-gap: 26px; padding-top: 1.6rem; }
+  .bbc-page > .bbc { order: 0; grid-column: 3; grid-row: 1; padding-top: 0; }
+  .bbc-rail { grid-row: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 2.4rem; max-width: none; margin: 0 0 3rem; padding: 0; }
+  .bbc-rail.is-left { grid-column: 2; }
+  .bbc-rail.is-right { grid-column: 4; }
+  .ad-media { aspect-ratio: 4 / 5; }
+}
+@media (min-width: 1360px) { .bbc-page { grid-template-columns: minmax(0, 1fr) 215px minmax(0, 840px) 215px minmax(0, 1fr); } }
+@media (max-width: 520px) { .bbc-rail { gap: 1.1rem 10px; } .ad-h { font-size: .92rem; } .ad-p { font-size: .72rem; } .ad-brand { font-size: .74rem; } }
+@media (prefers-reduced-motion: reduce) { .ad, .ad *, .ad::after { animation: none !important; transition: none !important; } .ad-timer { transform: scaleX(1); } }

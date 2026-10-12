@@ -1660,7 +1660,7 @@ exports.landscape = (ctx, { indicators, meta, year, years, counties }) => shell(
   extraHead: `<script src="/assets/lsc-charts.js?v=${ASSET_V}" defer></script>
     <script src="/assets/landscape.js?v=${ASSET_V}" defer></script>`,
   body: `
-  ${pageHeader('data-landscape', 'Data Landscape', 'Every county as a tower. Height is the value, so you can see which counties lead and which are behind national, in one look.')}
+  ${pageHeader('data-landscape', 'Data Landscape')}
 
   <div class="sticky-selector dx-cmd dx-black lsc-cmd"><div class="wrap">
     <div class="selector-field"><label>Category</label>${xdd('dd-lsc-category', 'All categories')}</div>

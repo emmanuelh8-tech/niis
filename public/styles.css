@@ -5639,14 +5639,13 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
 .pg-head.is-center > p { margin: 0; font-family: var(--sans); font-weight: 400; text-align: center; hyphens: manual; }
 
 /* ============ SUBMIT A PAPER, IN THE LOG IN STYLE ============
-   The same two halves as Log In: a navy panel on the left (Cornelia W. Kruah's portrait, cut out of
-   the owner's poster to stand on the navy, fading at its foot, the seal, one line and the step tracker, which stays in view as the form scrolls)
+   The same two halves as Log In: a navy panel on the left (the Coat of Arms of Liberia, large, the seal, one line and the step tracker, which stays in view as the form scrolls)
    and the form centred on white on the right: the title in the label face, labels in capitals in
    the label face, one column, and the navy pearl button. The panel runs into the footer. */
 .sp2-wrap.sp-page { max-width: none; padding: 0; }
 .sp-brand { align-items: flex-start; padding-top: clamp(14rem, 34vh, 21rem); }
 .sp-brand::before { inset: 0 0 auto 0; height: min(640px, 74vh);
-  background: url('/img/submit/cornelia-kruah.webp') right 6% top 1.6rem / auto 92% no-repeat; }
+  background: url('/img/brand/seal-large.webp') center top 2.6rem / auto min(330px, 36vh) no-repeat; filter: drop-shadow(0 18px 30px rgba(3,12,32,.45)); }
 .sp-brand .lg-cells { bottom: auto; height: min(900px, 100%); }
 .sp-brand-in { position: sticky; top: calc(var(--nav-h, 76px) + 1.6rem); }
 .sp-rail { position: static; padding: 0; border: 0; border-radius: 0; background: none; text-shadow: none; }
@@ -5681,7 +5680,7 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
 .sp2-send.pearl .sp2-spin { width: 14px; height: 14px; }
 @media (max-width: 900px) {
   .sp-brand { min-height: 230px; padding-top: 1.4rem; align-items: flex-end; }
-  .sp-brand::before { inset: 0; height: auto; background: linear-gradient(180deg, rgba(7,28,68,0) 45%, rgba(7,28,68,.85) 100%), url('/img/submit/cornelia-kruah.webp') right 6% top .8rem / auto 112% no-repeat; }
+  .sp-brand::before { inset: 0; height: auto; background: url('/img/brand/seal-large.webp') right 7% center / auto 74% no-repeat; }
   .sp-brand-in { position: static; }
   .sp-side { padding: 2rem 1.2rem 6rem; }
 }
@@ -5886,3 +5885,9 @@ html:has(.bbc) { background-image: none; background-color: #fff; }
 /* a long name or address never widens a box: every advert keeps its column's width */
 .ad-slot { grid-template-columns: minmax(0, 1fr); }
 .ad-box, .ad { min-width: 0; width: 100%; }
+
+/* Submit a Paper: the form reads from the left (title, labels, help lines, the fine print); the
+   large seal above the panel's words stands in for the small one beside "NIIS" */
+.lg-card.sp-card, .sp-card h1, .sp-card .lg-sub, .sp-lg .sp2-field > label, .sp-lg .sp2-help, .sp-lg .sp2-err, .sp2-fine { text-align: left; }
+.sp-lg .sp2-under { justify-content: space-between; text-align: left; }
+.sp-brand .lg-seal img, .sp-brand .lg-seal svg { display: none; }

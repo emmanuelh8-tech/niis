@@ -3763,14 +3763,13 @@ exports.team = (ctx) => {
       <div class="tp-panel">
         <div class="tp-head">
           <div>
-            <p class="tp-eyebrow"><i aria-hidden="true"></i>Discovered across Liberia</p>
             <h2 id="tp-h" class="tp-title">National ICT <em>Talent Pool</em></h2>
             <p class="tp-lede">Young Liberians we have found building, designing and securing the country’s digital future.</p>
           </div>
         </div>
-        <div class="tp-chips" role="group" aria-label="Filter by field">
-          <button type="button" class="is-on" data-tp-field="" aria-pressed="true">All <b>${TALENTS.length}</b></button>
-          ${[...new Set(TALENTS.map((t) => t.field))].map((f) => `<button type="button" data-tp-field="${esc(f)}" aria-pressed="false">${esc(f)} <b>${TALENTS.filter((t) => t.field === f).length}</b></button>`).join('')}
+        <div class="tp-orbs" role="group" aria-label="Filter by field">
+          ${[['', 'All', 'layers', TALENTS.length], ...[...new Set(TALENTS.map((t) => t.field))].map((f) => [f, f, (FIELD_MARK[f] || ['sparkle'])[0], TALENTS.filter((t) => t.field === f).length])]
+            .map(([f, label, ic, n], k) => `<button type="button" class="tp-orb${k ? '' : ' is-on'}" data-tp-field="${esc(f)}" aria-pressed="${k ? 'false' : 'true'}"><span class="dock-ic"><i class="dock-water" aria-hidden="true"></i>${icon(ic)}</span><span class="tp-orb-l">${esc(label)} <b>${n}</b></span></button>`).join('')}
         </div>
         <div class="tl-cols" id="tlCols" role="region" aria-label="ICT talents">
           ${tlCols.map((rows) => `<ol class="tl-col">${rows}</ol>`).join('')}

@@ -236,7 +236,7 @@ function mainNav(active, q) {
   // [href, label, icon, submenu?, short label for the phone dock]
   const links = [
     ['/', 'Home', 'home', null, 'Home'],
-    ['/data', 'Data Explorer', 'bars', [['/indicators', 'Indicator Catalogue', 'bookopen'], ['/query', 'Data Query', 'search'], ['/landscape', 'Data Landscape', 'layers']], 'Data'],
+    ['/data', 'Data Explorer', 'bars', [['/landscape', 'Data Landscape', 'layers']], 'Data'],
     ['/reports', 'ICT Reports', 'chart', null, 'Reports'],
     ['/research', 'Research', 'doc', [['/research/submit', 'Submit Paper', 'plus']], 'Research'],
     ['/partners', 'Our Partners', 'globe', null, 'Partners'],
@@ -269,7 +269,7 @@ function mainNav(active, q) {
   };
   return `<nav class="gov-nav" aria-label="Main"><div class="nav-shell">
     <a class="gov-wordmark nav-mapblock" href="/" aria-label="NIIS home"><img class="nav-logo" src="/img/brand/niis-mark.webp?v=${ASSET_V}" alt="" width="852" height="341" decoding="async"></a>
-    <form class="nav-search" action="/indicators" method="get" role="search">
+    <form class="nav-search" action="/data" method="get" role="search">
       <input type="search" name="q" aria-label="Search indicators" autocomplete="off" value="${esc(q || '')}">
       <button type="button" class="nav-search-x" aria-label="Clear the search"${q ? '' : ' hidden'}>${icon('x')}</button>
       <span class="nav-search-rule" aria-hidden="true"></span>
@@ -288,7 +288,7 @@ function mainNav(active, q) {
       <button type="button" class="nav-drawer-x" aria-label="Close menu" data-sheet-close>${icon('x')}</button>
       <div class="nav-sheet-in">
         <div class="nav-drawer-head"><img src="${esc(sealArt())}" alt="Coat of Arms of the Republic of Liberia" width="220" height="233" decoding="async"></div>
-        <form class="sheet-search" action="/indicators" method="get" role="search">
+        <form class="sheet-search" action="/data" method="get" role="search">
           ${icon('search')}
           <input type="search" name="q" placeholder="Search" aria-label="Search indicators" value="${esc(q || '')}">
         </form>
@@ -382,8 +382,6 @@ ${extraHead}
       <span class="sb-section-label">Workspace</span>
       ${item('/portal', 'portal', 'home', 'Overview')}
       ${item('/data', 'data', 'database', 'Data Explorer')}
-      ${item('/indicators', 'indicators', 'layers', 'Indicator Catalogue')}
-      ${item('/query', 'query', 'sliders', 'Data Query')}
       ${item('/partners', 'partners', 'users', 'Our Partners')}
       ${item('/research', 'research', 'doc', 'Research Papers', ctx.paperReview || 0)}
       ${item('/media', 'media', 'image', 'Media Library')}
@@ -1782,190 +1780,8 @@ exports.landscape = (ctx, { indicators, meta, year, years, counties }) => shell(
   })};</script>`,
 });
 
-// ============ INDICATOR CATALOGUE ============
-// Search, a category rail and a collection-frequency switch over every indicator the reader may
-// see. Rows are grouped by category, and a row opens the indicator's full record in a side sheet
-// (app.js, initCatalogue). Every figure on the page is counted from the catalogue itself.
-const tierOf = (m) => ((String(m || '').match(/Quality tier: ([^.]+)/) || [])[1] || '').trim();
-// A small label above a page title, shared by the catalogue, query, reports, team and log-in pages
+// A small label above a page title, shared by the reports, team and other pages
 const eyebrow = (text) => `<p class="ui-eyebrow"><i aria-hidden="true"></i>${esc(text)}</p>`;
-exports.catalogue = (ctx, { indicators, domainOrder, domainLabels, q = '' }) => {
-  const byDomain = {};
-  indicators.forEach((i) => (byDomain[i.domain] = byDomain[i.domain] || []).push(i));
-  const domains = domainOrder.filter((d) => byDomain[d]);
-  const total = indicators.length;
-  const agencies = new Set(indicators.map((i) => i.agency).filter(Boolean)).size;
-  const counties = Math.max(0, ...indicators.map((i) => Number(i.coverage) || 0));
-  const pers = ['Quarterly', 'Annual', 'Biennial'].map((p) => [p, indicators.filter((i) => i.periodicity === p).length]).filter(([, n]) => n);
-  const mockN = indicators.filter((i) => i.is_mock).length;
-  const maxN = Math.max(1, ...domains.map((d) => byDomain[d].length));
-  const row = (i) => {
-    const tier = tierOf(i.methodology);
-    return `<button type="button" class="ic-row" data-code="${esc(i.code)}" data-domain="${esc(i.domain)}" data-per="${esc(i.periodicity || '')}"
-        data-name="${esc(i.name)}" data-search="${esc((i.name + ' ' + i.description + ' ' + (i.agency || '') + ' ' + i.unit + ' ' + i.code).toLowerCase())}">
-      <span class="ic-row-main">
-        <span class="ic-row-name"><span class="ic-row-t">${esc(i.name)}</span>${i.headline ? '<em class="ic-flag">Headline</em>' : ''}</span>
-        <span class="ic-row-desc">${esc(i.description)}</span>
-      </span>
-      <span class="ic-row-meta">
-        <span class="ic-meta-unit">${esc(i.unit)}</span>
-        ${i.periodicity ? `<span class="ic-meta-per">${esc(i.periodicity)}</span>` : ''}
-        ${tier ? `<span class="ic-meta-tier">${esc(tier.replace(/^Tier (\d)\s*/, 'Tier $1 · '))}</span>` : ''}
-      </span>
-      <span class="ic-row-src">${esc(i.agency || '')}</span>
-      <i class="ic-row-go" aria-hidden="true">${icon('arrow')}</i>
-    </button>`;
-  };
-  return shell(ctx, {
-    title: 'Indicator Catalogue', active: '/indicators', workspaceActive: 'indicators', q, body: `
-  <div class="ic">
-    <header class="ic-hero wrap">
-      <div class="ic-hero-l">
-        ${eyebrow('Indicator Catalogue')}
-        <h1 data-rise-head>Every indicator, with its definition and source</h1>
-        <p class="ui-lede">Definitions, methods and sources for each indicator NIIS tracks. Open one to read its full record, then take it to the Data Explorer or into a query.</p>
-      </div>
-      <div class="ic-hero-r">
-        <dl class="ui-stats">
-          <div><dt>Indicators</dt><dd data-count="${total}">${total}</dd></div>
-          <div><dt>Categories</dt><dd data-count="${domains.length}">${domains.length}</dd></div>
-          <div><dt>Source agencies</dt><dd data-count="${agencies}">${agencies}</dd></div>
-          <div><dt>Counties</dt><dd data-count="${counties}">${counties}</dd></div>
-        </dl>
-        <figure class="ic-spark" aria-label="Indicators per category">
-          <div class="ic-spark-bars">${domains.map((d, n) => `<button type="button" class="ic-spark-bar" data-domain="${d}" style="--h:${(byDomain[d].length / maxN).toFixed(3)};--i:${n}" aria-label="${esc(domainLabels[d])}: ${byDomain[d].length} indicators"><i></i><span class="ic-spark-tip">${esc(domainLabels[d])}<b>${byDomain[d].length}</b></span></button>`).join('')}</div>
-          <figcaption>Indicators per category. Select a bar to filter.</figcaption>
-        </figure>
-      </div>
-    </header>
-    ${mockN ? `<p class="ic-note wrap"><span aria-hidden="true"></span>${mockN === total ? 'The figures behind every indicator' : `The figures behind ${mockN} indicators`} are placeholders for demonstration, not official statistics.</p>` : ''}
-
-    <div class="ic-tools-band">
-      <div class="ic-tools wrap">
-        <div class="ui-search" role="search">
-          ${icon('search')}
-          <input id="catalogue-search" type="search" placeholder="Search ${total} indicators by name, source or unit" aria-label="Search indicators" value="${esc(q)}" autocomplete="off">
-          <button type="button" class="ui-search-x" aria-label="Clear the search"${q ? '' : ' hidden'}>${icon('x')}</button>
-          <kbd aria-hidden="true">/</kbd>
-        </div>
-        <div class="ui-seg" role="group" aria-label="How often it is collected">
-          <button type="button" class="is-on" data-per="" aria-pressed="true">Any frequency</button>
-          ${pers.map(([p, n]) => `<button type="button" data-per="${p}" aria-pressed="false">${p} <b>${n}</b></button>`).join('')}
-        </div>
-        <p class="ic-count" aria-live="polite"><b id="ic-shown">${total}</b> of ${total} indicators</p>
-      </div>
-    </div>
-
-    <div class="ic-body wrap">
-      <nav class="ic-rail" aria-label="Categories">
-        <p class="ic-rail-h">Categories</p>
-        <button type="button" class="ic-cat is-on" data-domain="" aria-pressed="true"><span>All categories</span><b>${total}</b></button>
-        ${domains.map((d) => `<button type="button" class="ic-cat" data-domain="${d}" aria-pressed="false"><span>${esc(domainLabels[d])}</span><b>${byDomain[d].length}</b></button>`).join('')}
-      </nav>
-      <div class="ic-list" id="catalogue-tbody">
-        ${domains.map((d, n) => `<section class="ic-group" data-group="${d}" aria-labelledby="ic-g-${d}">
-          <header class="ic-group-head"><span class="ic-idx">${String(n + 1).padStart(2, '0')}</span><h2 id="ic-g-${d}">${esc(domainLabels[d])}</h2><span class="ic-group-n" data-gn>${byDomain[d].length}</span></header>
-          <div class="ic-rows">${byDomain[d].map(row).join('')}</div>
-        </section>`).join('')}
-        <div class="ui-empty" hidden>
-          <div class="ui-empty-art" aria-hidden="true">${'<i></i>'.repeat(9)}</div>
-          <h3>No indicator matches <span id="ic-empty-q"></span></h3>
-          <p>Try a broader word, or clear the filters to see all ${total}.</p>
-          <button type="button" class="ui-btn" data-reset>Clear filters</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="ic-sheet" id="drawer-overlay" hidden>
-    <div class="ic-sheet-scrim" data-close></div>
-    <aside class="ic-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="drawer-title" tabindex="-1">
-      <header class="ic-sheet-head">
-        <p class="ic-sheet-cat" id="drawer-cat"></p>
-        <div class="ic-sheet-nav">
-          <button type="button" data-step="-1" aria-label="Previous indicator">${icon('chevron', 'icn ui-flip')}</button>
-          <button type="button" data-step="1" aria-label="Next indicator">${icon('chevron')}</button>
-          <button type="button" class="drawer-close" data-close aria-label="Close">${icon('x')}</button>
-        </div>
-      </header>
-      <div class="ic-sheet-body" id="drawer-body"></div>
-    </aside>
-  </div>
-  <script>window.__NICTD_PAGE__='catalogue';window.__CATALOGUE_STATE__=${JSON.stringify({ indicators })};</script>`,
-  });
-};
-
-// ============ DATA QUERY BUILDER ============
-// Four numbered steps on the left (indicators, counties, years, format), each showing when it is
-// done; the live preview, the API call and the download on the right. Logic: app.js, initQueryBuilder.
-exports.query = (ctx, { indicators, domainOrder, domainLabels, counties, years }) => {
-  const step = (n, key, title, sub, inner) => `<section class="qb-step" data-step="${key}">
-        <header class="qb-step-head">
-          <span class="qb-num" aria-hidden="true"><b>${n}</b>${icon('check')}</span>
-          <div><h2>${title}</h2><p>${sub}</p></div>
-          <span class="qb-state" data-state>${key === 'yrs' || key === 'fmt' ? 'Set' : 'None yet'}</span>
-        </header>
-        ${inner}
-      </section>`;
-  const fmts = [['csv', 'CSV', 'Spreadsheets, R, Stata'], ['json', 'JSON', 'Apps and scripts'], ['xlsx', 'Excel', 'Opens in Excel']];
-  return shell(ctx, {
-    title: 'Data Query', active: '/query', workspaceActive: 'query', body: `
-  <div class="qb">
-    <header class="qb-hero wrap">
-      ${eyebrow('Data Query')}
-      <h1 data-rise-head>Build your own extract</h1>
-      <p class="ui-lede">Choose indicators, counties and years. The preview updates as you go; download the result or call it straight from the API.</p>
-    </header>
-    <div class="qb-layout wrap">
-      <div class="qb-steps">
-        ${step(1, 'ind', 'Indicators', 'What to measure', `${xddMulti('dd-query-indicators', 'Choose indicators')}
-        <div class="qb-chips" data-chips="ind"></div>`)}
-        ${step(2, 'cty', 'Counties', 'Where', `${xddMulti('dd-query-counties', 'Choose counties', `Select all ${counties.length} counties`)}
-        <div class="qb-chips" data-chips="cty"></div>
-        <div class="qb-quick"><button type="button" class="ui-chip" data-all-counties>All ${counties.length} counties</button><button type="button" class="ui-chip" data-clear-counties hidden>Clear counties</button></div>`)}
-        ${step(3, 'yrs', 'Years', 'When', `<div class="qb-years">
-          <div class="qb-field"><label for="year-from">From</label><select id="year-from">${years.map((y) => `<option${y === years[0] ? ' selected' : ''}>${y}</option>`).join('')}</select></div>
-          <div class="qb-field"><label for="year-to">To</label><select id="year-to">${years.map((y) => `<option${y === years[years.length - 1] ? ' selected' : ''}>${y}</option>`).join('')}</select></div>
-        </div>
-        <div class="qb-track" aria-hidden="true">${years.map((y) => `<span data-y="${y}" class="on"><i></i><em>${y}</em></span>`).join('')}</div>`)}
-        ${step(4, 'fmt', 'Format', 'How you receive it', `<div class="qb-fmts" role="radiogroup" aria-label="Output format">
-          ${fmts.map(([v, l, d], i) => `<label class="qb-fmt"><input type="radio" name="fmt" value="${v}"${i ? '' : ' checked'}><span><b>${l}</b><em>${d}</em></span></label>`).join('')}
-        </div>`)}
-      </div>
-      <div class="qb-result">
-        <div class="qb-panel" data-rise-block>
-          <header class="qb-panel-head">
-            <div><p class="ui-k">Live preview</p><p class="qb-summary" id="qb-summary">Nothing selected yet</p></div>
-            <span class="qb-count" id="query-count"></span>
-          </header>
-          <div class="qb-table-wrap">
-            <table class="qb-table" id="query-preview"><thead><tr><th>Indicator</th><th>County</th><th class="num">Year</th><th class="num">Value</th><th>Unit</th></tr></thead><tbody></tbody></table>
-            <div class="ui-empty qb-empty" id="qb-empty">
-              <div class="ui-empty-art" aria-hidden="true">${'<i></i>'.repeat(9)}</div>
-              <h3>Your preview appears here</h3>
-              <p>Choose at least one indicator and one county.</p>
-            </div>
-          </div>
-          <p class="qb-more" id="qb-more" hidden></p>
-          <div class="qb-api">
-            <div class="qb-api-head"><span class="ui-k">API call</span><button type="button" class="qb-copy" id="qb-copy" disabled>${icon('copy')}<span>Copy</span></button></div>
-            <code id="api-call-box">Choose indicators and counties to build the call.</code>
-          </div>
-          <footer class="qb-actions">
-            <button class="ui-btn ui-btn-primary" id="btn-generate-download" type="button" disabled>${icon('download')}<span>Download</span></button>
-            <button class="ui-btn" id="btn-save-query" type="button" disabled>Save query</button>
-          </footer>
-          <form class="qb-save" id="qb-save" hidden>
-            <label for="qb-save-name">Name this query</label>
-            <div class="qb-save-row"><input id="qb-save-name" maxlength="120" placeholder="e.g. Connectivity, all counties" required><button type="submit" class="ui-btn ui-btn-primary">Save</button><button type="button" class="ui-btn" data-cancel>Cancel</button></div>
-          </form>
-          ${ctx.user ? '' : '<p class="qb-hint">Saving queries needs an account. <a href="/login">Log in</a> or <a href="/register">request access</a>.</p>'}
-        </div>
-      </div>
-    </div>
-  </div>
-  <script>window.__NICTD_PAGE__='query';window.__QUERY_STATE__=${JSON.stringify({ signedIn: !!ctx.user, years, indicators: indicators.map((i) => ({ value: i.code, label: i.name, group: domainLabels[i.domain] })), counties: counties.map((c) => ({ value: c.name, label: c.name })) })};</script>`,
-  });
-};
 
 // ============ DASHBOARDS ============
 // One dashboards page: the title itself is the filter, pick a dashboard and it loads in place.
@@ -2433,15 +2249,6 @@ exports.submitPaper = (ctx, { errors = [], values = {}, done = false } = {}) => 
           <span><strong>NIIS</strong><span>National ICT Intelligence System</span></span>
         </a>
         <h2>Send your research to the NIIS library</h2>
-        <nav class="sp2-rail sp-rail" aria-label="Form progress">
-          <ol>
-            <li data-step="you"><span class="sp2-dot">1</span><span>About you</span></li>
-            <li data-step="paper"><span class="sp2-dot">2</span><span>Your paper</span></li>
-            <li data-step="send"><span class="sp2-dot">3</span><span>Confirm</span></li>
-          </ol>
-          <div class="sp2-meter" aria-hidden="true"><i></i></div>
-          <p class="sp2-left" data-left>6 required fields to go</p>
-        </nav>
       </div>
     </div>
     <div class="lg-side sp-side">
@@ -2452,69 +2259,26 @@ exports.submitPaper = (ctx, { errors = [], values = {}, done = false } = {}) => 
         ${errors.length ? `<div class="sp2-alert" role="alert"><b>A few things need fixing before this can be sent.</b>
           <ul>${errors.map((e) => `<li>${esc(e.message)}</li>`).join('')}</ul></div>` : ''}
 
-    <form method="post" action="/research/submit" class="sp2" id="sp2" novalidate>
-      <div class="sp2-sheet">
-        <section class="sp2-sec" data-sec="you" aria-labelledby="sp2-h-you">
-          <header class="sp2-head"><span class="sp2-n" aria-hidden="true">1</span><div>
-            <h2 id="sp2-h-you">About you</h2>
-            <p>So a reviewer can reach you about this paper. None of it is published.</p></div></header>
-          <div class="sp2-grid">
-            ${field('sp-name', 'Full name', ctl('sp-name', `name="sub_name" required maxlength="120" autocomplete="name" value="${v('sub_name')}"`), { req: true, err: 'Enter your full name.', name: 'sub_name' })}
-            ${field('sp-email', 'Email address', ctl('sp-email', `type="email" name="sub_email" required maxlength="180" autocomplete="email" inputmode="email" value="${v('sub_email')}"`), { req: true, help: 'Where the review outcome is sent.', err: 'Enter an email address like name@domain.org.', name: 'sub_email' })}
-            ${field('sp-org', 'Institution or organization', ctl('sp-org', `name="sub_org" maxlength="160" autocomplete="organization" value="${v('sub_org')}"`), { help: 'Optional.' })}
-            ${field('sp-country', 'Country', `<select id="sp-country" name="sub_country" aria-describedby="sp-country-help"><option value="">Choose a country</option>${COUNTRIES.map((c) => `<option ${values.sub_country === c ? 'selected' : ''}>${c}</option>`).join('')}</select>`, { help: 'Optional.' })}
-            ${field('sp-role', 'Your role', `<select id="sp-role" name="sub_role" aria-describedby="sp-role-help"><option value="">Choose a role</option>${ROLES.map((r) => `<option ${values.sub_role === r ? 'selected' : ''}>${r}</option>`).join('')}</select>`, { help: 'Optional.', wide: true })}
-            ${field('sp-bio', 'Short bio', `<textarea id="sp-bio" name="sub_bio" rows="3" maxlength="800" data-grow aria-describedby="sp-bio-help">${v('sub_bio')}</textarea>`, { help: 'A few lines on your background and research interests.', wide: true, count: 800 })}
+        <form method="post" action="/research/submit" class="sp2" id="sp2" novalidate>
+          <div class="sp2-sheet">
+            <section class="sp2-sec" data-sec="all" aria-label="Your paper">
+              <div class="sp2-grid">
+                ${field('sp-name', 'Full name', ctl('sp-name', `name="sub_name" required maxlength="120" autocomplete="name" value="${v('sub_name')}"`), { req: true, err: 'Enter your full name.', name: 'sub_name' })}
+                ${field('sp-email', 'Email address', ctl('sp-email', `type="email" name="sub_email" required maxlength="180" autocomplete="email" inputmode="email" value="${v('sub_email')}"`), { req: true, help: 'Where the review outcome is sent.', err: 'Enter an email address like name@domain.org.', name: 'sub_email' })}
+                ${field('sp-org', 'Institution', ctl('sp-org', `name="sub_org" maxlength="160" autocomplete="organization" value="${v('sub_org')}"`), { help: 'Optional.' })}
+                ${field('sp-abstract', 'Paper summary', `<textarea id="sp-abstract" name="abstract" rows="4" required maxlength="1200" data-grow aria-describedby="sp-abstract-help sp-abstract-err">${v('abstract')}</textarea>`, { req: true, wide: true, count: 1200, help: 'A short summary of what the paper covers.', err: 'Add a short summary.', name: 'abstract' })}
+                ${field('sp-body', 'Your paper', `<textarea id="sp-body" name="body" rows="8" required maxlength="20000" data-grow aria-describedby="sp-body-help sp-body-err">${v('body')}</textarea>`, { req: true, wide: true, count: 20000, help: 'Paste the full paper here. Its first line is taken as the title.', err: 'Paste your paper.', name: 'body' })}
+              </div>
+            </section>
+            <div class="sp2-actions">
+              <button class="sp2-send pearl" type="submit"><span class="pearl-wrap"><span class="pearl-p"><span class="sp2-send-t">Submit</span><span class="sp2-spin" aria-hidden="true"></span></span></span></button>
+              <p class="sp2-fine">By submitting, you confirm the paper is your own work or that you may share it. Your contact details are used only for this review, in line with Liberia’s Data Protection Act.</p>
+            </div>
           </div>
-        </section>
-
-        <section class="sp2-sec" data-sec="paper" aria-labelledby="sp2-h-paper">
-          <header class="sp2-head"><span class="sp2-n" aria-hidden="true">2</span><div>
-            <h2 id="sp2-h-paper">Your paper</h2>
-            <p>What a reader sees in the library once it is approved.</p></div></header>
-          <div class="sp2-grid">
-            ${field('sp-title', 'Title', ctl('sp-title', `name="title" required maxlength="240" value="${v('title')}"`), { req: true, wide: true, err: 'Give the paper a title.', name: 'title' })}
-            ${field('sp-authors', 'Author(s)', ctl('sp-authors', `name="authors" required maxlength="200" value="${v('authors')}"`), { req: true, help: 'As they should appear in print.', err: 'Name at least one author.', name: 'authors' })}
-            <fieldset class="sp2-field sp2-chips" data-field>
-              <legend>Category</legend>
-              <div class="sp2-chiprow">${TAGS.map((t) => `<label class="sp2-chip"><input type="radio" name="tag" value="${t}" ${t === tag0 ? 'checked' : ''}><span>${t}</span></label>`).join('')}</div>
-            </fieldset>
-            ${field('sp-abstract', 'Abstract', `<textarea id="sp-abstract" name="abstract" rows="4" required maxlength="1200" data-grow aria-describedby="sp-abstract-help sp-abstract-err">${v('abstract')}</textarea>`, { req: true, wide: true, count: 1200, help: 'The summary shown with the paper.', err: 'Add a short abstract.', name: 'abstract' })}
-            ${field('sp-body', 'Full text', `<textarea id="sp-body" name="body" rows="6" maxlength="20000" data-grow aria-describedby="sp-body-help">${v('body')}</textarea>`, { wide: true, count: 20000, help: 'Optional. Paste the paper here, or leave it blank and a reviewer will ask for the file by email.' })}
-          </div>
-        </section>
-
-        <section class="sp2-sec" data-sec="send" aria-labelledby="sp2-h-send">
-          <header class="sp2-head"><span class="sp2-n" aria-hidden="true">3</span><div>
-            <h2 id="sp2-h-send">Confirm</h2>
-            <p>One last check before it goes to a reviewer.</p></div></header>
-          <div class="sp2-field sp2-consent${errors.some((e) => e.field === 'consent') ? ' is-invalid is-touched' : ''}" data-field data-req>
-            <label class="sp2-check">
-              <input type="checkbox" name="consent" value="1" ${values.consent ? 'checked' : ''} required>
-              <span class="sp2-box" aria-hidden="true">${icon('check')}</span>
-              <span>I confirm this is my own work, or that I am allowed to submit it, and I agree that the ICT Statistics &amp; Policy Unit may keep my contact details to process this submission. <span class="sp2-req" aria-hidden="true">*</span></span>
-            </label>
-            <p class="sp2-err">Please tick this box to send the paper.</p>
-            <p class="sp2-note">${icon('shield')} Your name, email and bio stay with this submission for review correspondence only, in line with Liberia’s Data Protection Act.</p>
-          </div>
-        </section>
-
-        <div class="sp2-actions">
-          <button class="sp2-send pearl" type="submit"><span class="pearl-wrap"><span class="pearl-p"><span class="sp2-send-t">Submit for review</span><span class="sp2-spin" aria-hidden="true"></span></span></span></button>
-          <a class="sp2-cancel" href="/research">Cancel</a>
-        </div>
-      </div>
-    </form>
+        </form>
       </div>
     </div>
   </section>
-
-    <div class="sp2-bar" aria-hidden="true">
-      <div class="sp2-bar-in">
-        <div class="sp2-bar-p"><div class="sp2-meter"><i></i></div><span data-left>6 required fields to go</span></div>
-        <button class="sp2-send sp2-send-sm" type="submit" form="sp2" tabindex="-1"><span class="sp2-send-t">Submit</span><span class="sp2-send-i">${icon('arrow')}</span><span class="sp2-spin"></span></button>
-      </div>
-    </div>
   </div>
   <script>${submitPaperScript}</script>`,
   });
@@ -2551,11 +2315,6 @@ const submitPaperScript = `
     var done=req.filter(ok).length, left=req.length-done;
     f.closest('.sp2-wrap').style.setProperty('--sp2-p', String(done/req.length));
     [].forEach.call(document.querySelectorAll('[data-left]'), function(el){ el.textContent = left ? (left+' required field'+(left>1?'s':'')+' to go') : 'Ready to send'; });
-    ['you','paper','send'].forEach(function(k){
-      var sec=f.querySelector('[data-sec="'+k+'"]'), dot=document.querySelector('[data-step="'+k+'"]');
-      var rs=[].slice.call(sec.querySelectorAll('[data-req]'));
-      if(dot) dot.classList.toggle('is-done', rs.length>0 && rs.every(ok));
-    });
   }
   function count(c){
     var el=f.querySelector('[data-count="'+c.id+'"]'); if(!el) return;
@@ -2587,13 +2346,6 @@ const submitPaperScript = `
   if(bar && 'IntersectionObserver' in window){
     new IntersectionObserver(function(es){ bar.classList.toggle('is-on', es[0].isIntersecting); },{ threshold:0 }).observe(f);
   }
-  // the navy panel's grid: a few cells light and fade at a time, as on Log In
-  var cells=[].slice.call(document.querySelectorAll('.sp-brand .lg-cells i'));
-  if(!reduce && cells.length) setInterval(function(){
-    if(document.hidden) return;
-    var c=cells[Math.floor(Math.random()*cells.length)]; c.classList.add('on');
-    setTimeout(function(){ c.classList.remove('on'); }, 1600+Math.random()*1400);
-  }, 260);
   var sending=false;
   f.addEventListener('submit',function(e){
     if(sending){ e.preventDefault(); return; }
@@ -3415,7 +3167,7 @@ exports.reports = (ctx, { indicators = [], domainLabels = {} } = {}) => {
   const tags = [...new Set(list.map((r) => r.tag))];
   const covered = [...new Set(list.flatMap((r) => r.domains || []))].filter((d) => byDomain[d]);
   const related = (r) => (r.domains || []).filter((d) => byDomain[d]).map((d) => ({ d, label: domainLabels[d] || d, n: byDomain[d].length, names: byDomain[d].slice(0, 5).map((x) => x.name) }));
-  const chipsFor = (r) => related(r).map((x) => `<a class="ui-chip" href="/indicators?domain=${x.d}">${esc(x.label)} <b>${x.n}</b></a>`).join('');
+  const chipsFor = (r) => related(r).map((x) => `<a class="ui-chip" href="/data">${esc(x.label)} <b>${x.n}</b></a>`).join('');
   const card = (r) => `<article class="rx-card" data-rp-item data-tag="${esc(r.tag)}" data-search="${esc((r.title + ' ' + r.tag + ' ' + r.desc + ' ' + r.date).toLowerCase())}">
         <button type="button" class="rx-card-hit" data-open="${r.i}" aria-label="Read the summary: ${esc(r.title)}"></button>
         <div class="rx-card-img" style="${r.bg}"><span class="rx-card-n">${String(r.i + 1).padStart(2, '0')}</span></div>
@@ -3708,7 +3460,7 @@ exports.team = (ctx) => {
   // a studio card: the portrait, the name and role; on hover the person and their links; a click opens the profile
   const card = (kind, list, folder) => (m) => {
     const i = list.indexOf(m), src = `/img/${folder}/${m.img}.jpg?v=${ASSET_V}`;
-    return `<article class="tc-card" data-person="${kind}" data-i="${i}" style="--k:${Math.min(i, 7)}" tabindex="0" role="button" aria-label="${esc(m.name)}, ${esc(m.role)}. Open profile">
+    return `<article class="tc-card" data-person="${kind}" data-i="${i}" style="--k:${Math.min(i, 7)};--o:${i}" tabindex="0" role="button" aria-label="${esc(m.name)}, ${esc(m.role)}. Open profile">
           <div class="tc-media"><img class="tc-photo" src="${src}" alt="" width="600" height="600" loading="lazy" decoding="async"></div>
           <div class="tc-info">
             <span class="tc-name">${esc(m.name)}</span>
@@ -3799,6 +3551,7 @@ exports.team = (ctx) => {
         <div class="tl-cols" id="tlCols" role="region" aria-label="ICT talents">
           ${tlCols.map((rows) => `<ol class="tl-col">${rows}</ol>`).join('')}
         </div>
+        <p class="tl-swipe" aria-hidden="true">Swipe for more ${icon('chevrons')}</p>
         <p class="tp-note-s tl-note">Sample profiles with AI-generated placeholder photos.</p>
       </div>
     </section>
@@ -4278,28 +4031,45 @@ exports.login = (ctx, { error }) => publicLayout(ctx, {
   </section>
   <script>window.__NICTD_PAGE__='login';</script>`,
 });
+// Request Access: Log In's two halves. The national seal and one line on the navy panel (the
+// President's photograph, its grid cells lighting one by one), the request form centred on white.
 exports.register = (ctx, { error, success, form = {} }) => publicLayout(ctx, {
   title: 'Request Access', body: `
-  <div class="auth-wrap"><div class="auth-card">
-    <h1>${icon('users')} Request Access</h1>
-    <p class="muted">Provide the details needed for your credentials. Your request goes to the administration team, who will review it and create your account, you'll receive your login credentials from them directly.</p>
-    ${error ? `<div class="alert alert-error">${esc(error)}</div>` : ''}
-    ${success ? `<div class="alert alert-ok">${esc(success)}</div><p style="margin-top:1rem"><a class="btn btn-teal" href="/">Back to Home</a></p>` : `
-    <form method="post" action="/register">
-      <label>Full name *<input name="name" required maxlength="120" value="${esc(form.name || '')}"></label>
-      <label>Email *<input name="email" type="email" required maxlength="160" value="${esc(form.email || '')}"></label>
-      <label>Organization / affiliation *<input name="organization" required maxlength="160" placeholder="University, newsroom, ministry, NGO…" value="${esc(form.organization || '')}"></label>
-      <label>Phone (optional)<input name="phone" maxlength="40" placeholder="+231 …" value="${esc(form.phone || '')}"></label>
-      <label>Access level requested
-        <select name="role_requested">
-          <option value="public" ${form.role_requested !== 'stakeholder' ? 'selected' : ''}>Public user, researcher, journalist, citizen</option>
-          <option value="stakeholder" ${form.role_requested === 'stakeholder' ? 'selected' : ''}>Stakeholder, government, donor, institutional partner</option>
-        </select></label>
-      <label>What data do you need, and why? (optional)<textarea name="purpose" rows="3" maxlength="1000" placeholder="e.g. county-level connectivity series for a reporting project…">${esc(form.purpose || '')}</textarea></label>
-      <button class="btn btn-teal" type="submit" style="margin-top:1rem">Submit request</button>
-    </form>
-    <p class="muted" style="margin-top:1rem">Already have an account? <a href="/login">Log in</a>.</p>`}
-  </div></div>`,
+  <section class="lg rg-lg">
+    <div class="lg-brand">
+      <div class="lg-cells" aria-hidden="true">${'<i></i>'.repeat(96)}</div>
+      <div class="lg-brand-in">
+        <a class="lg-seal" href="/">
+          ${imgs.exists('brand', 'seal') ? `<img src="${esc(imgs.url('brand', 'seal'))}" alt="" width="54" height="58" decoding="async">` : sealLogo(54)}
+          <span><strong>NIIS</strong><span>National ICT Intelligence System</span></span>
+        </a>
+        <h2>Request access to Liberia’s ICT Data</h2>
+      </div>
+    </div>
+    <div class="lg-side">
+      <div class="lg-card rg-card">
+        <h1>Request Access</h1>
+        <p class="lg-sub">Your request goes to the administration team, who review it and create your account. They send your login details to you directly.</p>
+        ${error ? `<div class="lg-alert" role="alert">${icon('info')}<span>${esc(error)}</span></div>` : ''}
+        ${success ? `<div class="rg-done" role="status">${icon('check')}<p>${esc(success)}</p></div>
+        <a class="lg-submit pearl rg-home" href="/"><span class="pearl-wrap"><span class="pearl-p">Back to Home</span></span></a>` : `
+        <form method="post" action="/register" class="lg-form rg-form">
+          <div class="lg-field"><label for="rg-name">Full name</label><input id="rg-name" name="name" required maxlength="120" autocomplete="name" value="${esc(form.name || '')}"></div>
+          <div class="lg-field"><label for="rg-email">Email</label><input id="rg-email" name="email" type="email" required maxlength="160" autocomplete="email" placeholder="name@organisation.org" value="${esc(form.email || '')}"></div>
+          <div class="lg-field"><label for="rg-org">Organization</label><input id="rg-org" name="organization" required maxlength="160" autocomplete="organization" placeholder="University, newsroom, ministry, NGO…" value="${esc(form.organization || '')}"></div>
+          <div class="lg-field"><label for="rg-phone">Phone (optional)</label><input id="rg-phone" name="phone" maxlength="40" autocomplete="tel" placeholder="+231 …" value="${esc(form.phone || '')}"></div>
+          <div class="lg-field"><label for="rg-level">Access level</label>
+            <select id="rg-level" name="role_requested">
+              <option value="public" ${form.role_requested !== 'stakeholder' ? 'selected' : ''}>Public user, researcher, journalist, citizen</option>
+              <option value="stakeholder" ${form.role_requested === 'stakeholder' ? 'selected' : ''}>Stakeholder, government, donor, institutional partner</option>
+            </select></div>
+          <div class="lg-field"><label for="rg-why">What data do you need? (optional)</label><textarea id="rg-why" name="purpose" rows="3" maxlength="1000" placeholder="e.g. county-level connectivity series for a reporting project…">${esc(form.purpose || '')}</textarea></div>
+          <button class="lg-submit pearl" type="submit"><span class="pearl-wrap"><span class="pearl-p"><span class="lg-submit-t">Submit request</span></span></span></button>
+        </form>
+        <p class="lg-alt">Already have an account? <a href="/login">Log in</a></p>`}
+      </div>
+    </div>
+  </section>`,
 });
 
 // ============ WORKSPACE (signed-in) ============
@@ -4307,8 +4077,6 @@ exports.portal = (ctx, stats) => {
   const u = ctx.user; const has = (p) => ctx.perms.includes(p);
   const cards = [
     ['/data', 'database', 'Data Explorer', 'Map, trend and county table for every indicator you are authorized to see.', true],
-    ['/indicators', 'layers', 'Indicator Catalogue', 'Full metadata: definitions, methodology, source and coverage.', true],
-    ['/query', 'sliders', 'Data Query builder', 'Build a custom multi-indicator, multi-county extract.', true],
     ['/dashboards', 'gauge', 'Dashboards', 'Six curated topic dashboards with live sync status.', true],
     ['/media', 'image', 'Media Library', 'Images, research papers and embedded video from the project.', true],
     ['/analytics', 'chart', 'Platform Analytics', 'Usage and trend analysis across the stored data.', has('analytics')],

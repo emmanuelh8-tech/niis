@@ -595,7 +595,10 @@ async function handler(req, res) {
       if (p === '/data') {
         logEvent('page_view', p, user);
         const indicators = listIndicators(user);
-        const code = url.searchParams.get('indicator') || indicators.find((i) => i.headline)?.code || indicators[0].code;
+        // the nav search lands here: the first indicator whose name or code holds the words
+        const q = (url.searchParams.get('q') || '').trim().toLowerCase();
+        const hit = q ? indicators.find((i) => String(i.name || '').toLowerCase().includes(q) || String(i.code).includes(q.replace(/\s+/g, '_'))) : null;
+        const code = url.searchParams.get('indicator') || (hit && hit.code) || indicators.find((i) => i.headline)?.code || indicators[0].code;
         const meta = indicators.find((i) => i.code === code) || indicators[0];
         const years = cache.years;
         const year = Number(url.searchParams.get('year')) || years[years.length - 1];
@@ -635,13 +638,11 @@ async function handler(req, res) {
         const ref = /^(?:NIIS|NICTD)-\d{6}-[0-9A-F]{4}$/.test(url.searchParams.get('ref') || '') ? url.searchParams.get('ref') : '';
         return send(res, 200, views.careerApply(ctx, { role, counties: cache.counties.map((c) => c.name), sent: url.searchParams.get('sent') === '1', reference: ref }));
       }
-      if (p === '/indicators') {
-        logEvent('page_view', p, user);
-        return send(res, 200, views.catalogue(ctx, { indicators: listIndicators(user), domainOrder: DOMAIN_ORDER, domainLabels: DOMAIN_LABELS, q: url.searchParams.get('q') || '' }));
-      }
-      if (p === '/query') {
-        logEvent('page_view', p, user);
-        return send(res, 200, views.query(ctx, { indicators: listIndicators(user), domainOrder: DOMAIN_ORDER, domainLabels: DOMAIN_LABELS, counties: cache.counties, years: cache.years }));
+      // The Indicator Catalogue and the Data Query pages are gone: their links land on the Data
+      // Explorer, a search carried over to it.
+      if (p === '/indicators' || p === '/query') {
+        const q = (url.searchParams.get('q') || '').trim();
+        return redirect(res, '/data' + (q ? '?q=' + encodeURIComponent(q) : ''));
       }
       // Sponsors was folded into Our Partners. Keep the old link working.
       if (p === '/sponsors') return redirect(res, '/partners');
@@ -722,35 +723,33 @@ async function handler(req, res) {
       const f = parseForm(await readBody(req));
       const t = (k, n) => (f[k] || '').trim().slice(0, n);
       const errors = [];
+      // The form is short: name, email, institution, a summary and the paper itself (pasted). The
+      // paper's first line becomes its title and the submitter its author, for the review queue.
       const name = t('sub_name', 120);
       const email = t('sub_email', 180);
-      const title = t('title', 240);
-      const authors = t('authors', 200);
       const abstract = t('abstract', 1200);
+      const body = (f.body || '').trim().slice(0, 20000);
+      const title = (body.split(/\r?\n/).map((l) => l.trim()).find(Boolean) || abstract).slice(0, 240);
+      const authors = name.slice(0, 200);
 
       if (!name) errors.push({ field: 'sub_name', message: 'Your full name is required.' });
       if (!email) errors.push({ field: 'sub_email', message: 'An email address is required.' });
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) errors.push({ field: 'sub_email', message: 'That email address does not look valid.' });
-      if (!title) errors.push({ field: 'title', message: 'A paper title is required.' });
-      if (!authors) errors.push({ field: 'authors', message: 'At least one author is required.' });
-      if (!abstract) errors.push({ field: 'abstract', message: 'An abstract is required.' });
-      if (!f.consent) errors.push({ field: 'consent', message: 'Please confirm the declaration before submitting.' });
+      if (!abstract) errors.push({ field: 'abstract', message: 'A short summary of the paper is required.' });
+      if (!body) errors.push({ field: 'body', message: 'Paste your paper.' });
 
       if (errors.length) {
         return send(res, 400, views.submitPaper(ctx, { errors, values: f }));
       }
 
       await sdb.ins('papers', [{
-        title, authors, abstract, body: (f.body || '').slice(0, 20000),
-        tag: ['Report', 'Working Paper', 'Policy Brief', 'Dataset Note', 'Article'].includes(f.tag) ? f.tag : 'Report',
+        title, authors, abstract, body,
+        tag: 'Report',
         published_on: new Date().toISOString().slice(0, 10),
         status: 'submitted', visible: false, deleted: false, downloadable: true,
         submitted_by: user ? user.id : null, submitter_name: name,
         submitter_email: email,
         submitter_org: t('sub_org', 160) || null,
-        submitter_country: t('sub_country', 60) || null,
-        submitter_role: t('sub_role', 60) || null,
-        submitter_bio: t('sub_bio', 800) || null,
       }]);
       logEvent('paper_submitted', p, user);
       return redirect(res, '/research/submit?done=1');

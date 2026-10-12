@@ -513,340 +513,6 @@
   }
 
   // ============================================================
-  // PAGE: Indicator Catalogue
-  // ============================================================
-  function initCatalogue() {
-    var state = window.__CATALOGUE_STATE__;
-    var root = qs('.ic');
-    if (!state || !root) return;
-    var byCode = {};
-    state.indicators.forEach(function (i) { byCode[i.code] = i; });
-    var rows = qsa('.ic-row', root), groups = qsa('.ic-group', root);
-    var cats = qsa('.ic-cat', root), pers = qsa('.ui-seg button', root);
-    var empty = qs('.ui-empty', root), emptyQ = qs('#ic-empty-q'), shownEl = qs('#ic-shown');
-    var domain = '', per = '';
-    var params = new URLSearchParams(location.search);
-    if (params.get('domain') && cats.some(function (c) { return c.dataset.domain === params.get('domain'); })) domain = params.get('domain');
-    var search = wireSearch(qs('.ui-search', root), function () { apply(true); });
-
-    function hl(name, w) {
-      if (!w) return esc(name);
-      var i = name.toLowerCase().indexOf(w);
-      if (i < 0) return esc(name);
-      return esc(name.slice(0, i)) + '<mark>' + esc(name.slice(i, i + w.length)) + '</mark>' + esc(name.slice(i + w.length));
-    }
-    function apply(animate) {
-      var raw = search.value.trim(), words = raw.toLowerCase().split(/\s+/).filter(Boolean);
-      var n = 0, k = 0;
-      rows.forEach(function (r) {
-        var ok = (!domain || r.dataset.domain === domain) && (!per || r.dataset.per === per) &&
-          words.every(function (w) { return r.dataset.search.indexOf(w) !== -1; });
-        var was = !r.hidden;
-        r.hidden = !ok;
-        if (ok) {
-          n++;
-          if (animate && !REDUCE && (!was || words.length) && k < 14) {
-            r.style.setProperty('--d', (k++ * 26) + 'ms');
-            r.classList.remove('is-enter'); void r.offsetWidth; r.classList.add('is-enter');
-          }
-        }
-        qs('.ic-row-t', r).innerHTML = hl(r.dataset.name, words[0] || '');
-      });
-      groups.forEach(function (g) {
-        var c = qsa('.ic-row:not([hidden])', g).length;
-        g.hidden = !c; qs('[data-gn]', g).textContent = c;
-      });
-      empty.hidden = n > 0;
-      emptyQ.textContent = raw ? '“' + raw + '”' : 'these filters';
-      tweenNumber(shownEl, n, 360);
-      pressOnly(cats, 'data-domain', domain);
-      pressOnly(pers, 'data-per', per);
-      // keep the address shareable
-      try {
-        var u = new URL(location.href);
-        if (raw) u.searchParams.set('q', raw); else u.searchParams.delete('q');
-        if (domain) u.searchParams.set('domain', domain); else u.searchParams.delete('domain');
-        history.replaceState(null, '', u);
-      } catch (e) {}
-    }
-    function setDomain(d, fromBar) {
-      domain = d; apply(true);
-      var on = cats.filter(function (c) { return c.dataset.domain === d; })[0];
-      if (on && on.scrollIntoView && getComputedStyle(on.parentNode).overflowX !== 'visible') on.scrollIntoView({ block: 'nearest', inline: 'center', behavior: REDUCE ? 'auto' : 'smooth' });
-      if (fromBar) qs('.ic-tools-band').scrollIntoView({ block: 'start', behavior: REDUCE ? 'auto' : 'smooth' });
-    }
-    cats.forEach(function (c) { c.addEventListener('click', function () { setDomain(c.dataset.domain); }); });
-    qsa('.ic-spark-bar', root).forEach(function (b) { b.addEventListener('click', function () { setDomain(b.dataset.domain, true); }); });
-    pers.forEach(function (b) { b.addEventListener('click', function () { per = b.dataset.per; apply(true); }); });
-    qs('[data-reset]', root).addEventListener('click', function () {
-      search.value = ''; qs('.ui-search-x', root).hidden = true; domain = ''; per = ''; apply(true);
-    });
-    apply(false);
-    initCounters(root);
-    initInView('.ic-spark');
-
-    // ---- the record sheet
-    var sheet = qs('#drawer-overlay'), panel = qs('.ic-sheet-panel', sheet), body = qs('#drawer-body'), catEl = qs('#drawer-cat');
-    var current = null, lastRow = null;
-    var LABELS = ['Computation', 'Collected by', 'Instrument', 'Reported at', 'Disaggregation', 'Quality tier'];
-    function parseMethod(text) {
-      var parts = String(text || '').split(new RegExp('(' + LABELS.join('|') + '):\\s*'));
-      var out = { intro: parts[0].trim(), items: [], tier: '', note: '' };
-      for (var i = 1; i < parts.length; i += 2) {
-        var key = parts[i], val = (parts[i + 1] || '').trim();
-        if (key === 'Quality tier') {
-          var dot = val.indexOf('. ');
-          if (dot > -1) { out.note = val.slice(dot + 2).trim(); val = val.slice(0, dot); }
-          out.tier = val.replace(/\.$/, '');
-        } else out.items.push([key, val.replace(/\.$/, '')]);
-      }
-      return out;
-    }
-    function fact(k, v) { return '<div><dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd></div>'; }
-    function render(ind) {
-      var m = parseMethod(ind.methodology), dots = '';
-      for (var i = 0; i < 15; i++) dots += '<i' + (i < ind.coverage ? ' class="on"' : '') + ' style="--i:' + i + '"></i>';
-      catEl.textContent = ind.domainLabel || '';
-      body.innerHTML =
-        '<h2 id="drawer-title">' + esc(ind.name) + '</h2>' +
-        ((ind.headline || ind.is_mock) ? '<p class="ic-flags">' + (ind.headline ? '<span class="ic-flag">Headline indicator</span>' : '') + (ind.is_mock ? '<span class="ic-flag is-warn">Placeholder figures</span>' : '') + '</p>' : '') +
-        '<p class="ic-sheet-desc">' + esc(ind.description || '') + '</p>' +
-        '<dl class="ic-facts">' + fact('Unit', ind.unit) + fact('Collected', ind.periodicity || 'Not stated') + fact('Quality tier', m.tier || 'Not stated') +
-          fact('Latest year', ind.last_year || ind.lastUpdated || 'n/a') + fact('Access', String(ind.access_level || '').replace(/^\w/, function (c) { return c.toUpperCase(); })) +
-          '<div><dt>Code</dt><dd class="ic-code"><code>' + esc(ind.code) + '</code><button type="button" class="ic-copy" data-copy="' + esc(ind.code) + '" aria-label="Copy the indicator code"><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></dd></div></dl>' +
-        '<div class="ic-cov"><p><span>County coverage</span><b>' + esc(ind.coverage) + ' of 15</b></p><div class="ic-cov-dots" aria-hidden="true">' + dots + '</div></div>' +
-        '<div class="ic-src"><span class="ui-k">Source agency</span><p>' + esc(ind.agency || 'Not stated') + '</p></div>' +
-        '<div class="ic-method"><h3>Methodology</h3>' + (m.intro ? '<p>' + esc(m.intro) + '</p>' : '') +
-          (m.items.length ? '<ol>' + m.items.map(function (it) { return '<li><span>' + esc(it[0]) + '</span><p>' + esc(it[1]) + '</p></li>'; }).join('') + '</ol>' : '') +
-          (m.note ? '<p class="ic-method-note">' + esc(m.note) + '</p>' : '') + '</div>' +
-        '<div class="ic-sheet-actions"><a class="ui-btn ui-btn-primary" href="/data?indicator=' + encodeURIComponent(ind.code) + '">Open in Data Explorer</a>' +
-          '<a class="ui-btn" href="/query?indicators=' + encodeURIComponent(ind.code) + '">Add to a query</a></div>';
-      var vis = rows.filter(function (r) { return !r.hidden; }), at = vis.map(function (r) { return r.dataset.code; }).indexOf(ind.code);
-      qs('[data-step="-1"]', sheet).disabled = at <= 0;
-      qs('[data-step="1"]', sheet).disabled = at < 0 || at >= vis.length - 1;
-    }
-    function open(code, row) {
-      var ind = byCode[code];
-      if (!ind) return;
-      var swap = current !== null;
-      current = code; lastRow = row || lastRow;
-      render(ind);
-      body.scrollTop = 0;
-      if (swap) { if (!REDUCE) { body.classList.remove('is-swap'); void body.offsetWidth; body.classList.add('is-swap'); } return; }
-      sheet.hidden = false;
-      document.documentElement.classList.add('ui-locked');
-      requestAnimationFrame(function () { requestAnimationFrame(function () { sheet.classList.add('open'); panel.focus(); }); });
-    }
-    function close() {
-      if (current === null) return;
-      current = null;
-      sheet.classList.remove('open');
-      document.documentElement.classList.remove('ui-locked');
-      setTimeout(function () { if (current === null) sheet.hidden = true; }, REDUCE ? 0 : 280);
-      if (lastRow) lastRow.focus({ preventScroll: true });
-    }
-    function step(d) {
-      var vis = rows.filter(function (r) { return !r.hidden; });
-      var at = vis.map(function (r) { return r.dataset.code; }).indexOf(current), nx = vis[at + d];
-      if (nx) open(nx.dataset.code, nx);
-    }
-    rows.forEach(function (r) { r.addEventListener('click', function () { open(r.dataset.code, r); }); });
-    qsa('[data-close]', sheet).forEach(function (b) { b.addEventListener('click', close); });
-    qsa('[data-step]', sheet).forEach(function (b) { b.addEventListener('click', function () { step(Number(b.dataset.step)); }); });
-    body.addEventListener('click', function (e) {
-      var c = e.target.closest('.ic-copy');
-      if (c) copyText(c.dataset.copy);
-    });
-    document.addEventListener('keydown', function (e) {
-      if (current !== null) {
-        if (e.key === 'Escape') { e.preventDefault(); close(); }
-        else if (e.key === 'ArrowRight') step(1);
-        else if (e.key === 'ArrowLeft') step(-1);
-        else trapTab(e, panel);
-        return;
-      }
-      var t = e.target.tagName;
-      if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(t) && !e.target.isContentEditable) { e.preventDefault(); search.focus(); search.select(); }
-    });
-  }
-
-  // ============================================================
-  // PAGE: Data Query builder
-  // ============================================================
-  function initQueryBuilder() {
-    var state = window.__QUERY_STATE__;
-    var root = qs('.qb');
-    if (!state || !root) return;
-    var sel = { ind: [], cty: [] };
-    var yf = qs('#year-from'), yt = qs('#year-to');
-    var yearFrom = Number(yf.value), yearTo = Number(yt.value);
-    var format = (qs('input[name=fmt]:checked') || { value: 'csv' }).value;
-    var nameOf = {};
-    state.indicators.forEach(function (i) { nameOf[i.value] = i.label; });
-    // a link from the catalogue ("Add to a query") arrives with its indicators already chosen
-    var params = new URLSearchParams(location.search);
-    var known = function (list, v) { return list.some(function (x) { return x.value === v; }); };
-    var preInd = (params.get('indicators') || '').split(',').filter(function (v) { return known(state.indicators, v); });
-    var preCty = (params.get('counties') || '').split(',').filter(function (v) { return known(state.counties, v); });
-
-    var ddInd = initMultiDropdown(qs('#dd-query-indicators'), {
-      items: state.indicators, placeholder: 'Choose indicators', initial: preInd,
-      onChange: function (v) { sel.ind = v; update(); },
-    });
-    var ddCty = initMultiDropdown(qs('#dd-query-counties'), {
-      items: state.counties, placeholder: 'Choose counties', initial: preCty,
-      onChange: function (v) { sel.cty = v; update(); },
-    });
-    sel.ind = preInd; sel.cty = preCty;
-
-    function chips(key, values, all) {
-      var box = qs('[data-chips="' + key + '"]', root);
-      if (!values.length) { box.innerHTML = ''; return; }
-      if (all && values.length === all) { box.innerHTML = ''; return; }
-      var shown = values.slice(0, 8);
-      box.innerHTML = shown.map(function (v) {
-        var label = key === 'ind' ? (nameOf[v] || v) : v;
-        return '<span class="qb-chip">' + esc(label) + '<button type="button" data-drop="' + esc(v) + '" aria-label="Remove ' + esc(label) + '"><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></span>';
-      }).join('') + (values.length > shown.length ? '<span class="qb-chip is-more">+' + (values.length - shown.length) + ' more</span>' : '');
-    }
-    qsa('[data-chips]', root).forEach(function (box) {
-      box.addEventListener('click', function (e) {
-        var b = e.target.closest('[data-drop]');
-        if (!b) return;
-        var key = box.dataset.chips, dd = key === 'ind' ? ddInd : ddCty;
-        dd.set(sel[key].filter(function (v) { return v !== b.dataset.drop; }));
-      });
-    });
-    qs('[data-all-counties]', root).addEventListener('click', function () { ddCty.set(state.counties.map(function (c) { return c.value; })); });
-    qs('[data-clear-counties]', root).addEventListener('click', function () { ddCty.set([]); });
-
-    function stepState(key, done, text) {
-      var s = qs('[data-step="' + key + '"]', root);
-      s.classList.toggle('is-done', done);
-      qs('[data-state]', s).textContent = text;
-    }
-    function track() {
-      qsa('.qb-track span', root).forEach(function (c) {
-        var y = Number(c.dataset.y);
-        c.classList.toggle('on', y >= yearFrom && y <= yearTo);
-        c.classList.toggle('edge', y === yearFrom || y === yearTo);
-      });
-    }
-    function years() {
-      yearFrom = Number(yf.value); yearTo = Number(yt.value);
-      if (yearFrom > yearTo) { var t = yearFrom; yearFrom = yearTo; yearTo = t; yf.value = yearFrom; yt.value = yearTo; }
-      update();
-    }
-    yf.addEventListener('change', years);
-    yt.addEventListener('change', years);
-    // the year cells move whichever end of the range is nearer
-    qsa('.qb-track span', root).forEach(function (c) {
-      c.addEventListener('click', function () {
-        var y = Number(c.dataset.y);
-        if (Math.abs(y - yearFrom) <= Math.abs(y - yearTo)) yf.value = y; else yt.value = y;
-        years();
-      });
-    });
-    qsa('input[name=fmt]', root).forEach(function (r) { r.addEventListener('change', function () { format = r.value; update(true); }); });
-
-    var tbody = qs('#query-preview tbody'), empty = qs('#qb-empty'), table = qs('#query-preview');
-    var countEl = qs('#query-count'), more = qs('#qb-more'), summary = qs('#qb-summary');
-    var apiBox = qs('#api-call-box'), copyBtn = qs('#qb-copy');
-    var dl = qs('#btn-generate-download'), saveBtn = qs('#btn-save-query'), saveForm = qs('#qb-save');
-    var seq = 0, timer = null;
-    function qp(withFormat) {
-      var p = new URLSearchParams();
-      p.set('indicators', sel.ind.join(',')); p.set('counties', sel.cty.join(','));
-      p.set('year_from', yearFrom); p.set('year_to', yearTo);
-      if (withFormat) p.set('format', format);
-      return p.toString();
-    }
-    function ready() { return sel.ind.length && sel.cty.length; }
-    function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
-    function update(formatOnly) {
-      var allC = state.counties.length;
-      chips('ind', sel.ind); chips('cty', sel.cty, allC);
-      stepState('ind', sel.ind.length > 0, sel.ind.length ? sel.ind.length + ' chosen' : 'None yet');
-      stepState('cty', sel.cty.length > 0, sel.cty.length ? (sel.cty.length === allC ? 'All ' + allC : sel.cty.length + ' chosen') : 'None yet');
-      stepState('yrs', true, yearFrom === yearTo ? String(yearFrom) : yearFrom + ' to ' + yearTo);
-      stepState('fmt', true, format === 'xlsx' ? 'Excel' : format.toUpperCase());
-      qs('[data-clear-counties]', root).hidden = !sel.cty.length;
-      qs('[data-all-counties]', root).hidden = sel.cty.length === allC;
-      track();
-      var ok = ready();
-      dl.disabled = !ok; copyBtn.disabled = !ok; saveBtn.disabled = !ok || !state.signedIn;
-      apiBox.textContent = ok ? 'GET ' + location.origin + '/api/v1/query?' + qp(true) : 'Choose indicators and counties to build the call.';
-      apiBox.classList.toggle('is-idle', !ok);
-      summary.textContent = ok ? plural(sel.ind.length, 'indicator') + ' · ' + (sel.cty.length === allC ? 'all ' + allC + ' counties' : plural(sel.cty.length, 'county').replace('countys', 'counties')) + ' · ' + (yearFrom === yearTo ? yearFrom : yearFrom + ' to ' + yearTo) : 'Nothing selected yet';
-      if (formatOnly) return;
-      clearTimeout(timer);
-      if (!ok) { seq++; table.hidden = true; empty.hidden = false; more.hidden = true; countEl.textContent = ''; countEl.classList.remove('is-on'); return; }
-      skeleton();
-      timer = setTimeout(load, 220);
-    }
-    function skeleton() {
-      empty.hidden = true; table.hidden = false; more.hidden = true;
-      var r = '';
-      for (var i = 0; i < 7; i++) r += '<tr class="qb-skel" style="--i:' + i + '"><td><i></i></td><td><i></i></td><td class="num"><i></i></td><td class="num"><i></i></td><td><i></i></td></tr>';
-      tbody.innerHTML = r;
-      root.classList.add('is-loading');
-    }
-    function load() {
-      var my = ++seq;
-      fetch('/api/v1/query/preview?' + qp(false)).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (data) {
-        if (my !== seq) return;
-        root.classList.remove('is-loading');
-        var rows = data.rows || [];
-        if (!rows.length) {
-          tbody.innerHTML = '<tr class="qb-none"><td colspan="5">No values recorded for this selection. Try a wider year range.</td></tr>';
-        } else {
-          tbody.innerHTML = rows.slice(0, 60).map(function (r, i) {
-            return '<tr style="--i:' + Math.min(i, 14) + '"><td>' + esc(r.indicator) + '</td><td>' + esc(r.county) + '</td><td class="num">' + r.year + '</td><td class="num">' + fmtNum(r.value) + '</td><td class="qb-unit">' + esc(r.unit) + '</td></tr>';
-          }).join('');
-        }
-        more.hidden = data.count <= 60;
-        more.textContent = 'Showing the first 60 of ' + Number(data.count).toLocaleString('en-US') + ' rows. The download has them all.';
-        countEl.classList.add('is-on');
-        countEl.innerHTML = '<b>0</b> rows';
-        tweenNumber(qs('b', countEl), Number(data.count) || 0, 500);
-      }).catch(function () {
-        if (my !== seq) return;
-        root.classList.remove('is-loading');
-        tbody.innerHTML = '<tr class="qb-none"><td colspan="5">The preview could not load. <button type="button" class="qb-retry">Try again</button></td></tr>';
-        var b = qs('.qb-retry', tbody); if (b) b.addEventListener('click', function () { skeleton(); load(); });
-      });
-    }
-    copyBtn.addEventListener('click', function () {
-      copyText(location.origin + '/api/v1/query?' + qp(true));
-      copyBtn.classList.add('is-done'); qs('span', copyBtn).textContent = 'Copied';
-      setTimeout(function () { copyBtn.classList.remove('is-done'); qs('span', copyBtn).textContent = 'Copy'; }, 1600);
-    });
-    dl.addEventListener('click', function () {
-      if (!ready()) return;
-      dl.classList.add('is-busy'); setTimeout(function () { dl.classList.remove('is-busy'); }, 1400);
-      window.location = '/api/v1/query?' + qp(true);
-    });
-    saveBtn.addEventListener('click', function () {
-      saveForm.hidden = false; saveBtn.hidden = true;
-      qs('#qb-save-name').focus();
-    });
-    qs('[data-cancel]', saveForm).addEventListener('click', function () { saveForm.hidden = true; saveBtn.hidden = false; saveBtn.focus(); });
-    saveForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var name = qs('#qb-save-name').value.trim();
-      if (!name) { qs('#qb-save-name').focus(); return; }
-      fetch('/api/v1/query/save', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name, indicators: sel.ind.join(','), counties: sel.cty.join(','), year_from: yearFrom, year_to: yearTo, format: format }),
-      }).then(function (r) { return r.json(); }).then(function (res) {
-        toast(res.ok ? 'Query saved' : (res.error || 'Could not save the query'));
-        if (res.ok) { saveForm.hidden = true; saveBtn.hidden = false; qs('#qb-save-name').value = ''; }
-      }).catch(function () { toast('Could not save the query'); });
-    });
-    update();
-  }
-
-  // ============================================================
   // PAGE: ICT Reports
   // ============================================================
   function initReports() {
@@ -900,7 +566,7 @@
       qs('#rx-m-tag').textContent = r.tag; qs('#rx-m-date').textContent = r.date;
       qs('#rx-m-title').textContent = r.title; qs('#rx-m-desc').textContent = r.desc;
       qs('#rx-m-rel').innerHTML = r.related.length ? '<p class="ui-k">The data behind it</p>' + r.related.map(function (x) {
-        return '<div class="rx-m-cat"><a href="/indicators?domain=' + encodeURIComponent(x.d) + '"><span>' + esc(x.label) + '</span><b>' + x.n + ' indicators</b></a><p>' + x.names.map(esc).join(' · ') + (x.n > x.names.length ? ' and more' : '') + '</p></div>';
+        return '<div class="rx-m-cat"><a href="/data"><span>' + esc(x.label) + '</span><b>' + x.n + ' indicators</b></a><p>' + x.names.map(esc).join(' · ') + (x.n > x.names.length ? ' and more' : '') + '</p></div>';
       }).join('') : '';
       if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
       document.documentElement.classList.add('ui-locked');
@@ -1412,8 +1078,6 @@
     initAccordions('.faq-item', '.faq-q');
     if (page === 'home') { initHome(); if (window.__DASHBOARD_STATE__) initDashboardTopic(); }
     // the Data Explorer runs on its own engine, public/explorer.js
-    if (page === 'catalogue') initCatalogue();
-    if (page === 'query') initQueryBuilder();
     if (page === 'reports') initReports();
     if (page === 'team') initTeam();
     if (page === 'programs') initPrograms();
@@ -1580,4 +1244,18 @@
   document.addEventListener('change', function (e) { if (e.target.type === 'range') sync(e.target); });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', all); else all();
   setInterval(function () { if (!document.hidden) all(); }, 300);
+})();
+
+// ---------- the navy panel's grid (Request Access, Submit a Paper): a few cells light and fade at a time ----------
+// Log In runs its own (initLogin).
+(function () {
+  if (window.__NICTD_PAGE__ === 'login' || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var cells = [].slice.call(document.querySelectorAll('.lg-cells i'));
+  if (!cells.length) return;
+  setInterval(function () {
+    if (document.hidden) return;
+    var c = cells[Math.floor(Math.random() * cells.length)];
+    c.classList.add('on');
+    setTimeout(function () { c.classList.remove('on'); }, 1600 + Math.random() * 1400);
+  }, 260);
 })();

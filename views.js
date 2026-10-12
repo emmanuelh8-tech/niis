@@ -2235,10 +2235,7 @@ exports.submitPaper = (ctx, { errors = [], values = {}, done = false } = {}) => 
     <div class="lg-brand sp-brand">
       <div class="lg-cells" aria-hidden="true">${'<i></i>'.repeat(96)}</div>
       <div class="lg-brand-in sp-brand-in">
-        <a class="lg-seal" href="/">
-          ${imgs.exists('brand', 'seal') ? `<img src="${esc(imgs.url('brand', 'seal'))}" alt="" width="54" height="58" decoding="async">` : sealLogo(54)}
-          <span><strong>NIIS</strong><span>National ICT Intelligence System</span></span>
-        </a>
+        <a class="lg-seal" href="/" aria-label="NIIS home"><span><span>National ICT Intelligence System</span></span></a>
         <h2>Send your research to the NIIS library</h2>
       </div>
     </div>

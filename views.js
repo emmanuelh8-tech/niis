@@ -237,7 +237,7 @@ function mainNav(active, q) {
   const links = [
     ['/', 'Home', 'home', null, 'Home'],
     ['/data', 'Data Explorer', 'bars', [['/landscape', 'Data Landscape', 'layers']], 'Data'],
-    ['/reports', 'ICT Reports', 'chart', null, 'Reports'],
+    ['/reports', 'ICT Reports', 'chart', [['/updates', 'News & Updates', 'doc']], 'Reports'],
     ['/research', 'Research', 'doc', [['/research/submit', 'Submit Paper', 'plus']], 'Research'],
     ['/partners', 'Our Partners', 'globe', null, 'Partners'],
     ['/careers', 'Careers', 'briefcase', [['/careers/programs', 'Programs', 'calendar']], 'Careers'],
@@ -2883,63 +2883,117 @@ function updAgo(d) {
   // within the year the day and month say it; older updates carry the year too
   return `${+m[3]} ${UPD_MONTHS[+m[2] - 1]}${+m[1] === now.getUTCFullYear() ? '' : ' ' + m[1]}`;
 }
-// The advertisers in the news page's side rails. Each runs its own campaign artwork from its own site
-// (public/img/ads, downloaded with the owner's approval) and only words those campaigns or sites use.
+// The advertisers in the news and reports pages. Each runs its own campaign artwork from its own site
+// (public/img/ads, downloaded with the owner's approval) and only words those campaigns or sites use;
+// the two NIIS boxes invite advertisers. Every box can be closed (app.js remembers it for the visit).
 const NEWS_ADS = {
-  orange: { name: 'Orange Liberia', href: 'https://www.orange.com.lr/', site: 'orange.com.lr',
+  orange: { name: 'Orange Liberia', href: 'https://www.orange.com.lr/', site: 'orange.com.lr', img: 'orange',
     h: 'Get access to AI without data', p: 'Just call Lorpu on 2026 or text LAD to 2026 to subscribe.' },
-  lonestar: { name: 'Lonestar Cell MTN', href: 'https://lonestarcell.com/', site: 'lonestarcell.com',
+  lonestar: { name: 'Lonestar Cell MTN', href: 'https://lonestarcell.com/', site: 'lonestarcell.com', img: 'lonestar',
     h: 'Y’ello to the MTN Nation', p: 'Yor thank you plenty. Here’s to you, the people who make 300 million possible.' },
-  arcelormittal: { name: 'ArcelorMittal Liberia', href: 'https://liberia.arcelormittal.com/', site: 'liberia.arcelormittal.com',
+  arcelormittal: { name: 'ArcelorMittal Liberia', href: 'https://liberia.arcelormittal.com/', site: 'liberia.arcelormittal.com', img: 'arcelormittal',
     h: 'Smarter steels for people and planet', p: 'Our mining operations in Liberia prioritize safety.' },
-  globalpharm: { name: 'Global Pharm', href: 'https://gpmlafrica.com/', site: 'gpmlafrica.com',
+  globalpharm: { name: 'Global Pharm', href: 'https://gpmlafrica.com/', site: 'gpmlafrica.com', img: 'globalpharm',
     h: 'Better Medicines for Better Healthcare.', p: 'Quality pharmaceutical products, made in Liberia.' },
+  'niis-a': { name: 'NIIS', href: '/about', site: 'Advertise with us', house: 'Your brand<br>here',
+    h: 'Advertise with NIIS', p: 'Put your brand beside Liberia’s ICT news and reports.' },
+  'niis-b': { name: 'NIIS', href: '/about', site: 'Advertise with us', house: 'This space<br>is yours',
+    h: 'Reach Liberia’s ICT readers', p: 'Advertise on the national ICT data platform. Contact the NIIS team.' },
 };
+// rails on wide screens; on narrower ones the same adverts come in pairs between the headlines
+const AD_LEFT = ['orange', 'arcelormittal', 'niis-a'];
+const AD_RIGHT = ['lonestar', 'globalpharm', 'niis-b'];
+const AD_PAIRS = [['orange', 'lonestar'], ['arcelormittal', 'globalpharm'], ['niis-a', 'niis-b']];
 function newsAd(key, k) {
   const a = NEWS_ADS[key];
-  return `<div class="ad-slot">
+  const out = /^https?:/.test(a.href);
+  return `<div class="ad-slot" data-ad="${key}">
       <p class="ad-tag">Advertisement</p>
-      <a class="ad ad--${key}" style="--d:${k}" href="${a.href}" target="_blank" rel="sponsored noopener noreferrer" aria-label="Advertisement: ${esc(a.name)}, ${esc(a.h)}. Opens ${esc(a.site)}">
-        <span class="ad-brand"><i aria-hidden="true"></i>${esc(a.name)}</span>
-        <span class="ad-media"><img src="/img/ads/${key}.webp?v=${ASSET_V}" alt="" loading="lazy" decoding="async"></span>
-        <span class="ad-copy"><b class="ad-h">${esc(a.h)}</b><span class="ad-p">${esc(a.p)}</span></span>
-        <span class="ad-cta"><span>${esc(a.site)}</span>${icon('arrow')}</span>
-        <span class="ad-timer" aria-hidden="true"></span>
-      </a>
+      <div class="ad-box">
+        <a class="ad ad--${a.house ? 'house' : key}${key === 'niis-b' ? ' is-alt' : ''}" style="--d:${k}" href="${a.href}"${out ? ' target="_blank" rel="sponsored noopener noreferrer"' : ''} aria-label="Advertisement: ${esc(a.name)}, ${esc(a.h)}${out ? `. Opens ${esc(a.site)}` : ''}">
+          <span class="ad-brand"><i aria-hidden="true"></i>${esc(a.name)}</span>
+          ${a.house ? `<span class="ad-media ad-house" aria-hidden="true"><b>${a.house}</b></span>`
+            : `<span class="ad-media"><img src="/img/ads/${a.img}.webp?v=${ASSET_V}" alt="" loading="lazy" decoding="async"></span>`}
+          <span class="ad-copy"><b class="ad-h">${esc(a.h)}</b><span class="ad-p">${esc(a.p)}</span></span>
+          <span class="ad-cta"><span>${esc(a.site)}</span>${icon('arrow')}</span>
+          <span class="ad-timer" aria-hidden="true"></span>
+        </a>
+        <button type="button" class="ad-x" data-ad-x="${key}" aria-label="Close this advertisement (${esc(a.name)})">${icon('x')}</button>
+      </div>
     </div>`;
 }
-exports.updates = (ctx, items) => {
-  const meta = (u) => {
-    const demo = STAT_FIGURE.test(String(u.title || '') + ' ' + String(u.body || ''));
-    const iso = (/^(\d{4}-\d{2}-\d{2})/.exec(String(u.published_on || '')) || [])[1] || '';
-    return `<span class="bbc-meta"><time datetime="${iso}">${esc(updAgo(u.published_on))}</time><span class="bbc-sep" aria-hidden="true"></span><span>${esc(updCategory(u.category))}</span>${demo ? `<span class="bbc-sep" aria-hidden="true"></span><span title="Demonstration figures">Demo data</span>` : ''}</span>`;
-  };
-  const lead = items[0];
+// The page in the BBC News format, shared by News & Updates and ICT Reports: a lead (full-width photo,
+// a large serif headline after a red "Latest" marker, its summary), then rows under a dark rule, a
+// thumbnail beside a serif headline and its meta line. Adverts run in the side rails on wide screens
+// and come in pairs after every four headlines on narrower ones.
+//   lead / rows: { href, img, title, body?, meta?, ext?: source name, open?: dialog index }
+function bbcLayout({ h1, lead, rows }) {
+  const linkAttrs = (x) => `href="${esc(x.href)}"${x.ext ? ' target="_blank" rel="noopener noreferrer"' : ''}${x.open != null ? ` data-open="${x.open}"` : ''}`;
+  const img = (src, w, h, eager) => (src ? `<img src="${esc(src)}" alt="" width="${w}" height="${h}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">` : '<i class="bbc-noimg" aria-hidden="true"></i>');
   const leadHtml = lead ? `<article class="bbc-lead" aria-labelledby="bbc-lead-h">
-      <a class="bbc-lead-img" href="/updates/${esc(updateSlug(lead))}" tabindex="-1" aria-hidden="true"><img src="${esc(updPhoto(items, 0))}" alt="" width="1200" height="675" decoding="async"></a>
+      <a class="bbc-lead-img" ${linkAttrs(lead)} tabindex="-1" aria-hidden="true">${img(lead.img, 1200, 675, true)}</a>
       <div class="bbc-lead-in">
-        <h2 class="bbc-lead-h" id="bbc-lead-h"><a href="/updates/${esc(updateSlug(lead))}"><span class="bbc-flag"><i aria-hidden="true"></i>Latest</span> ${esc(String(lead.title || ''))}</a></h2>
-        <p class="bbc-lead-p">${esc(String(lead.body || ''))}</p>
-        ${STAT_FIGURE.test(String(lead.title || '') + ' ' + String(lead.body || '')) ? meta(lead) : ''}
+        <h2 class="bbc-lead-h" id="bbc-lead-h"><a ${linkAttrs(lead)}><span class="bbc-flag"><i aria-hidden="true"></i>Latest</span> ${esc(lead.title)}</a></h2>
+        ${lead.body ? `<p class="bbc-lead-p">${esc(lead.body)}</p>` : ''}
+        ${lead.meta || ''}
       </div>
     </article>` : '';
-  const rows = items.slice(1).map((u, k) => `<li class="bbc-item" id="${updateAnchor(u)}">
-        <a class="bbc-row" href="/updates/${esc(updateSlug(u))}">
-          <span class="bbc-thumb"><img src="${esc(updPhoto(items, k + 1))}" alt="" width="480" height="270" loading="${k < 4 ? 'eager' : 'lazy'}" decoding="async"></span>
-          <span class="bbc-txt"><span class="bbc-h">${esc(String(u.title || ''))}</span>${meta(u)}</span>
+  const pairs = AD_PAIRS.slice();
+  const adRow = () => {
+    const p = pairs.shift();
+    return p ? `<li class="bbc-adrow">${newsAd(p[0], 0)}${newsAd(p[1], 1)}</li>` : '';
+  };
+  let list = '';
+  rows.forEach((r, k) => {
+    list += `<li class="bbc-item"${r.id ? ` id="${esc(r.id)}"` : ''}>
+        <a class="bbc-row" ${linkAttrs(r)}${r.ext ? ` aria-label="${esc(r.title)} (${esc(r.ext)}, opens in a new tab)"` : ''}>
+          <span class="bbc-thumb">${img(r.img, 480, 270, k < 4)}</span>
+          <span class="bbc-txt"><span class="bbc-h">${esc(r.title)}</span>${r.meta || ''}</span>
         </a>
-      </li>`).join('');
-  return shell(ctx, {
-    title: 'News & Updates', body: `
-  <div class="bbc-page">
-  <aside class="bbc-rail is-left" aria-label="Advertisements">${newsAd('orange', 0)}${newsAd('arcelormittal', 2)}</aside>
-  <div class="bbc" id="newsNotices">
-    <h1 class="sr-only">News &amp; Updates</h1>
-    ${items.length ? `${leadHtml}
-    ${rows ? `<ol class="bbc-list">${rows}</ol>` : ''}` : '<p class="bbc-empty">No updates have been published yet.</p>'}
+      </li>`;
+    // the lead is the first headline, so a pair follows every fourth one (rows 3, 7, 11 ...)
+    if ((k + 2) % 4 === 0) list += adRow();
+  });
+  while (pairs.length) list += adRow();
+  return `<div class="bbc-page">
+  <aside class="bbc-rail is-left" aria-label="Advertisements">${AD_LEFT.map((key, k) => newsAd(key, k * 2)).join('')}</aside>
+  <div class="bbc">
+    <h1 class="sr-only">${h1}</h1>
+    ${leadHtml}
+    ${list ? `<ol class="bbc-list">${list}</ol>` : ''}
   </div>
-  <aside class="bbc-rail is-right" aria-label="Advertisements">${newsAd('lonestar', 1)}${newsAd('globalpharm', 3)}</aside>
-  </div>`,
+  <aside class="bbc-rail is-right" aria-label="Advertisements">${AD_RIGHT.map((key, k) => newsAd(key, k * 2 + 1)).join('')}</aside>
+  </div>`;
+}
+const bbcMeta = (iso, label, extra = '') => `<span class="bbc-meta"><time datetime="${esc(iso)}">${esc(updAgo(iso))}</time><span class="bbc-sep" aria-hidden="true"></span><span>${esc(label)}</span>${extra ? `<span class="bbc-sep" aria-hidden="true"></span><span>${extra}</span>` : ''}</span>`;
+// ICT news from Liberia reported elsewhere: each row names its source and opens the article there
+// (headline, date and photo as published; photos downloaded with the owner's approval).
+const EXT_NEWS = [
+  { date: '2026-09-07', source: 'Liberian Observer', img: 'lta-buchanan',
+    title: 'LTA Opens First County Consumer Support Center in Buchanan',
+    href: 'https://www.liberianobserver.com/news/lta-opens-first-county-consumer-support-center-in-buchanan/article_07cdb5f6-80ff-4e39-8f45-a990e5bdf119.html' },
+  { date: '2026-07-25', source: 'LTA', img: 'lta-atu',
+    title: 'LTA Secures US$361,151 ATU Debt Waiver, Restores Liberia’s Voting Rights',
+    href: 'https://lta.gov.lr/lta-secures-us361151-atu-debt-waiver-restores-liberias-voting-rights/' },
+  { date: '2026-07-17', source: 'FrontPage Africa', img: 'lta-reforms',
+    title: 'LTA Unveils Sweeping Telecom Reforms, Revokes Star Cell License After Six Years of Inactivity',
+    href: 'https://frontpageafricaonline.com/liberia-lta-unveils-sweeping-telecom-reforms-revokes-star-cell-license-after-six-years-of-inactivity/' },
+  { date: '2026-06-16', source: 'TechAfrica News', img: 'transco-fibre',
+    title: 'Liberia Advances Regional Fiber Optic Expansion Strategy Through TRANSCO CLSG Partnership',
+    href: 'https://techafricanews.com/2026/06/16/liberia-advances-regional-fiber-optic-expansion-strategy-through-transco-clsg-partnership/' },
+];
+exports.updates = (ctx, items) => {
+  const iso = (u) => (/^(\d{4}-\d{2}-\d{2})/.exec(String(u.published_on || '')) || [])[1] || '';
+  const demo = (u) => STAT_FIGURE.test(String(u.title || '') + ' ' + String(u.body || ''));
+  const meta = (u) => bbcMeta(iso(u), updCategory(u.category), demo(u) ? '<span title="Demonstration figures">Demo data</span>' : '');
+  const lead = items[0] ? { href: '/updates/' + updateSlug(items[0]), img: updPhoto(items, 0), title: String(items[0].title || ''),
+    body: String(items[0].body || ''), meta: demo(items[0]) ? meta(items[0]) : '' } : null;
+  const rows = items.slice(1).map((u, k) => ({ id: updateAnchor(u), href: '/updates/' + updateSlug(u), img: updPhoto(items, k + 1), title: String(u.title || ''), meta: meta(u) }))
+    .concat(EXT_NEWS.map((n) => ({ href: n.href, ext: n.source, img: `/img/news/ext/${n.img}.webp?v=${ASSET_V}`, title: n.title, meta: bbcMeta(n.date, n.source) })));
+  return shell(ctx, {
+    title: 'News & Updates', active: '/updates', body: lead || rows.length
+      ? bbcLayout({ h1: 'News &amp; Updates', lead, rows })
+      : '<div class="bbc"><p class="bbc-empty">No updates have been published yet.</p></div>',
   });
 };
 // ============ ONE UPDATE ============
@@ -3145,91 +3199,22 @@ exports.partners = (ctx, { partners = [] }) => {
 // platform yet, so the page offers no download. Logic: app.js, initReports.
 const REPORT_MONTH = { Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6, Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12, Q1: 3, Q2: 6, Q3: 9, Q4: 12 };
 const reportOrder = (r) => r.year * 100 + (REPORT_MONTH[String(r.date).split(' ')[0]] || 0);
+// ICT Reports in the same BBC News format as News & Updates: the latest report leads, the others
+// follow as rows; a report opens its summary in the dialog (app.js, initReports).
 exports.reports = (ctx, { indicators = [], domainLabels = {} } = {}) => {
   const byDomain = {};
   indicators.forEach((i) => (byDomain[i.domain] = byDomain[i.domain] || []).push(i));
-  const list = NATIONAL_REPORTS.map((r, i) => ({ ...r, i, bg: slotBg('reports', r.img, true) }));
-  const latest = list.slice().sort((a, b) => reportOrder(b) - reportOrder(a))[0];
-  const tags = [...new Set(list.map((r) => r.tag))];
-  const covered = [...new Set(list.flatMap((r) => r.domains || []))].filter((d) => byDomain[d]);
+  const list = NATIONAL_REPORTS.map((r, i) => ({ ...r, i, bg: slotBg('reports', r.img, true), photo: imgs.url('reports', r.img) }));
   const related = (r) => (r.domains || []).filter((d) => byDomain[d]).map((d) => ({ d, label: domainLabels[d] || d, n: byDomain[d].length, names: byDomain[d].slice(0, 5).map((x) => x.name) }));
-  const chipsFor = (r) => related(r).map((x) => `<a class="ui-chip" href="/data">${esc(x.label)} <b>${x.n}</b></a>`).join('');
-  const card = (r) => `<article class="rx-card" data-rp-item data-tag="${esc(r.tag)}" data-search="${esc((r.title + ' ' + r.tag + ' ' + r.desc + ' ' + r.date).toLowerCase())}">
-        <button type="button" class="rx-card-hit" data-open="${r.i}" aria-label="Read the summary: ${esc(r.title)}"></button>
-        <div class="rx-card-img" style="${r.bg}"><span class="rx-card-n">${String(r.i + 1).padStart(2, '0')}</span></div>
-        <div class="rx-card-body">
-          <p class="rx-card-meta"><span class="rx-tag">${esc(r.tag)}</span><span>${esc(r.date)}</span></p>
-          <h3>${esc(r.title)}</h3>
-          <p>${esc(r.desc)}</p>
-          <span class="rx-card-go">Read the summary ${icon('arrow')}</span>
-        </div>
-      </article>`;
-  const timeline = list.slice().sort((a, b) => reportOrder(a) - reportOrder(b));
+  const ordered = list.slice().sort((a, b) => reportOrder(b) - reportOrder(a));
+  const meta = (r) => `<span class="bbc-meta"><span>${esc(r.date)}</span><span class="bbc-sep" aria-hidden="true"></span><span>${esc(r.tag)}</span></span>`;
+  const [first, ...rest] = ordered;
+  const lead = first ? { href: '/reports#report-' + first.i, open: first.i, img: first.photo, title: first.title, body: first.desc, meta: meta(first) } : null;
+  const rows = rest.map((r) => ({ id: 'report-' + r.i, href: '/reports#report-' + r.i, open: r.i, img: r.photo, title: r.title, meta: meta(r) }));
   const state = list.map((r) => ({ title: r.title, tag: r.tag, date: r.date, desc: r.desc, bg: r.bg, related: related(r) }));
   return shell(ctx, {
     title: 'ICT Reports', active: '/reports', workspaceActive: 'reports', body: `
-  ${pageHeader('reports', 'ICT Reports', 'Official statistical and sector reports from the ICT Statistics & Policy Unit.')}
-  <div class="rx">
-    <section class="rx-feature wrap">
-      ${eyebrow('Latest release')}
-      <article class="rx-feat" data-rise-block>
-        <div class="rx-feat-img" style="${latest.bg}"><span class="rx-feat-date">${esc(latest.date)}</span></div>
-        <div class="rx-feat-body">
-          <span class="rx-tag">${esc(latest.tag)}</span>
-          <h2 data-rise-head>${esc(latest.title)}</h2>
-          <p class="rx-feat-desc">${esc(latest.desc)}</p>
-          ${related(latest).length ? `<div class="rx-related"><p class="ui-k">The data behind it</p><div class="rx-chips">${chipsFor(latest)}</div></div>` : ''}
-          <div class="rx-actions">
-            <button type="button" class="ui-btn ui-btn-primary" data-open="${latest.i}">Read the summary ${icon('arrow')}</button>
-            <a class="ui-btn" href="/data">Explore the data</a>
-          </div>
-        </div>
-      </article>
-    </section>
-
-    <section class="rx-stats-band wrap">
-      <dl class="ui-stats">
-        <div><dt>Reports published</dt><dd data-count="${list.length}">${list.length}</dd></div>
-        <div><dt>Report types</dt><dd data-count="${tags.length}">${tags.length}</dd></div>
-        <div><dt>Latest release</dt><dd>${esc(latest.date)}</dd></div>
-        <div><dt>Indicator categories drawn on</dt><dd data-count="${covered.length}">${covered.length}</dd></div>
-      </dl>
-    </section>
-
-    <section class="rx-lib wrap" aria-labelledby="rx-lib-h">
-      <div class="rx-lib-head">
-        <h2 id="rx-lib-h" data-rise-head>All reports</h2>
-        <div class="ui-search" role="search">
-          ${icon('search')}
-          <input id="rx-q" type="search" placeholder="Search reports" aria-label="Search reports" autocomplete="off">
-          <button type="button" class="ui-search-x" aria-label="Clear the search" hidden>${icon('x')}</button>
-        </div>
-      </div>
-      <div class="rx-tags" role="group" aria-label="Report type">
-        <button type="button" class="ui-chip is-on" data-tag="" aria-pressed="true">All <b>${list.length}</b></button>
-        ${tags.map((t) => `<button type="button" class="ui-chip" data-tag="${esc(t)}" aria-pressed="false">${esc(t)} <b>${list.filter((r) => r.tag === t).length}</b></button>`).join('')}
-      </div>
-      <div class="rx-grid is-all" id="rx-grid">${list.map(card).join('')}</div>
-      <div class="ui-empty" hidden>
-        <div class="ui-empty-art" aria-hidden="true">${'<i></i>'.repeat(9)}</div>
-        <h3>No report matches that search</h3>
-        <p>Clear the box or pick a different report type.</p>
-        <button type="button" class="ui-btn" data-reset>Show all reports</button>
-      </div>
-    </section>
-
-    <section class="rx-time wrap" aria-labelledby="rx-time-h">
-      <h2 id="rx-time-h" data-rise-head>Publication timeline</h2>
-      <ol class="rx-tl">
-        ${timeline.map((r, k) => `<li style="--k:${k}">
-          <span class="rx-tl-date">${esc(r.date)}</span>
-          <span class="rx-tl-dot" aria-hidden="true"></span>
-          <button type="button" class="rx-tl-t" data-open="${r.i}">${esc(r.title)}</button>
-          <span class="rx-tl-tag">${esc(r.tag)}</span>
-        </li>`).join('')}
-      </ol>
-    </section>
-  </div>
+  ${bbcLayout({ h1: 'ICT Reports', lead, rows })}
   <dialog class="rx-modal" id="rx-modal" aria-labelledby="rx-m-title">
     <div class="rx-m-img" id="rx-m-img"></div>
     <button type="button" class="rx-m-x" data-close aria-label="Close">${icon('x')}</button>

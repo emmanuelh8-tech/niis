@@ -515,52 +515,13 @@
   // ============================================================
   // PAGE: ICT Reports
   // ============================================================
+  // ICT Reports: a report's headline opens its summary in the dialog
   function initReports() {
-    var data = window.__REPORTS__;
-    var root = qs('.rx');
-    if (!data || !root) return;
-    var grid = qs('#rx-grid'), cards = qsa('[data-rp-item]', grid), chips = qsa('.rx-tags .ui-chip', root);
-    var empty = qs('.rx-lib .ui-empty', root), tag = '';
-    var search = wireSearch(qs('.rx-lib .ui-search', root), function () { apply(); });
-    // filtering rearranges the cards with a FLIP: measure, change, then play each card from its old place
-    function apply() {
-      var words = search.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
-      var before = new Map();
-      cards.forEach(function (c) { if (!c.hidden) before.set(c, c.getBoundingClientRect()); });
-      var n = 0;
-      cards.forEach(function (c) {
-        var ok = (!tag || c.dataset.tag === tag) && words.every(function (w) { return c.dataset.search.indexOf(w) !== -1; });
-        c.hidden = !ok; if (ok) n++;
-      });
-      empty.hidden = n > 0;
-      grid.classList.toggle('is-all', !tag && !words.length);
-      pressOnly(chips, 'data-tag', tag);
-      if (REDUCE) return;
-      cards.forEach(function (c) {
-        if (c.hidden) return;
-        var was = before.get(c), now = c.getBoundingClientRect();
-        if (was) {
-          var dx = was.left - now.left, dy = was.top - now.top;
-          if (dx || dy) c.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' });
-        } else {
-          c.animate([{ opacity: 0, transform: 'scale(.96) translateY(8px)', filter: 'blur(4px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], { duration: 380, easing: 'cubic-bezier(.2,.8,.2,1)' });
-        }
-      });
-    }
-    chips.forEach(function (c) { c.addEventListener('click', function () { tag = c.dataset.tag; apply(); }); });
-    qs('[data-reset]', root).addEventListener('click', function () { tag = ''; search.value = ''; qs('.rx-lib .ui-search-x', root).hidden = true; apply(); });
-    // a soft light follows the pointer across a card
-    cards.forEach(function (c) {
-      c.addEventListener('pointermove', function (e) {
-        var r = c.getBoundingClientRect();
-        c.style.setProperty('--mx', (e.clientX - r.left) + 'px'); c.style.setProperty('--my', (e.clientY - r.top) + 'px');
-      });
-    });
-    // the summary dialog
-    var dlg = qs('#rx-modal'), lastBtn = null;
+    var data = window.__REPORTS__, dlg = qs('#rx-modal'), lastBtn = null;
+    if (!data || !dlg) return;
     function open(i, btn) {
       var r = data[i];
-      if (!r || !dlg) return;
+      if (!r) return;
       lastBtn = btn;
       qs('#rx-m-img').setAttribute('style', r.bg);
       qs('#rx-m-tag').textContent = r.tag; qs('#rx-m-date').textContent = r.date;
@@ -571,16 +532,13 @@
       if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
       document.documentElement.classList.add('ui-locked');
     }
-    function close() {
-      if (dlg.close) dlg.close(); else dlg.removeAttribute('open');
-    }
-    if (dlg) {
-      dlg.addEventListener('close', function () { document.documentElement.classList.remove('ui-locked'); if (lastBtn) lastBtn.focus({ preventScroll: true }); });
-      dlg.addEventListener('click', function (e) { if (e.target === dlg || e.target.closest('[data-close]')) close(); });
-    }
-    qsa('[data-open]', root).forEach(function (b) { b.addEventListener('click', function () { open(Number(b.dataset.open), b); }); });
-    initCounters(root);
-    initInView('.rx-tl, .rx-feat');
+    function close() { if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); }
+    dlg.addEventListener('close', function () { document.documentElement.classList.remove('ui-locked'); if (lastBtn) lastBtn.focus({ preventScroll: true }); });
+    dlg.addEventListener('click', function (e) { if (e.target === dlg || e.target.closest('[data-close]')) close(); });
+    qsa('[data-open]').forEach(function (b) { b.addEventListener('click', function (e) { e.preventDefault(); open(Number(b.dataset.open), b); }); });
+    // a link to one report (/reports#report-3) opens its summary
+    var m = /^#report-(\d+)$/.exec(location.hash);
+    if (m) open(Number(m[1]), null);
   }
 
   // ============================================================
@@ -1258,4 +1216,25 @@
     c.classList.add('on');
     setTimeout(function () { c.classList.remove('on'); }, 1600 + Math.random() * 1400);
   }, 260);
+})();
+
+// ---------- adverts: the close button hides that advert (and its copy elsewhere on the page) for the visit ----------
+(function () {
+  var KEY = 'niis-ads-closed';
+  function closed() { try { return JSON.parse(sessionStorage.getItem(KEY) || '[]'); } catch (e) { return []; } }
+  function hide(k) {
+    [].forEach.call(document.querySelectorAll('.ad-slot[data-ad="' + k + '"]'), function (s) { s.hidden = true; });
+    [].forEach.call(document.querySelectorAll('.bbc-adrow'), function (r) { r.hidden = !r.querySelector('.ad-slot:not([hidden])'); });
+  }
+  if (!document.querySelector('.ad-slot')) return;
+  closed().forEach(hide);
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-ad-x]');
+    if (!b) return;
+    e.preventDefault();
+    var k = b.getAttribute('data-ad-x'), c = closed();
+    hide(k);
+    if (c.indexOf(k) < 0) c.push(k);
+    try { sessionStorage.setItem(KEY, JSON.stringify(c)); } catch (e2) {}
+  });
 })();

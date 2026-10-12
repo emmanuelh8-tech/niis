@@ -3566,11 +3566,6 @@ body.dx-fs-open { overflow: hidden; }
 .lsc-go:hover { background: var(--navy-600); }
 
 /* ---- how to read this ---- */
-.lsc-legend { margin-top: 2.4rem; border-top: 1px solid var(--line); padding-top: 1.3rem; }
-.lsc-legend h2 { margin: 0 0 .8rem; font: 700 1.1rem/1.2 var(--serif); }
-.lsc-legend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(228px, 1fr)); gap: 1rem 1.4rem; }
-.lsc-legend-grid div { font-size: .82rem; line-height: 1.55; color: var(--ink); }
-.lsc-legend-grid b { font-weight: 800; }
 
 @media (max-width: 1080px) {
   .lsc-stage { grid-template-columns: 1fr; }
@@ -4170,7 +4165,6 @@ html { -webkit-text-size-adjust: 100%; }
   .lsc-an-plot.is-wide { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; scrollbar-width: none; }
   .lsc-an-plot.is-wide::-webkit-scrollbar { display: none; }
   .lsc-an-card:has(.lsc-an-plot.is-wide)::after { content: 'Swipe the chart sideways'; display: block; margin-top: .4rem; font-size: .72rem; font-weight: 600; color: var(--muted); text-align: right; }
-  .lsc-legend-grid { grid-template-columns: 1fr; }
 }
 
 

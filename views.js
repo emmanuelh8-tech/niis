@@ -1740,15 +1740,6 @@ exports.landscape = (ctx, { indicators, meta, year, years, counties }) => shell(
       </div>
     </section>
 
-    <div class="lsc-legend">
-      <h2>How to read this</h2>
-      <div class="lsc-legend-grid">
-        <div><b>Tower height is the value.</b> The taller the tower, the higher the figure for that county. The scale is fixed across every year of an indicator, so when you scrub the years you are watching real change, not a rescaled picture.</div>
-        <div><b>Colour says the same thing again.</b> Pale to deep on the national scale, so rank still reads where a tall tower stands in front of a short one. The county you point at turns red.</div>
-        <div><b>The floor is the map.</b> Each county tile carries a faint wash of its own value and uses the exact county boundaries, so the landscape still works as a map of Liberia.</div>
-        <div><b>The floating outline is the national figure.</b> Towers breaking through it are above the national level; towers under it are below. Counties with no recorded value show a grey tile and no tower.</div>
-      </div>
-    </div>
   </div>
 
   <div class="lsc-deck" id="lsc-deck" hidden role="dialog" aria-modal="true" aria-label="Visualization deck">

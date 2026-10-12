@@ -5596,3 +5596,9 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
 
 /* the profile hides an empty section (a patron with no education on record) and the social links of a real person */
 .pm-sec[hidden], .pm-social[hidden] { display: none; }
+
+/* each orb sits centred over its section's name: the menu arrow after a name hangs just past it
+   instead of widening the label, and the item keeps the arrow's room on its right */
+.dock .nav-label { position: relative; }
+.dock .nav-caret { position: absolute; left: calc(100% + .22rem); top: 50%; transform: translateY(-50%); }
+.dock-item.nav-has-sub { margin-right: .7rem; }

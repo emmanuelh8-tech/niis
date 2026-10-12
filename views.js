@@ -3631,7 +3631,7 @@ const LAPTOP = `<svg class="tc-laptop" viewBox="0 0 48 34" aria-hidden="true">
 // The first three are the patrons the owner has named, with what the Executive Mansion, the Ministry
 // of Foreign Affairs and the press record (no social links, nothing that sources disagree on); the
 // rest are sample profiles. Photographs: the President's from the Executive Mansion (the home slider);
-// the Vice President's and the Charge d'Affaires' are initials until real ones are sent.
+// the Vice President's and the Charge d'Affaires' as the owner sent them.
 const PATRONS = [
   { name: 'H.E. Joseph Nyuma Boakai, Sr.', img: 'joseph-boakai', role: 'President of the Republic of Liberia', real: true,
     bio: 'President of Liberia since 22 January 2024, and Vice President from 2006 to 2018. At the Liberia Technology Summit 2026 he set out investment in digital infrastructure, connectivity and cybersecurity.',
@@ -3758,7 +3758,7 @@ exports.team = (ctx) => {
       title: 'The people<br>behind NIIS.', label: 'Team members', note: 'Sample profiles with AI-generated placeholder photos, shown until appointments are confirmed.' })}
 
     ${studio({ id: 'pc', kind: 'patron', list: PATRONS, folder: 'patrons', mark: MEDAL, words: ['Our', 'patrons'], extra: 'is-patrons', anchor: 'patrons',
-      title: 'National ICT<br>Patrons.', label: 'Patrons', note: 'The first three are the patrons named so far (two photographs to follow); the others are sample profiles with AI-generated placeholder photos.' })}
+      title: 'National ICT<br>Patrons.', label: 'Patrons', note: 'The first three are the patrons named so far; the others are sample profiles with AI-generated placeholder photos.' })}
 
     <section class="tp wrap" id="talent" aria-labelledby="tp-h">
       <div class="tp-panel">

@@ -5306,29 +5306,29 @@ input[type=range]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px #10141
    glare behind it, the label fading out toward its foot. On hover the sheen lifts, the glare drops;
    pressed, it sinks. (After the "Pearl Button" component the owner chose,
    scaled from its poster size to the nav bar.) */
-:is(.nav-cta, .lg-submit).pearl { --pearl-bg: #0B2C63; position: relative; padding: 0; border: 0; border-radius: 100px; background: var(--pearl-bg); filter: none; cursor: pointer;
+:is(.nav-cta, .lg-submit, .sp2-send).pearl { --pearl-bg: #0B2C63; position: relative; padding: 0; border: 0; border-radius: 100px; background: var(--pearl-bg); filter: none; cursor: pointer;
   box-shadow: inset 0 .18rem .55rem rgba(255,255,255,.3), inset 0 -.06rem .2rem rgba(0,0,0,.7), inset 0 -.25rem .55rem rgba(255,255,255,.5),
     0 .7rem .9rem rgba(11,44,99,.22), 0 .35rem .35rem -.22rem rgba(11,44,99,.7);
   transition: box-shadow .2s ease, transform .2s ease; }
-:is(.nav-cta, .lg-submit).pearl .pearl-wrap { position: relative; display: block; overflow: hidden; padding: .58rem 1.05rem; border-radius: inherit;
+:is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-wrap { position: relative; display: block; overflow: hidden; padding: .58rem 1.05rem; border-radius: inherit;
   color: rgba(255,255,255,.92); font: 600 .7rem/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
-:is(.nav-cta, .lg-submit).pearl .pearl-wrap::before, :is(.nav-cta, .lg-submit).pearl .pearl-wrap::after { content: ''; position: absolute; transition: all .3s ease; pointer-events: none; }
-:is(.nav-cta, .lg-submit).pearl .pearl-wrap::before { left: -15%; right: -15%; bottom: 25%; top: -100%; border-radius: 50%; background: rgba(255,255,255,.12); }
-:is(.nav-cta, .lg-submit).pearl .pearl-wrap::after { left: 6%; right: 6%; top: 12%; bottom: 40%; border-radius: 12px 12px 0 0;
+:is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-wrap::before, :is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-wrap::after { content: ''; position: absolute; transition: all .3s ease; pointer-events: none; }
+:is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-wrap::before { left: -15%; right: -15%; bottom: 25%; top: -100%; border-radius: 50%; background: rgba(255,255,255,.12); }
+:is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-wrap::after { left: 6%; right: 6%; top: 12%; bottom: 40%; border-radius: 12px 12px 0 0;
   box-shadow: inset 0 6px 5px -6px rgba(255,255,255,.8); background: linear-gradient(180deg, rgba(255,255,255,.3) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0) 100%); }
-:is(.nav-cta, .lg-submit).pearl .pearl-p { position: relative; display: flex; align-items: center; gap: .5rem; transform: translateY(2%); transition: transform .2s ease;
+:is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-p { position: relative; display: flex; align-items: center; gap: .5rem; transform: translateY(2%); transition: transform .2s ease;
   -webkit-mask-image: linear-gradient(to bottom, #fff 40%, transparent); mask-image: linear-gradient(to bottom, #fff 40%, transparent); }
-:is(.nav-cta, .lg-submit).pearl:hover { text-decoration: none;
+:is(.nav-cta, .lg-submit, .sp2-send).pearl:hover { text-decoration: none;
   box-shadow: inset 0 .18rem .3rem rgba(255,255,255,.4), inset 0 -.06rem .2rem rgba(0,0,0,.7), inset 0 -.25rem .55rem rgba(255,255,255,.7),
     0 .7rem .9rem rgba(11,44,99,.22), 0 .35rem .35rem -.22rem rgba(11,44,99,.7); }
-:is(.nav-cta, .lg-submit).pearl:hover .pearl-wrap::before { transform: translateY(-5%); }
-:is(.nav-cta, .lg-submit).pearl:hover .pearl-wrap::after { opacity: .4; transform: translateY(5%); }
-:is(.nav-cta, .lg-submit).pearl:hover .pearl-p { transform: translateY(-4%); }
-:is(.nav-cta, .lg-submit).pearl:active { transform: translateY(2px);
+:is(.nav-cta, .lg-submit, .sp2-send).pearl:hover .pearl-wrap::before { transform: translateY(-5%); }
+:is(.nav-cta, .lg-submit, .sp2-send).pearl:hover .pearl-wrap::after { opacity: .4; transform: translateY(5%); }
+:is(.nav-cta, .lg-submit, .sp2-send).pearl:hover .pearl-p { transform: translateY(-4%); }
+:is(.nav-cta, .lg-submit, .sp2-send).pearl:active { transform: translateY(2px);
   box-shadow: inset 0 .18rem .3rem rgba(255,255,255,.5), inset 0 -.06rem .2rem rgba(0,0,0,.8), inset 0 -.25rem .55rem rgba(255,255,255,.4),
     0 .5rem .7rem rgba(11,44,99,.2), 0 .28rem .28rem -.2rem rgba(11,44,99,.7); }
-:is(.nav-cta, .lg-submit).pearl:focus-visible { outline: 2px solid #FFCC00; outline-offset: 3px; }
-@media (prefers-reduced-motion: reduce) { :is(.nav-cta, .lg-submit).pearl, :is(.nav-cta, .lg-submit).pearl .pearl-p, :is(.nav-cta, .lg-submit).pearl .pearl-wrap::before, :is(.nav-cta, .lg-submit).pearl .pearl-wrap::after { transition: none; } }
+:is(.nav-cta, .lg-submit, .sp2-send).pearl:focus-visible { outline: 2px solid #FFCC00; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { :is(.nav-cta, .lg-submit, .sp2-send).pearl, :is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-p, :is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-wrap::before, :is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-wrap::after { transition: none; } }
 
 /* ============ THE PAGE ARRIVES WHOLE ============
    Nothing waits to be scrolled to: every section, card, chart, heading and number is in its
@@ -5643,3 +5643,66 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
 .pg-head.is-center { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: .45rem; text-align: center; }
 .pg-head.is-center h2 { margin: 0; font-family: var(--font-label); font-weight: 700; letter-spacing: .01em; }
 .pg-head.is-center > p { margin: 0; font-family: var(--sans); font-weight: 400; text-align: center; hyphens: manual; }
+
+/* ============ SUBMIT A PAPER, IN THE LOG IN STYLE ============
+   The same two halves as Log In: a navy panel on the left (a photograph of analysts at work fading
+   into the navy, the seal, one line and the step tracker, which stays in view as the form scrolls)
+   and the form centred on white on the right: the title in the label face, labels in capitals in
+   the label face, one column, and the navy pearl button. The panel runs into the footer. */
+.sp2-wrap.sp-page { max-width: none; padding: 0; }
+.sp-brand { align-items: flex-start; padding-top: clamp(14rem, 34vh, 21rem); }
+.sp-brand::before { inset: 0 0 auto 0; height: min(640px, 74vh);
+  background: linear-gradient(180deg, rgba(11,44,99,.18) 0%, rgba(11,44,99,.4) 100%), url('/img/about/analysts.jpg') 50% 32% / cover no-repeat; }
+.sp-brand .lg-cells { bottom: auto; height: min(900px, 100%); }
+.sp-brand-in { position: sticky; top: calc(var(--nav-h, 76px) + 1.6rem); }
+.sp-rail { position: static; padding: 0; border: 0; border-radius: 0; background: none; text-shadow: none; }
+.sp-rail li { color: rgba(255,255,255,.72); }
+.sp-rail li.is-here { background: rgba(255,255,255,.1); color: #fff; }
+.sp-rail .sp2-dot { border-color: rgba(255,255,255,.5); background: transparent; color: #fff; }
+.sp-rail li.is-done .sp2-dot { background: #fff; border-color: #fff; color: #0B2C63; }
+.sp-rail .sp2-meter { background: rgba(255,255,255,.18); }
+.sp-rail .sp2-meter i { background: #fff; }
+.sp-rail .sp2-left { color: #B9C9E6; }
+.sp-side { place-items: start center; padding: 3.4rem 1.6rem 4rem; }
+.lg-card.sp-card { width: min(560px, 100%); }
+.sp-lg .sp2 { display: block; }
+.sp-lg .sp2-alert { text-align: left; }
+.sp-lg .sp2-sheet { background: none; border: 0; border-radius: 0; box-shadow: none; }
+.sp-lg .sp2-sec { padding: 1.6rem 0; }
+.sp-lg .sp2-sec + .sp2-sec { border-top: 1px solid var(--line); }
+.sp-lg .sp2-head { flex-direction: column; align-items: center; gap: .55rem; margin-bottom: 1.2rem; text-align: center; }
+.sp-lg .sp2-head h2 { font-family: var(--font-label); font-weight: 400; font-size: 1.35rem; letter-spacing: .02em; color: #0B2C63; }
+.sp-lg .sp2-head p { text-align: center; }
+.sp-lg .sp2-grid { grid-template-columns: minmax(0, 1fr); gap: 1.15rem; }
+.sp-lg .sp2-field > label, .sp-lg .sp2-chips legend { width: 100%; font-family: var(--font-label); font-weight: 400; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: #2B2F36; text-align: center; }
+.sp-lg .sp2-under { justify-content: center; gap: .8rem; text-align: center; }
+.sp-lg .sp2-help, .sp-lg .sp2-err { text-align: center; }
+.sp-lg .sp2-chiprow { justify-content: center; }
+.sp-lg .sp2-check, .sp-lg .sp2-note { text-align: left; }
+.sp-lg .sp2-actions { flex-direction: column; align-items: stretch; gap: .9rem; padding: .4rem 0 0; }
+.sp-lg .sp2-cancel { align-self: center; }
+.sp2-send.pearl { display: block; width: 100%; min-height: 0; margin-top: .2rem; color: #fff; }
+.sp2-send.pearl .pearl-wrap { padding: 1.05rem 1.4rem; font-size: .8rem; letter-spacing: .14em; }
+.sp2-send.pearl .pearl-p { justify-content: center; gap: .6rem; }
+.sp2-send.pearl .sp2-spin { width: 14px; height: 14px; }
+@media (max-width: 900px) {
+  .sp-brand { min-height: 230px; padding-top: 1.4rem; align-items: flex-end; }
+  .sp-brand::before { inset: 0; height: auto; background: linear-gradient(180deg, rgba(11,44,99,.15) 0%, rgba(11,44,99,.4) 45%, rgba(7,28,68,.92) 100%), url('/img/about/analysts.jpg') 50% 35% / cover no-repeat; }
+  .sp-brand-in { position: static; }
+  .sp-side { padding: 2rem 1.2rem 6rem; }
+}
+
+/* ============ RESEARCH: THE PROMO SECTION ============
+   The two buttons are lettered in the label face. The section alone wears the carved masks of the
+   About page, very blurred, on white (in place of the binary canvas). The search and the year
+   filter sit further down, after the flagship paper, across the shelf. */
+.rp-btn { font-family: var(--font-label); font-weight: 400; letter-spacing: .05em; }
+section.rp { position: relative; isolation: isolate; overflow: hidden; background: #fff; }
+/* the masks, very blurred: the line work softened into its own tile (mask-pattern-soft.webp,
+   blurred with wrap-around so it repeats without seams) */
+section.rp::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: url("/img/brand/mask-pattern-soft.webp") 0 0 / 185px auto repeat; }
+.rp-shelf .rp-search-row { grid-column: 1 / -1; scroll-margin-top: calc(var(--nav-h, 76px) + 1.2rem); }
+.rp-shelf .rp-search-row .fbar { margin: 0; }
+/* the consent line stays a sentence beside its checkbox (it is a label too, so it opts out) */
+.sp-lg .sp2-field > label.sp2-check { display: flex; width: auto; font: 400 .95rem/1.55 var(--sans); letter-spacing: 0; text-transform: none; text-align: left; color: #17233A; }

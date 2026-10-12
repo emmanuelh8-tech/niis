@@ -2423,24 +2423,36 @@ exports.submitPaper = (ctx, { errors = [], values = {}, done = false } = {}) => 
 
   return shell(ctx, {
     title: 'Submit a Paper', active: '/research', workspaceActive: 'research', body: `
-  ${pageHeader('research', 'Submit a Paper', 'Send research, a working paper or a policy brief to the ICT Statistics & Policy Unit for review.')}
-  <div class="wrap section sp2-wrap">
-    <p class="sp2-lede">Anyone can submit, no account needed. A reviewer reads every paper before it goes into the NIIS research library.</p>
+  <div class="sp2-wrap sp-page">
+  <section class="lg sp-lg">
+    <div class="lg-brand sp-brand">
+      <div class="lg-cells" aria-hidden="true">${'<i></i>'.repeat(96)}</div>
+      <div class="lg-brand-in sp-brand-in">
+        <a class="lg-seal" href="/">
+          ${imgs.exists('brand', 'seal') ? `<img src="${esc(imgs.url('brand', 'seal'))}" alt="" width="54" height="58" decoding="async">` : sealLogo(54)}
+          <span><strong>NIIS</strong><span>National ICT Intelligence System</span></span>
+        </a>
+        <h2>Send your research to the NIIS library</h2>
+        <nav class="sp2-rail sp-rail" aria-label="Form progress">
+          <ol>
+            <li data-step="you"><span class="sp2-dot">1</span><span>About you</span></li>
+            <li data-step="paper"><span class="sp2-dot">2</span><span>Your paper</span></li>
+            <li data-step="send"><span class="sp2-dot">3</span><span>Confirm</span></li>
+          </ol>
+          <div class="sp2-meter" aria-hidden="true"><i></i></div>
+          <p class="sp2-left" data-left>6 required fields to go</p>
+        </nav>
+      </div>
+    </div>
+    <div class="lg-side sp-side">
+      <div class="lg-card sp-card">
+        <h1>Submit a Paper</h1>
+        <p class="lg-sub">Anyone can submit, no account needed. A reviewer reads every paper before it goes into the NIIS research library.</p>
 
-    ${errors.length ? `<div class="sp2-alert" role="alert"><b>A few things need fixing before this can be sent.</b>
-      <ul>${errors.map((e) => `<li>${esc(e.message)}</li>`).join('')}</ul></div>` : ''}
+        ${errors.length ? `<div class="sp2-alert" role="alert"><b>A few things need fixing before this can be sent.</b>
+          <ul>${errors.map((e) => `<li>${esc(e.message)}</li>`).join('')}</ul></div>` : ''}
 
     <form method="post" action="/research/submit" class="sp2" id="sp2" novalidate>
-      <nav class="sp2-rail" aria-label="Form progress">
-        <ol>
-          <li data-step="you"><span class="sp2-dot">1</span><span>About you</span></li>
-          <li data-step="paper"><span class="sp2-dot">2</span><span>Your paper</span></li>
-          <li data-step="send"><span class="sp2-dot">3</span><span>Confirm</span></li>
-        </ol>
-        <div class="sp2-meter" aria-hidden="true"><i></i></div>
-        <p class="sp2-left" data-left>6 required fields to go</p>
-      </nav>
-
       <div class="sp2-sheet">
         <section class="sp2-sec" data-sec="you" aria-labelledby="sp2-h-you">
           <header class="sp2-head"><span class="sp2-n" aria-hidden="true">1</span><div>
@@ -2488,11 +2500,14 @@ exports.submitPaper = (ctx, { errors = [], values = {}, done = false } = {}) => 
         </section>
 
         <div class="sp2-actions">
-          <button class="sp2-send" type="submit"><span class="sp2-send-t">Submit for review</span><span class="sp2-send-i" aria-hidden="true">${icon('arrow')}</span><span class="sp2-spin" aria-hidden="true"></span></button>
+          <button class="sp2-send pearl" type="submit"><span class="pearl-wrap"><span class="pearl-p"><span class="sp2-send-t">Submit for review</span><span class="sp2-spin" aria-hidden="true"></span></span></span></button>
           <a class="sp2-cancel" href="/research">Cancel</a>
         </div>
       </div>
     </form>
+      </div>
+    </div>
+  </section>
 
     <div class="sp2-bar" aria-hidden="true">
       <div class="sp2-bar-in">
@@ -2537,7 +2552,7 @@ const submitPaperScript = `
     f.closest('.sp2-wrap').style.setProperty('--sp2-p', String(done/req.length));
     [].forEach.call(document.querySelectorAll('[data-left]'), function(el){ el.textContent = left ? (left+' required field'+(left>1?'s':'')+' to go') : 'Ready to send'; });
     ['you','paper','send'].forEach(function(k){
-      var sec=f.querySelector('[data-sec="'+k+'"]'), dot=f.querySelector('[data-step="'+k+'"]');
+      var sec=f.querySelector('[data-sec="'+k+'"]'), dot=document.querySelector('[data-step="'+k+'"]');
       var rs=[].slice.call(sec.querySelectorAll('[data-req]'));
       if(dot) dot.classList.toggle('is-done', rs.length>0 && rs.every(ok));
     });
@@ -2560,7 +2575,7 @@ const submitPaperScript = `
   // the step you are on is the one in view
   if('IntersectionObserver' in window){
     var steps={};
-    [].forEach.call(f.querySelectorAll('[data-step]'),function(li){ steps[li.getAttribute('data-step')]=li; });
+    [].forEach.call(document.querySelectorAll('[data-step]'),function(li){ steps[li.getAttribute('data-step')]=li; });
     var io=new IntersectionObserver(function(es){ es.forEach(function(e){
       var k=e.target.getAttribute('data-sec');
       if(e.isIntersecting){ e.target.classList.add('is-in'); Object.keys(steps).forEach(function(s){ steps[s].classList.toggle('is-here', s===k); }); }
@@ -2572,6 +2587,13 @@ const submitPaperScript = `
   if(bar && 'IntersectionObserver' in window){
     new IntersectionObserver(function(es){ bar.classList.toggle('is-on', es[0].isIntersecting); },{ threshold:0 }).observe(f);
   }
+  // the navy panel's grid: a few cells light and fade at a time, as on Log In
+  var cells=[].slice.call(document.querySelectorAll('.sp-brand .lg-cells i'));
+  if(!reduce && cells.length) setInterval(function(){
+    if(document.hidden) return;
+    var c=cells[Math.floor(Math.random()*cells.length)]; c.classList.add('on');
+    setTimeout(function(){ c.classList.remove('on'); }, 1600+Math.random()*1400);
+  }, 260);
   var sending=false;
   f.addEventListener('submit',function(e){
     if(sending){ e.preventDefault(); return; }
@@ -2967,11 +2989,11 @@ exports.research = (ctx, { papers = [], canManage = false, canSubmit = false, no
   ${researchPromo()}
   <div class="wrap section page-black">
     ${notice ? `<div class="alert alert-ok">${esc(notice)}</div>` : ''}
-    <span id="paper-search"></span>
-    ${papers.length ? filterBar({ variant: 'pills', placeholder: 'Search papers by title, author or abstract', facetLabel: 'Year', facetAll: 'All years',
-      options: [...new Set(papers.map(paperYear).filter(Boolean))].sort((a, b) => b.localeCompare(a)).map((y) => ({ value: String(y), label: String(y) })),
-      total: papers.length, noun: 'papers' }) : ''}
-    ${papers.length ? `<div class="rp-shelf" id="rpShelf">${papers.map(paperCard).join('')}</div>
+    ${papers.length ? `<div class="rp-shelf" id="rpShelf">${papers.map(paperCard)[0]}
+      <div class="rp-search-row" id="paper-search">${filterBar({ variant: 'pills', placeholder: 'Search papers by title, author or abstract', facetLabel: 'Year', facetAll: 'All years',
+        options: [...new Set(papers.map(paperYear).filter(Boolean))].sort((a, b) => b.localeCompare(a)).map((y) => ({ value: String(y), label: String(y) })),
+        total: papers.length, noun: 'papers' })}</div>
+      ${papers.map(paperCard).slice(1).join('')}</div>
     <div class="rp-empty" data-lib-empty hidden>
       <p class="rp-empty-t">No papers match that search.</p>
       <p>Clear the search box or choose a different year to see the full library.</p>
@@ -3756,7 +3778,7 @@ exports.team = (ctx) => {
     title: 'Our Team', active: '/about/team', workspaceActive: 'about', body: `
   ${pageHeader('team', 'Our Team', 'The people who collect, check and publish Liberia’s ICT data.')}
   <div class="tm">
-    ${studio({ id: 'pc', kind: 'patron', list: PATRONS, folder: 'patrons', mark: MEDAL, words: ['Our', 'patrons'], extra: 'is-patrons', anchor: 'patrons',
+    ${studio({ id: 'pc', kind: 'patron', list: PATRONS, folder: 'patrons', mark: MEDAL, words: [], extra: 'is-patrons', anchor: 'patrons',
       title: 'National ICT System<br>Patrons', label: 'Patrons', note: 'The first four are the patrons named so far; the others are sample profiles with AI-generated placeholder photos.' })}
 
     ${studio({ id: 'tc', kind: 'team', list: TEAM_MEMBERS, folder: 'team', mark: LAPTOP, words: ['Who', 'we', 'are'],

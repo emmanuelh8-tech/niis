@@ -5626,3 +5626,20 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
 .tp-orb:active .dock-ic { filter: brightness(.94); }
 @media (max-width: 640px) { .tp-orbs { gap: .9rem 1.1rem; } .tp-orb-l { font-size: .66rem; } }
 @media (prefers-reduced-motion: reduce) { .tp-orb:hover .dock-ic .icn, .tp-orb:focus-visible .dock-ic .icn { animation: none; } .tp-orb-l { transition: none; } }
+
+/* ============ RESEARCH: SQUARE BUTTONS, "SUBMIT PAPERS" CIRCLED IN RED MARKER ============
+   The two calls to action have square corners. The headline's "Submit Papers" is ringed by hand
+   in red marker: one loop that overshoots where it closes, with a fainter second pass for the
+   marker's texture (the stroke keeps its weight however the ring stretches). */
+.rp-btn { border-radius: 0; }
+.rp-mark { position: relative; display: inline-block; }
+.rp-mark-ring { position: absolute; left: -6%; top: -24%; width: 112%; height: 152%; overflow: visible; pointer-events: none; }
+.rp-mark-ring path { fill: none; stroke: #D7192F; stroke-width: 4.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; opacity: .92; }
+.rp-mark-ring .rp-mark-2 { stroke-width: 1.6; opacity: .45; }
+@media (max-width: 640px) { .rp-mark-ring { left: -5%; width: 113%; } .rp-mark-ring path { stroke-width: 3.2; } .rp-mark-ring .rp-mark-2 { stroke-width: 1.2; } }
+
+/* Programs: "Upcoming Events" centred on two lines, the title in the label face (bold), the line
+   under it in the regular face */
+.pg-head.is-center { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: .45rem; text-align: center; }
+.pg-head.is-center h2 { margin: 0; font-family: var(--font-label); font-weight: 700; letter-spacing: .01em; }
+.pg-head.is-center > p { margin: 0; font-family: var(--sans); font-weight: 400; text-align: center; hyphens: manual; }

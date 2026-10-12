@@ -2731,7 +2731,10 @@ function researchPromo() {
       <div class="rp-left">
         <h2 class="rp-title">
           Search Papers,<br>
-          <em>Submit Papers,</em><br>
+          <em><span class="rp-mark">Submit Papers<svg class="rp-mark-ring" viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M70 14C150 4 300 4 360 14c32 6 38 38 30 62-10 30-70 38-190 38C90 114 22 108 10 80 2 56 8 26 50 16c40-8 100-10 160-8"/>
+            <path class="rp-mark-2" d="M64 20C150 10 300 10 356 20c30 6 36 34 28 56-10 26-68 32-184 32C92 108 28 102 18 78 10 56 16 30 54 22"/>
+          </svg></span>,</em><br>
           Become Published,<br>
           all in one place.
         </h2>
@@ -3919,8 +3922,8 @@ exports.programs = (ctx) => {
   ${pageHeader('programs', 'Programs', 'What is coming up, the trainings and bootcamps, and the work on film and in pictures.')}
   <div class="pg">
     <section class="pg-sec wrap" aria-labelledby="pg-ev-h">
-      <div class="pg-head">
-        <div>${eyebrow('Coming up')}<h2 id="pg-ev-h" data-rise-head>Upcoming events</h2></div>
+      <div class="pg-head is-center">
+        <h2 id="pg-ev-h">Upcoming Events</h2>
         <p>Trainings, workshops and open days across the counties.</p>
       </div>
       <ol class="pg-tickets">

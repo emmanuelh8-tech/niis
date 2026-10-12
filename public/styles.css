@@ -5539,3 +5539,40 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
 @media (max-width: 1180px) { .tl-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .tl-cols { grid-template-columns: minmax(0, 1fr); gap: 2px; } .tl-row { grid-template-columns: 1.5rem 52px minmax(0, 1fr) 22px; gap: .7rem; } .tl-ph { width: 52px; height: 52px; } }
 @media (prefers-reduced-motion: reduce) { .tl-row, .tl-ph img, .tl-go { transition: none; } }
+
+/* ============ NAV ICONS: GLASS ORBS WITH WATER INSIDE ============
+   Every section's icon sits in a glossy blue orb (after the owner's reference): a deep blue sphere,
+   brighter at its foot, a thin bright rim, a glassy highlight over the top half, the icon in white,
+   and a soft shadow under it. On hover the orb bounces like a jelly and water fills it, rolling in
+   two waves; the current page's orb holds its water at rest. (--dock-s, the dock's magnifier in
+   app.js, stays on transform; the bounce uses scale, so the two add up.) */
+.dock-ic { position: relative; isolation: isolate; overflow: hidden; width: 36px; height: 36px; border: 0; color: #fff;
+  background: radial-gradient(120% 95% at 50% 108%, #3D9BFF 0%, #1167E3 32%, #0A47B8 58%, #072F86 82%, #051F5C 100%);
+  box-shadow: inset 0 0 0 1px rgba(110,175,255,.75), inset 0 -3px 6px rgba(120,190,255,.35), 0 0 0 1px #0A3A94, 0 5px 7px -3px rgba(5,31,92,.55), 0 9px 10px -8px rgba(5,31,92,.5);
+  transition: box-shadow .25s ease; }
+.dock-ic::before { content: ''; position: absolute; z-index: 2; left: 11%; right: 11%; top: 4%; height: 50%; pointer-events: none;
+  border-radius: 50% 50% 46% 46% / 62% 62% 38% 38%;
+  background: linear-gradient(180deg, rgba(255,255,255,.88) 0%, rgba(255,255,255,.42) 45%, rgba(255,255,255,.08) 100%); }
+.dock-ic .icn { position: relative; z-index: 1; width: 17px; height: 17px; color: #fff; stroke-width: 2; filter: drop-shadow(0 1px 1px rgba(3,20,60,.45)); }
+.dock-water { position: absolute; inset: 0; z-index: 0; overflow: hidden; border-radius: 50%; pointer-events: none; }
+.dock-water::before, .dock-water::after { content: ''; position: absolute; left: 50%; top: 108%; width: 230%; height: 230%; margin-left: -115%;
+  transition: top .8s cubic-bezier(.2,.8,.2,1); animation: dockWave 3.6s linear infinite paused; }
+.dock-water::before { border-radius: 43%; background: rgba(150,210,255,.38); }
+.dock-water::after { border-radius: 39%; background: linear-gradient(180deg, rgba(64,160,255,.75), rgba(14,92,220,.85)); animation-duration: 5.4s; animation-direction: reverse; }
+@keyframes dockWave { to { transform: rotate(360deg); } }
+@keyframes dockJelly { 0% { scale: 1; } 28% { scale: 1.16 .9; } 48% { scale: .94 1.08; } 66% { scale: 1.05 .97; } 82% { scale: .99 1.02; } 100% { scale: 1.04; } }
+.dock .nav-link:hover .dock-ic, .dock .nav-link:focus-visible .dock-ic { animation: dockJelly .7s cubic-bezier(.3,.7,.3,1) both;
+  box-shadow: inset 0 0 0 1px rgba(150,205,255,.9), inset 0 -3px 8px rgba(150,210,255,.5), 0 0 0 1px #0A3A94, 0 7px 10px -3px rgba(5,31,92,.5), 0 0 14px rgba(40,140,255,.45); }
+.dock .nav-link:hover .dock-water::before, .dock .nav-link:focus-visible .dock-water::before { top: 46%; animation-play-state: running; }
+.dock .nav-link:hover .dock-water::after, .dock .nav-link:focus-visible .dock-water::after { top: 52%; animation-play-state: running; }
+.dock .nav-link:hover .dock-ic, .dock .nav-link.active .dock-ic { color: #fff; border-color: transparent; }
+.dock .nav-link:active .dock-ic { scale: .94; filter: brightness(.95); }
+/* the current page: the orb holds water, gently moving, and a gold ring marks it */
+.dock .nav-link.active .dock-ic { background: radial-gradient(120% 95% at 50% 108%, #3D9BFF 0%, #1167E3 32%, #0A47B8 58%, #072F86 82%, #051F5C 100%);
+  box-shadow: inset 0 0 0 1px rgba(110,175,255,.75), inset 0 -3px 6px rgba(120,190,255,.35), 0 0 0 1px #0A3A94, 0 0 0 3px #fff, 0 0 0 4.5px #FFCC00, 0 6px 9px -3px rgba(5,31,92,.5); }
+.dock .nav-link.active .dock-water::before { top: 58%; animation-play-state: running; animation-duration: 6s; }
+.dock .nav-link.active .dock-water::after { top: 63%; animation-play-state: running; animation-duration: 8s; }
+@media (prefers-reduced-motion: reduce) {
+  .dock .nav-link:hover .dock-ic, .dock .nav-link:focus-visible .dock-ic { animation: none; }
+  .dock-water::before, .dock-water::after { animation: none; transition: none; }
+}

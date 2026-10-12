@@ -246,7 +246,7 @@ function mainNav(active, q) {
   const isActive = (href, sub) => active === href || (sub || []).some(([h]) => active === h);
   const navItem = ([href, label, ic, sub, short]) => {
     const on = isActive(href, sub);
-    const link = `<a href="${href}" class="nav-link${on ? ' active' : ''}"${on ? ' aria-current="page"' : ''}><span class="dock-ic">${icon(ic)}</span><span class="nav-label"><span class="nav-full">${esc(label)}</span><span class="nav-short">${esc(short)}</span>${sub ? `<i class="nav-caret" aria-hidden="true">${icon('chevron')}</i>` : ''}</span></a>`;
+    const link = `<a href="${href}" class="nav-link${on ? ' active' : ''}"${on ? ' aria-current="page"' : ''}><span class="dock-ic"><i class="dock-water" aria-hidden="true"></i>${icon(ic)}</span><span class="nav-label"><span class="nav-full">${esc(label)}</span><span class="nav-short">${esc(short)}</span>${sub ? `<i class="nav-caret" aria-hidden="true">${icon('chevron')}</i>` : ''}</span></a>`;
     if (!sub) return `<div class="dock-item">${link}</div>`;
     // a menu's first row is its own section, so the name is always written out
     return `<div class="dock-item nav-has-sub">${link}

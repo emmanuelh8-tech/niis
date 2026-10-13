@@ -79,23 +79,6 @@ function icon(name, cls = 'icn') { return `<svg class="${cls}" viewBox="0 0 24 2
 const DASH_ICON = { connectivity: 'tower', 'mobile-broadband': 'wifi', affordability: 'coin', 'trust-governance': 'gavel', sustainability: 'leaf', education: 'book' };
 const DASH_COLOR = { connectivity: '', 'mobile-broadband': 'teal', affordability: '', 'trust-governance': 'clay', sustainability: 'teal', education: '' };
 
-// generic report-cover graphic + PDF badge, hand-authored, varies slightly per id for visual rhythm across a list
-const COVER_ACCENTS = ['#1C5BB8', '#C8102E', '#1C4C9E', '#7FA0CE'];
-function paperCover(seed = 0) {
-  const accent = COVER_ACCENTS[seed % COVER_ACCENTS.length];
-  const lines = [64, 78, 52, 70, 44];
-  return `<svg class="paper-cover" viewBox="0 0 160 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <rect width="160" height="200" fill="#fff"/>
-    <rect width="160" height="46" fill="#0B2C63"/>
-    <rect y="46" width="160" height="4" fill="${accent}"/>
-    <path d="M136 0 L160 0 L160 24 Z" fill="rgba(255,255,255,.14)"/>
-    <g fill="#DCE2DA">${lines.map((w, i) => `<rect x="16" y="${72 + i * 20}" width="${w}" height="6" rx="3"/>`).join('')}</g>
-    <circle cx="128" cy="168" r="20" fill="${accent}" opacity=".12"/>
-    <path d="M40 24 L52 24 L52 36" stroke="#fff" stroke-width="2.4" fill="none" opacity=".55"/>
-  </svg>
-  <span class="pdf-badge">PDF</span>`;
-}
-
 // original "network node" mark, a center point with satellite nodes (not any real org's logo)
 function nodeMark(size = 30, cls = '') {
   return `<svg class="nodemark ${cls}" width="${size}" height="${size}" viewBox="0 0 40 40" aria-hidden="true">
@@ -2697,17 +2680,77 @@ const partnerBookScript = `
 
 // ============ RESEARCH / UPDATES (retained; reachable from footer &amp; homepage) ============
 // Public / all-account browse view + (for admins) a full management console.
-// A paper's cover, set from its own title like a published report: a coloured board in the
-// series colour for its category, the title in Besley, the authors and year at the foot, and
-// a band of the flag's stripes down the spine.
-const RP_SERIES = { 'Flagship Report': 'navy', 'Working Paper': 'blue', 'Brief': 'red', 'Policy Brief': 'red', 'Report': 'ink', 'Dataset Note': 'blue', 'Article': 'ink' };
+// A paper's cover page, laid out like a published report's: an A4 page with the NIIS logo, the
+// series, the paper's own title, authors and year. Four designs, one per kind of paper: a photo cut
+// by diagonal bands (flagship reports), a network of nodes on navy (working papers and data notes),
+// flowing lines round a round photo (briefs), and a dark full-bleed photo (reports and articles).
+// The photographs are the site's own, from public/img/about; the network is drawn from the paper's id,
+// so each paper keeps its own.
+const PC_KIND = { 'Flagship Report': 'photo', 'Working Paper': 'net', 'Dataset Note': 'net', 'Brief': 'lines', 'Policy Brief': 'lines', 'Report': 'dark', 'Article': 'dark' };
+const PC_PHOTOS = {
+  photo: ['woman-phone', 'field-tall', 'man-phone', 'capacity'],
+  lines: ['analyst-sq', 'phone-sq'],
+  dark: ['analysts', 'sovereignty', 'benchmark'],
+};
+const pcRand = (seed) => () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+// the working paper's network: nodes gathered towards the top right, joined to their near neighbours
+function pcNet(seed) {
+  const r = pcRand(seed * 7919 + 13), pts = [];
+  for (let k = 0; k < 58; k++) {
+    const a = r(), b = r();
+    pts.push([+(18 + 92 * Math.sqrt(a)).toFixed(1), +(-6 + 78 * b * b).toFixed(1), +(.35 + r() * .9).toFixed(2)]);
+  }
+  let lines = '';
+  pts.forEach((p, i) => pts.slice(i + 1).forEach((q) => {
+    const d = Math.hypot(p[0] - q[0], p[1] - q[1]);
+    if (d < 21) lines += `<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke-opacity="${(.65 * (1 - d / 21)).toFixed(2)}"/>`;
+  }));
+  const dots = pts.map((p) => `<circle cx="${p[0]}" cy="${p[1]}" r="${p[2]}"/>`).join('');
+  const glow = pts.filter((p) => p[2] > 1.1).map((p) => `<circle cx="${p[0]}" cy="${p[1]}" r="${(p[2] * 3.2).toFixed(2)}"/>`).join('');
+  return `<svg class="pc-art" viewBox="0 0 100 141" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <g fill="#5FA2FF" fill-opacity=".14">${glow}</g>
+        <g stroke="#8CBBFF" stroke-width=".22">${lines}</g>
+        <g fill="#D6E7FF">${dots}</g>
+      </svg>`;
+}
+// the brief's ribbon: a bundle of fine curves sweeping up across the page in the flag's colours
+function pcLines() {
+  let d = '';
+  for (let i = 0; i < 34; i++) {
+    const t = i / 33;
+    d += `<path d="M-6 ${(96 + t * 30).toFixed(1)}C26 ${(66 + t * 52).toFixed(1)} 60 ${(132 - t * 40).toFixed(1)} 106 ${(62 + t * 40).toFixed(1)}" stroke-opacity="${(.3 + .62 * (1 - Math.abs(t - .45))).toFixed(2)}"/>`;
+  }
+  return `<svg class="pc-art" viewBox="0 0 100 141" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="pcLn" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0B2C63"/><stop offset=".55" stop-color="#1C5BB8"/><stop offset="1" stop-color="#C8102E"/></linearGradient></defs>
+        <g fill="none" stroke="url(#pcLn)" stroke-width=".42">${d}</g>
+      </svg>`;
+}
 function rpCover(p) {
-  const year = String(p.published_on || '').slice(0, 4);
-  return `<div class="rp-cover rp-cover--${RP_SERIES[p.tag] || 'navy'}" aria-hidden="true">
-      <span class="rp-cover-spine"></span>
-      <span class="rp-cover-top"><b>NIIS</b><span>${esc(p.tag)}</span></span>
-      <span class="rp-cover-title">${esc(p.title)}</span>
-      <span class="rp-cover-foot"><span>${esc(p.authors)}</span><span>${esc(year)}</span></span>
+  const id = Number(p.id) || 0, year = String(p.published_on || '').slice(0, 4);
+  const kind = PC_KIND[p.tag] || ['photo', 'net', 'lines', 'dark'][id % 4];
+  const pool = PC_PHOTOS[kind], photo = pool ? `/img/about/${pool[id % pool.length]}.jpg?v=${ASSET_V}` : '';
+  const logo = `<img class="pc-logo" src="/img/brand/niis-mark.webp?v=${ASSET_V}" alt="" width="852" height="341" loading="lazy" decoding="async">`;
+  const head = `<span class="pc-head">${logo}<span class="pc-kicker">${esc(p.tag || 'Paper')}</span></span>`;
+  const words = `<span class="pc-words"><i class="pc-rule"></i><span class="pc-title">${esc(p.title)}</span><span class="pc-by">${esc(p.authors || '')}</span></span>`;
+  const foot = `<span class="pc-foot"><span>National ICT Intelligence System</span><b>${esc(year)}</b></span>`;
+  const img = (cls) => `<img class="${cls}" src="${photo}" alt="" loading="lazy" decoding="async">`;
+  const art = kind === 'photo' ? `${img('pc-photo')}
+      <svg class="pc-art" viewBox="0 0 100 141" preserveAspectRatio="none" aria-hidden="true">
+        <polygon points="0,0 100,0 100,17 0,25" fill="#fff"/>
+        <polygon points="0,25 100,17 100,19.4 0,27.4" fill="#0B2C63"/>
+        <polygon points="0,84 100,55 100,60 0,89" fill="#C8102E"/>
+        <polygon points="0,89 100,60 100,63.5 0,92.5" fill="#0B2C63"/>
+        <polygon points="0,92.5 100,63.5 100,141 0,141" fill="#fff"/>
+        <rect y="137.6" width="100" height="3.4" fill="#0B2C63"/><rect y="137.6" width="34" height="3.4" fill="#C8102E"/>
+      </svg>`
+    : kind === 'net' ? pcNet(id)
+    : kind === 'lines' ? `${pcLines()}<span class="pc-disc">${img('pc-photo')}</span>`
+    : `${img('pc-photo')}<i class="pc-shade"></i><i class="pc-frame"></i>`;
+  return `<div class="pc pc--${kind}" aria-hidden="true">
+      ${art}
+      ${head}
+      ${words}
+      ${foot}
     </div>`;
 }
 exports.research = (ctx, { papers = [], canManage = false, canSubmit = false, notice = '' }) => {
@@ -2841,7 +2884,7 @@ exports.paper = (ctx, p, canManage = false) => shell(ctx, {
     <p class="kicker"><a href="/research">← Research papers</a></p>
     ${canManage ? `<div class="alert">${statusPill(p)} <span class="muted">Admin preview, this is how the paper reads. Manage it from the Research Papers list.</span></div>` : ''}
     <div class="paper-detail-head">
-      <div class="paper-cover-wrap paper-cover-lg">${paperCover(p.id)}</div>
+      <div class="paper-cover-lg">${rpCover(p)}</div>
       <div>
         <h1>${esc(p.title)}</h1>
         <p class="authors">${esc(p.authors)} · <span class="mono">${esc(p.published_on)}</span></p>

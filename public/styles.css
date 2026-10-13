@@ -1029,7 +1029,7 @@ a.upd-row:hover .upd-row-title { color: var(--teal-dark); text-decoration: under
 .pdf-badge { position: absolute; left: 6px; bottom: 6px; background: var(--gold); color: #fff; font-size: .58rem; font-weight: 800; letter-spacing: .04em; padding: .1rem .35rem; border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
 .paper-card-body { min-width: 0; flex: 1; }
 .paper-detail-head { display: flex; gap: 1.4rem; align-items: flex-start; margin-bottom: 1.4rem; }
-.paper-cover-lg { width: 130px; }
+.paper-cover-lg { flex: 0 0 auto; width: 190px; }
 .pub-thumb-dh { position: relative; height: 130px; overflow: hidden; }
 .pub-thumb-dh .paper-cover { width: 100%; height: 100%; display: block; }
 
@@ -4133,7 +4133,7 @@ html { -webkit-text-size-adjust: 100%; }
 @media (max-width: 600px) {
   .paper-detail-head { flex-direction: column; gap: 1.1rem; }
   .paper-detail-head h1 { font-size: clamp(2rem, 9vw, 2.6rem); line-height: 1.08; overflow-wrap: anywhere; margin-bottom: .5rem; }
-  .paper-cover-lg { width: 112px; }
+  .paper-cover-lg { width: 150px; }
 }
 
 
@@ -5759,7 +5759,7 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 .bbc a { color: inherit; text-decoration: none; }
 /* the lead */
 .bbc-lead-img { display: block; }
-.bbc-lead-img img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: #EEF0F2; }
+.bbc-lead-img > img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: #EEF0F2; }
 .bbc-lead-in { padding: 1.4rem 15px 0; }
 .bbc-lead-h { margin: 0; font: 600 2.25rem/1.15 var(--bbc-serif); letter-spacing: -.005em; color: var(--bbc-ink); text-align: left; hyphens: manual; }
 .bbc-lead-h a:hover, .bbc-lead-h a:focus-visible { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
@@ -5772,7 +5772,7 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 .bbc-list { margin: 2.6rem 15px 0; padding: 0; list-style: none; border-top: 1px solid var(--bbc-grey); }
 .bbc-item { margin: 0; text-align: left; border-bottom: 1px solid var(--bbc-line); }
 .bbc-row { display: grid; grid-template-columns: minmax(0, 36%) minmax(0, 1fr); gap: 1rem; align-items: start; padding: 1.4rem 0; }
-.bbc-thumb img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: #EEF0F2; }
+.bbc-thumb > img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: #EEF0F2; }
 .bbc-txt { display: grid; gap: 1rem; min-width: 0; }
 .bbc-h { font: 600 1.5rem/1.2 var(--bbc-serif); color: var(--bbc-ink); }
 .bbc-row:hover .bbc-h, .bbc-row:focus-visible .bbc-h { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
@@ -5982,10 +5982,8 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 .bbc-adrow.is-filtered { display: none; }
 /* a paper's cover where the news has a photograph */
 .bbc-cover { display: grid; place-items: center; width: 100%; aspect-ratio: 16 / 9; background: linear-gradient(160deg, #EEF2F8 0%, #E1E8F2 100%); overflow: hidden; }
-.bbc-thumb .bbc-cover .rp-cover { width: 38%; }
-.bbc-lead-img .bbc-cover .rp-cover { width: 30%; }
-.bbc-cover .rp-cover { transition: transform .6s cubic-bezier(.16,1,.3,1); transform-origin: 0 50%; }
-.bbc-row:hover .bbc-cover .rp-cover, .bbc-lead:hover .bbc-cover .rp-cover { transform: rotateY(-14deg) translateY(-3px); }
+.bbc-cover .pc { height: 86%; transition: transform .6s cubic-bezier(.16,1,.3,1); transform-origin: 0 50%; }
+.bbc-row:hover .bbc-cover .pc, .bbc-lead:hover .bbc-cover .pc { transform: rotateY(-12deg) translateY(-4px); }
 .bbc-cover { perspective: 900px; }
 @media (max-width: 900px) {
   .rs-cmd-in { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: .75rem 15px; }
@@ -5993,7 +5991,7 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
   .rs-count { grid-column: 1 / -1; margin: 0; }
   .rs-cmd.dx-cmd { position: static; }
 }
-@media (prefers-reduced-motion: reduce) { .bbc-cover .rp-cover { transition: none; } .bbc-row:hover .bbc-cover .rp-cover, .bbc-lead:hover .bbc-cover .rp-cover { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .bbc-cover .pc { transition: none; } .bbc-row:hover .bbc-cover .pc, .bbc-lead:hover .bbc-cover .pc { transform: none; } }
 
 /* ============ CHART TOOLTIPS: A ROUND PANE OF GLASS ============
    The hover reading on every chart (Data Explorer and Data Landscape) is a circle of frosted white
@@ -6081,3 +6079,50 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
   .tw-words { display: none; }   /* no room for it between the cards on a phone */
 }
 @media (prefers-reduced-motion: reduce) { .tw-ph img { transition: none; } }
+
+/* ---- a paper's cover page (rpCover in views.js): an A4 page, every size a share of its width, so the
+   same cover reads the same as a thumbnail, the lead and on the paper's own page. A second sheet
+   shows behind it, as a printed report would. */
+.pc { position: relative; display: flex; flex-direction: column; aspect-ratio: 1 / 1.414; container-type: inline-size; overflow: hidden;
+  background: #fff; color: #0B2C63; text-align: left; border-radius: 2px;
+  box-shadow: 0 1px 2px rgb(11 44 99 / .14), 0 16px 28px -14px rgb(11 44 99 / .5), 4px 4px 0 -1px #FBFCFD, 4px 4px 0 0 rgb(11 44 99 / .16); }
+.pc > * { position: relative; }
+.pc .pc-art, .pc .pc-photo, .pc .pc-shade { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pc .pc-photo { display: block; object-fit: cover; }
+.pc-head { display: flex; align-items: center; justify-content: space-between; gap: 4cqi; padding: 7cqi 7cqi 0; }
+.pc-logo { flex: 0 0 auto; width: 25cqi; height: auto; }
+.pc-kicker { font: 700 3.2cqi/1.2 var(--sans); letter-spacing: .16em; text-transform: uppercase; color: #C8102E; text-align: right; }
+.pc-words { display: flex; flex-direction: column; align-items: flex-start; gap: 2.6cqi; margin-top: auto; padding: 0 7cqi; }
+.pc-rule { width: 12cqi; height: 1.1cqi; background: #C8102E; }
+.pc-title { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;
+  font: 800 8.2cqi/1.04 var(--sans); letter-spacing: -.02em; text-wrap: balance; }
+.pc-by { font: 500 3.4cqi/1.3 var(--sans); color: #4A5568; }
+.pc-foot { display: flex; justify-content: space-between; align-items: baseline; gap: 3cqi; padding: 5cqi 7cqi 7cqi;
+  font: 600 2.7cqi/1.2 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: #5A6575; }
+.pc-foot b { font: 800 5cqi/1 var(--sans); letter-spacing: -.01em; color: #0B2C63; }
+/* flagship: a photograph cut by diagonal bands of red and navy */
+.pc--photo .pc-photo { object-position: 50% 22%; }
+.pc--photo .pc-title { font-size: 7.4cqi; }
+/* working paper: a network of nodes on navy */
+.pc--net { background: radial-gradient(125% 80% at 88% 6%, #1E56B0 0%, #0B2C63 46%, #061A3D 100%); color: #fff; }
+.pc--net .pc-kicker { color: #8CBBFF; }
+/* brief: fine lines sweeping round a round photograph */
+.pc--lines { background: linear-gradient(180deg, #fff 0%, #F2F5FA 100%); }
+.pc--lines .pc-words { margin-top: 9cqi; }
+.pc--lines .pc-foot { margin-top: auto; }
+.pc-disc { position: absolute; top: 70cqi; right: 6cqi; width: 44cqi; aspect-ratio: 1; overflow: hidden; border-radius: 50%;
+  border: 1.6cqi solid #fff; box-shadow: 0 0 0 .7cqi #C8102E, 0 8cqi 12cqi -6cqi rgb(11 44 99 / .45); }
+.pc-disc .pc-photo { object-position: 40% 30%; }
+/* report: a dark photograph, full bleed, in a thin frame */
+.pc--dark { background: #061228; color: #fff; }
+.pc--dark .pc-photo { object-position: 50% 35%; }
+.pc .pc-shade { background: linear-gradient(180deg, rgb(6 18 40 / .72) 0%, rgb(6 18 40 / .12) 26%, rgb(6 18 40 / .3) 48%, rgb(6 18 40 / .93) 74%, #061228 100%); }
+.pc .pc-frame { position: absolute; inset: 3.4cqi; border: max(1px, .3cqi) solid rgb(255 255 255 / .36); }
+.pc--dark .pc-kicker { color: #FFCC00; }
+.pc--dark .pc-title { font-family: var(--serif); font-weight: 600; font-size: 9cqi; letter-spacing: -.01em; line-height: 1.06; }
+/* the light words on the two dark covers, and a white logo */
+:is(.pc--net, .pc--dark) .pc-logo { filter: brightness(0) invert(1); }
+:is(.pc--net, .pc--dark) .pc-by { color: rgb(255 255 255 / .74); }
+:is(.pc--net, .pc--dark) .pc-foot { color: rgb(255 255 255 / .6); }
+:is(.pc--net, .pc--dark) .pc-foot b { color: #fff; }
+.paper-cover-lg .pc { width: 100%; }

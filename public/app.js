@@ -1240,8 +1240,7 @@
 })();
 
 // ---------- a source note under every chart, as journals and the statistical press set them ----------
-// "Source:" names the agency the figures come from and NIIS, which compiles and publishes them;
-// "Note:" names the indicator, its unit and the years shown (and flags demonstration figures). A
+// "Source:" names the agency the figures come from and NIIS, which compiles and publishes them; a
 // "Copy citation" button copies a full data-set reference. The page's own indicator heading, unit,
 // source and years are the record (.cite-cfg points at them), so every note follows the reader's
 // choice of indicator and year.
@@ -1270,11 +1269,9 @@
     figs.forEach(function (f) {
       var p = period(f.getAttribute('data-fig-src'));
       if (p === 'n/a') p = '';
-      var note = name + (unit ? ', ' + unit : '') + (p ? ', ' + p : '') + '.' + (mock ? ' Demonstration figures, not official statistics.' : '');
       var cite = 'National ICT Intelligence System (NIIS). (' + year + '). ' + name + (unit ? ' (' + unit + ')' : '') + ', Liberia' + (p ? ', ' + p : '') +
         ' [Data set]. ' + (agency ? 'Data from ' + agency + '. ' : '') + (mock ? 'Demonstration figures. ' : '') + 'Retrieved ' + today + ', from ' + href;
       f.innerHTML = '<p class="fig-src-l"><b>Source:</b> ' + esc(src) + '</p>' +
-        '<p class="fig-src-l"><b>Note:</b> ' + esc(note) + '</p>' +
         '<button type="button" class="fig-cite" data-cite="' + esc(cite) + '">' + COPY + '<span>Copy citation</span></button>';
     });
   }

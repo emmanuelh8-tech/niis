@@ -5994,3 +5994,39 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
   .rs-cmd.dx-cmd { position: static; }
 }
 @media (prefers-reduced-motion: reduce) { .bbc-cover .rp-cover { transition: none; } .bbc-row:hover .bbc-cover .rp-cover, .bbc-lead:hover .bbc-cover .rp-cover { transform: none; } }
+
+/* ============ CHART TOOLTIPS: A ROUND PANE OF GLASS ============
+   The hover reading on every chart (Data Explorer and Data Landscape) is a circle of frosted white
+   glass like the nav dropdown, with a gloss across its top; its words in the label face (digits in
+   the site's digit face), centred. It floats above the pointer. */
+.dx-tip, .lsc-tip { width: 172px; height: 172px; max-width: none; padding: 1.5rem 1.1rem; border-radius: 50%; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.85); border-left: 1px solid rgba(255,255,255,.85);
+  background: radial-gradient(circle at 32% 24%, rgba(255,255,255,.96) 0%, rgba(255,255,255,.78) 48%, rgba(222,232,248,.74) 100%);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6); backdrop-filter: blur(16px) saturate(1.6);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.95), inset 0 -10px 22px rgba(11,44,99,.06), 0 1px 2px rgba(11,44,99,.08), 0 18px 40px -12px rgba(11,44,99,.38);
+  color: #10172A; font-family: var(--font-label); text-align: center; white-space: normal; }
+.dx-tip { transform: translate(-50%, -108%); align-content: center; }
+.dx-tip[style*="block"] { display: grid !important; }
+.lsc-tip:not([hidden]) { display: grid; align-content: center; justify-items: center; }
+.dx-tip::before, .lsc-tip::before { content: ''; position: absolute; left: 16%; right: 16%; top: 5%; height: 34%; border-radius: 50%; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,0)); }
+.dx-tip > *, .lsc-tip > * { position: relative; }
+.dx-tip strong, .lsc-tip b { display: block; margin: 0 0 .25rem; font: 400 1.02rem/1.15 var(--font-label); letter-spacing: .03em; color: #0B2C63; text-transform: uppercase;
+  overflow: hidden; text-overflow: ellipsis; }
+.dx-tip .dx-tip-rank { display: block; font: 400 .66rem/1.3 var(--font-label); letter-spacing: .08em; color: #5A6273; text-transform: uppercase; }
+.dx-tip .dx-tip-val { display: block; margin-top: .2rem; font: 400 1.4rem/1.1 var(--font-label); color: #0B2C63; }
+.dx-tip .dx-tip-val i { font-size: .62rem; letter-spacing: .06em; color: #5A6273; text-transform: uppercase; }
+.dx-tip .dx-tip-yoy { display: block; margin-top: .2rem; font: 400 .7rem/1.2 var(--font-label); }
+.dx-tip .dx-tip-yoy.up { color: #1E7A45; }
+.dx-tip .dx-tip-yoy.down { color: #C8102E; }
+.dx-tip .dx-tip-line { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .35rem; margin-top: .25rem;
+  font: 400 .64rem/1.2 var(--font-label); letter-spacing: .06em; text-transform: uppercase; color: #2B3240; text-align: left; }
+.dx-tip .dx-tip-line i { width: 8px; height: 8px; border-radius: 50%; }
+.dx-tip .dx-tip-line b { margin: 0; padding: 0; font: 400 .86rem/1 var(--font-label); color: #0B2C63; }
+.lsc-tip span { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .5rem; width: 100%; font: 400 .62rem/1.5 var(--font-label); letter-spacing: .05em; text-transform: uppercase; text-align: left; }
+.lsc-tip i { color: #5A6273; }
+.lsc-tip em { font: 400 .8rem/1.3 var(--font-label); color: #0B2C63; }
+
+/* the nav dropdown in capitals */
+.nav-subitem { text-transform: uppercase; letter-spacing: .07em; font-size: .76rem; }
+.dx-tip .dx-tip-val i { display: block; margin-top: .2rem; line-height: 1.25; }

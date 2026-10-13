@@ -2712,22 +2712,25 @@ function rpCover(p) {
 }
 exports.research = (ctx, { papers = [], canManage = false, canSubmit = false, notice = '' }) => {
   const paperYear = (p) => String(p.published_on || '').slice(0, 4);
-  // The newest paper leads at full width; the rest sit on the shelf beneath it.
-  const paperCard = (p, i) => `<article class="rp-item${i === 0 ? ' rp-item--lead' : ''}" data-lib-item style="--i:${i}"
-    data-lib-year="${esc(paperYear(p))}"
-    data-lib-search="${esc((p.title + ' ' + p.authors + ' ' + p.abstract + ' ' + p.tag).toLowerCase())}">
-    <a class="rp-cover-link" href="/research/${p.id}" tabindex="-1" aria-hidden="true">${rpCover(p)}</a>
-    <div class="rp-body">
-      <p class="rp-meta"><span class="rp-tag">${esc(p.tag)}</span><time datetime="${esc(String(p.published_on || '').slice(0, 10))}">${esc(updDate(p.published_on))}</time></p>
-      <h3 class="rp-title"><a href="/research/${p.id}">${esc(p.title)}</a></h3>
-      <p class="rp-authors">${esc(p.authors)}</p>
-      <p class="rp-abstract">${esc(p.abstract)}</p>
-      <div class="rp-actions">
-        <a class="rp-read" href="/research/${p.id}">Read the paper ${icon('arrow')}</a>
-        ${p.downloadable ? `<a class="rp-dl" href="/papers/${p.id}/download">${icon('download')} Download</a>` : '<span class="rp-nodl">Read online only</span>'}
-      </div>
-    </div>
-  </article>`;
+  // The paper library in the news-page format: the newest paper leads (its cover large, the red
+  // "Latest" marker, its abstract), the rest follow as rows; the Explorer's filter bar narrows it.
+  const paperRow = (p) => ({ href: '/research/' + p.id, art: rpCover(p), title: String(p.title || ''), body: String(p.abstract || ''),
+    meta: bbcMeta(String(p.published_on || '').slice(0, 10), p.tag, esc(p.authors || '')),
+    attrs: ` data-rs-item data-year="${esc(paperYear(p))}" data-tag="${esc(p.tag)}" data-search="${esc((p.title + ' ' + p.authors + ' ' + p.abstract + ' ' + p.tag).toLowerCase())}"` });
+  const years = [...new Set(papers.map(paperYear).filter(Boolean))].sort((x, y) => y.localeCompare(x));
+  const types = [...new Set(papers.map((p) => p.tag).filter(Boolean))].sort();
+  const library = papers.length ? `<section class="rs" id="paper-search" aria-label="Research papers">
+    <div class="rs-cmd dx-cmd"><div class="rs-cmd-in">
+      <div class="selector-field rs-q"><label for="rs-q">Search</label>
+        <div class="rs-q-box">${icon('search')}<input id="rs-q" type="search" placeholder="Title, author or abstract" autocomplete="off"></div></div>
+      <div class="selector-field"><label>Year</label>${xdd('dd-rs-year', 'All years')}</div>
+      <div class="selector-field"><label>Type</label>${xdd('dd-rs-type', 'All types')}</div>
+      <p class="rs-count" aria-live="polite"><b data-rs-n>${papers.length}</b> of ${papers.length} papers</p>
+    </div></div>
+    <div id="rsLib">${bbcLayout({ h1: 'Research papers', tag: 'h2', lead: paperRow(papers[0]), rows: papers.slice(1).map(paperRow) })}</div>
+    <div class="rs-empty" hidden><p>No paper matches that search.</p><button type="button" class="ui-btn" data-rs-reset>Show all papers</button></div>
+    <script>window.__RS__=${JSON.stringify({ years, types }).replace(/</g, '\\u003c')};</script>
+  </section>` : '<div class="wrap section"><div class="rp-empty"><p class="rp-empty-t">No research papers are published yet.</p><p>New papers appear here as soon as the Unit publishes them.</p></div></div>';
 
   if (canManage) return shell(ctx, { title: 'Research Papers', workspaceActive: 'research', body: researchAdminBody(papers, notice) });
 
@@ -2737,17 +2740,9 @@ exports.research = (ctx, { papers = [], canManage = false, canSubmit = false, no
     kicker: 'Research', title: 'Liberia ICT Research Hub',
     sub: 'Published research and reports drawing on the National ICT Intelligence System.' })}
   ${researchPromo()}
+  ${notice ? `<div class="wrap"><div class="alert alert-ok">${esc(notice)}</div></div>` : ''}
+  ${library}
   <div class="wrap section page-black">
-    ${notice ? `<div class="alert alert-ok">${esc(notice)}</div>` : ''}
-    ${papers.length ? `<div class="rp-shelf" id="rpShelf">${papers.map(paperCard)[0]}
-      <div class="rp-search-row" id="paper-search">${filterBar({ variant: 'pills', placeholder: 'Search papers by title, author or abstract', facetLabel: 'Year', facetAll: 'All years',
-        options: [...new Set(papers.map(paperYear).filter(Boolean))].sort((a, b) => b.localeCompare(a)).map((y) => ({ value: String(y), label: String(y) })),
-        total: papers.length, noun: 'papers' })}</div>
-      ${papers.map(paperCard).slice(1).join('')}</div>
-    <div class="rp-empty" data-lib-empty hidden>
-      <p class="rp-empty-t">No papers match that search.</p>
-      <p>Clear the search box or choose a different year to see the full library.</p>
-    </div>` : '<div class="rp-empty"><p class="rp-empty-t">No research papers are published yet.</p><p>New papers appear here as soon as the Unit publishes them.</p></div>'}
     ${canSubmit ? `<div class="panel" style="margin-top:2rem">
       <h2>Submit your research</h2>
       <p class="muted">Submit a paper or report for the ICT Statistics &amp; Policy Unit to review. Approved submissions are published to this library.</p>
@@ -2761,7 +2756,7 @@ exports.research = (ctx, { papers = [], canManage = false, canSubmit = false, no
       </form>
     </div>` : ''}
   </div>
-  <script>${videoHeroScript}${researchPromoScript}${libraryFilterScript}${rpScript}</script>`,
+  <script>${videoHeroScript}${researchPromoScript}</script>`,
   });
 };
 
@@ -2948,12 +2943,14 @@ function newsAd(key, k) {
 // a large serif headline after a red "Latest" marker, its summary), then rows under a dark rule, a
 // thumbnail beside a serif headline and its meta line. Adverts run in the side rails on wide screens
 // and come in pairs after every four headlines on narrower ones.
-//   lead / rows: { href, img, title, body?, meta?, ext?: source name, open?: dialog index }
-function bbcLayout({ h1, lead, rows }) {
+//   lead / rows: { href, img | art (HTML, e.g. a paper's cover), title, body?, meta?, ext?: source name,
+//                  open?: dialog index, attrs?: extra attributes (filters) }
+function bbcLayout({ h1, lead, rows, tag = 'h1' }) {
   const linkAttrs = (x) => `href="${esc(x.href)}"${x.ext ? ' target="_blank" rel="noopener noreferrer"' : ''}${x.open != null ? ` data-open="${x.open}"` : ''}`;
-  const img = (src, w, h, eager) => (src ? `<img src="${esc(src)}" alt="" width="${w}" height="${h}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">` : '<i class="bbc-noimg" aria-hidden="true"></i>');
-  const leadHtml = lead ? `<article class="bbc-lead" aria-labelledby="bbc-lead-h">
-      <a class="bbc-lead-img" ${linkAttrs(lead)} tabindex="-1" aria-hidden="true">${img(lead.img, 1200, 675, true)}</a>
+  const pic = (x, w, h, eager) => (x.art ? `<span class="bbc-cover">${x.art}</span>`
+    : x.img ? `<img src="${esc(x.img)}" alt="" width="${w}" height="${h}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">` : '<i class="bbc-noimg" aria-hidden="true"></i>');
+  const leadHtml = lead ? `<article class="bbc-lead" aria-labelledby="bbc-lead-h"${lead.attrs || ''}>
+      <a class="bbc-lead-img" ${linkAttrs(lead)} tabindex="-1" aria-hidden="true">${pic(lead, 1200, 675, true)}</a>
       <div class="bbc-lead-in">
         <h2 class="bbc-lead-h" id="bbc-lead-h"><a ${linkAttrs(lead)}><span class="bbc-flag"><i aria-hidden="true"></i>Latest</span> ${esc(lead.title)}</a></h2>
         ${lead.body ? `<p class="bbc-lead-p">${esc(lead.body)}</p>` : ''}
@@ -2967,9 +2964,9 @@ function bbcLayout({ h1, lead, rows }) {
   };
   let list = '';
   rows.forEach((r, k) => {
-    list += `<li class="bbc-item"${r.id ? ` id="${esc(r.id)}"` : ''}>
+    list += `<li class="bbc-item"${r.id ? ` id="${esc(r.id)}"` : ''}${r.attrs || ''}>
         <a class="bbc-row" ${linkAttrs(r)}${r.ext ? ` aria-label="${esc(r.title)} (${esc(r.ext)}, opens in a new tab)"` : ''}>
-          <span class="bbc-thumb">${img(r.img, 480, 270, k < 4)}</span>
+          <span class="bbc-thumb">${pic(r, 480, 270, k < 4)}</span>
           <span class="bbc-txt"><span class="bbc-h">${esc(r.title)}</span>${r.meta || ''}</span>
         </a>
       </li>`;
@@ -2980,7 +2977,7 @@ function bbcLayout({ h1, lead, rows }) {
   return `<div class="bbc-page">
   <aside class="bbc-rail is-left" aria-label="Advertisements">${AD_LEFT.map((key, k) => newsAd(key, k * 2)).join('')}</aside>
   <div class="bbc">
-    <h1 class="sr-only">${h1}</h1>
+    <${tag} class="sr-only">${h1}</${tag}>
     ${leadHtml}
     ${list ? `<ol class="bbc-list">${list}</ol>` : ''}
   </div>

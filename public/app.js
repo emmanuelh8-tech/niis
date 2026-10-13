@@ -542,6 +542,32 @@
   }
 
   // ============================================================
+  // Research: the paper library's filter bar (search, year, type), with the Explorer's dropdowns
+  // ============================================================
+  function initResearchLib() {
+    var lib = qs('#rsLib'), S = window.__RS__ || { years: [], types: [] };
+    var items = qsa('[data-rs-item]', lib), q = qs('#rs-q'), n = qs('[data-rs-n]'), empty = qs('.rs-empty');
+    var adRows = qsa('.bbc-adrow', lib), year = '', type = '';
+    function opts(all, list) { return [{ value: '', label: all }].concat(list.map(function (x) { return { value: String(x), label: String(x) }; })); }
+    var dY = initDropdown(qs('#dd-rs-year'), { items: opts('All years', S.years), placeholder: 'All years', selected: '', onChange: function (v) { year = v; apply(); } });
+    var dT = initDropdown(qs('#dd-rs-type'), { items: opts('All types', S.types), placeholder: 'All types', selected: '', onChange: function (v) { type = v; apply(); } });
+    function apply() {
+      var words = q.value.trim().toLowerCase().split(/\s+/).filter(Boolean), shown = 0;
+      items.forEach(function (it) {
+        var ok = (!year || it.dataset.year === year) && (!type || it.dataset.tag === type) &&
+          words.every(function (w) { return it.dataset.search.indexOf(w) !== -1; });
+        it.hidden = !ok; if (ok) shown++;
+      });
+      // while a filter narrows the list, the adverts between its rows step aside
+      adRows.forEach(function (r) { r.classList.toggle('is-filtered', !!(year || type || words.length)); });
+      n.textContent = shown;
+      empty.hidden = shown > 0;
+    }
+    q.addEventListener('input', apply);
+    qs('[data-rs-reset]').addEventListener('click', function () { year = ''; type = ''; q.value = ''; dY.setSelected(''); dT.setSelected(''); apply(); q.focus(); });
+  }
+
+  // ============================================================
   // PAGE: Our Team
   // ============================================================
   // A scroll-snapping row of cards with skip buttons, a counter, a progress line and mouse drag;
@@ -1038,6 +1064,7 @@
     // the Data Explorer runs on its own engine, public/explorer.js
     if (page === 'reports') initReports();
     if (page === 'team') initTeam();
+    if (qs('#rsLib')) initResearchLib();
     if (page === 'programs') initPrograms();
     if (page === 'login') initLogin();
     if (page === 'dashboard-topic') initDashboardTopic();

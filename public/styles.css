@@ -1748,31 +1748,31 @@ tr.unread td { background: var(--gold-soft); }
 .rp-shelf { --rp-ease: cubic-bezier(.16, 1, .3, 1); --rp-navy: #0B2C63; --rp-red: #C8102E;
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3rem 2rem; margin-top: 2.2rem; }
 .rp-shelf .rp-item { display: flex; flex-direction: column; min-width: 0; }
-.rp-shelf .rp-cover-link { display: grid; place-items: center; aspect-ratio: 4 / 3; margin-bottom: 1.3rem; border-radius: 20px;
+:is(.rp-shelf, .bbc-cover) .rp-cover-link { display: grid; place-items: center; aspect-ratio: 4 / 3; margin-bottom: 1.3rem; border-radius: 20px;
   background: linear-gradient(160deg, #EEF2F8 0%, #E1E8F2 100%); overflow: hidden; perspective: 1100px; }
-.rp-shelf .rp-cover-link:hover { text-decoration: none; }
+:is(.rp-shelf, .bbc-cover) .rp-cover-link:hover { text-decoration: none; }
 
 /* the cover board */
-.rp-shelf .rp-cover { position: relative; display: flex; flex-direction: column; width: 46%; aspect-ratio: 3 / 4; container-type: inline-size;
+:is(.rp-shelf, .bbc-cover) .rp-cover { position: relative; display: flex; flex-direction: column; width: 46%; aspect-ratio: 3 / 4; container-type: inline-size;
   padding: 9% 9% 8% 15%; border-radius: 3px 9px 9px 3px; color: #fff; text-align: left;
   box-shadow: inset 0 1px 0 rgb(255 255 255 / .14), 16px 22px 34px -16px rgb(11 44 99 / .55), 2px 3px 6px rgb(11 44 99 / .18);
   transform-origin: 0 50%; transition: transform .7s var(--rp-ease), box-shadow .7s var(--rp-ease); }
-.rp-shelf .rp-cover--navy { background: linear-gradient(150deg, #133a7c 0%, #0B2C63 55%, #081f47 100%); }
-.rp-shelf .rp-cover--blue { background: linear-gradient(150deg, #2a64c4 0%, #1C4C9E 60%, #163d80 100%); }
-.rp-shelf .rp-cover--red  { background: linear-gradient(150deg, #c41a35 0%, #A50D26 60%, #870a1f 100%); }
-.rp-shelf .rp-cover--ink  { background: linear-gradient(150deg, #1d2e52 0%, #10203F 60%, #0a162d 100%); }
-.rp-shelf .rp-cover-spine { position: absolute; top: 0; bottom: 0; left: 0; width: 9%; border-radius: 3px 0 0 3px;
+:is(.rp-shelf, .bbc-cover) .rp-cover--navy { background: linear-gradient(150deg, #133a7c 0%, #0B2C63 55%, #081f47 100%); }
+:is(.rp-shelf, .bbc-cover) .rp-cover--blue { background: linear-gradient(150deg, #2a64c4 0%, #1C4C9E 60%, #163d80 100%); }
+:is(.rp-shelf, .bbc-cover) .rp-cover--red  { background: linear-gradient(150deg, #c41a35 0%, #A50D26 60%, #870a1f 100%); }
+:is(.rp-shelf, .bbc-cover) .rp-cover--ink  { background: linear-gradient(150deg, #1d2e52 0%, #10203F 60%, #0a162d 100%); }
+:is(.rp-shelf, .bbc-cover) .rp-cover-spine { position: absolute; top: 0; bottom: 0; left: 0; width: 9%; border-radius: 3px 0 0 3px;
   background: repeating-linear-gradient(180deg, #C8102E 0 4.545%, #fff 4.545% 9.09%);
   box-shadow: inset -3px 0 4px rgb(0 0 0 / .22); }
-.rp-shelf .rp-cover-top { display: flex; justify-content: space-between; gap: .5rem; color: rgb(255 255 255 / .82);
+:is(.rp-shelf, .bbc-cover) .rp-cover-top { display: flex; justify-content: space-between; gap: .5rem; color: rgb(255 255 255 / .82);
   font: 600 6cqi/1.2 var(--sans); letter-spacing: .04em; }
-.rp-shelf .rp-cover-top b { color: #fff; font-weight: 800; letter-spacing: .12em; }
-.rp-shelf .rp-cover-title { margin-top: auto; padding-top: 1rem; color: #fff; font: 600 13cqi/1.14 var(--serif); overflow-wrap: break-word; hyphens: auto;
+:is(.rp-shelf, .bbc-cover) .rp-cover-top b { color: #fff; font-weight: 800; letter-spacing: .12em; }
+:is(.rp-shelf, .bbc-cover) .rp-cover-title { margin-top: auto; padding-top: 1rem; color: #fff; font: 600 13cqi/1.14 var(--serif); overflow-wrap: break-word; hyphens: auto;
   letter-spacing: -.005em; text-wrap: balance; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
-.rp-shelf .rp-cover-foot { display: flex; justify-content: space-between; gap: .5rem; margin-top: 12%; padding-top: 7%;
+:is(.rp-shelf, .bbc-cover) .rp-cover-foot { display: flex; justify-content: space-between; gap: .5rem; margin-top: 12%; padding-top: 7%;
   border-top: 1px solid rgb(255 255 255 / .28); color: rgb(255 255 255 / .78); font: 500 5.4cqi/1.3 var(--sans); }
-.rp-shelf .rp-cover-top span, .rp-shelf .rp-cover-foot span { color: inherit; }
-.rp-shelf .rp-cover-foot span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+:is(.rp-shelf, .bbc-cover) .rp-cover-top span, .rp-shelf .rp-cover-foot span { color: inherit; }
+:is(.rp-shelf, .bbc-cover) .rp-cover-foot span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rp-shelf .rp-item:hover .rp-cover, .rp-shelf .rp-item:focus-within .rp-cover {
   transform: rotateY(-16deg) translateY(-6px);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / .14), 28px 30px 44px -18px rgb(11 44 99 / .6), 2px 3px 6px rgb(11 44 99 / .18); }
@@ -5752,7 +5752,7 @@ a.lg-submit.pearl { text-decoration: none; }
    the marker. The lead runs a full-width photograph; the rest are rows under a dark rule, a 16:9
    thumbnail beside the headline, hairlines between. Numbers here stay in the text faces, as the
    reference has them. */
-html:has(.bbc) { background-image: none; background-color: #fff; }
+html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; }
 .bbc { --bbc-ink: #141414; --bbc-grey: #545658; --bbc-line: #E6E8EA; --bbc-red: #B80000;
   --bbc-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif; --bbc-sans: 'Public Sans', 'Helvetica Neue', Arial, sans-serif;
   max-width: 840px; margin: 0 auto; padding: 0 0 3rem; background: #fff; color: var(--bbc-ink); }
@@ -5955,3 +5955,42 @@ html:has(.bbc) { background-image: none; background-color: #fff; }
 .share-b.is-mail:hover, .share-b.is-mail:focus-visible, .share-b.is-copy:hover, .share-b.is-copy:focus-visible, .share-b.is-native:hover, .share-b.is-native:focus-visible { background: #123B80; }
 .share-b:hover, .share-b:focus-visible { box-shadow: 0 6px 12px -4px rgba(16,20,28,.35); }
 .share-b.is-done { background: #1E6B3A; }
+
+/* ============ RESEARCH: THE PAPER LIBRARY ============
+   The Explorer's filter bar (labels in the label face, flat white fields with a grey edge and a
+   black caret), held under the nav while the library is in view; then the news-page format, a
+   paper's cover standing in for the photograph. */
+.rs { position: relative; padding-bottom: 1rem; background: #fff; }
+.rs-cmd.dx-cmd { position: sticky; top: var(--nav-h, 76px); z-index: 30; border-top: 1px solid #000; border-bottom: 1px solid #000;
+  background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }   /* solid: a blur here re-renders the animated page under it every frame */
+.rs-cmd-in { display: grid; grid-template-columns: minmax(0, 2fr) minmax(150px, 1fr) minmax(170px, 1fr) auto; align-items: end; gap: .85rem 1.1rem;
+  max-width: 1340px; margin: 0 auto; padding: .85rem 1.4rem; }
+.rs-cmd .selector-field { margin: 0; min-width: 0; }
+.rs-cmd .selector-field label { display: block; margin: 0 0 .4rem; font-family: var(--font-label); font-weight: 400; font-size: .75rem; letter-spacing: .17em; text-transform: uppercase; color: #5A6A85; }
+.rs-q-box { position: relative; }
+.rs-q-box .icn { position: absolute; left: .7rem; top: 50%; width: 16px; height: 16px; transform: translateY(-50%); color: #5A6273; pointer-events: none; }
+.rs-q-box input { width: 100%; height: 38px; margin: 0; padding: 0 .8rem 0 2.2rem; border: 1px solid #BFC4CC; border-radius: 2px; background: #fff;
+  font: 500 .92rem var(--sans); color: #1E2430; box-shadow: none; }
+.rs-q-box input:hover { border-color: #7F8794; }
+.rs-q-box input:focus { outline: none; border-color: #1E2430; box-shadow: 0 0 0 3px rgba(255,204,0,.5); }
+.rs-count { margin: 0 0 .55rem; font: 500 .82rem/1 var(--sans); color: #5A6273; white-space: nowrap; }
+.rs-count b { font-family: var(--num); font-weight: 400; color: #0B2C63; }
+.rs .bbc-page { padding-top: 1.6rem; }
+.rs-empty { display: grid; justify-items: center; gap: .8rem; max-width: 840px; margin: 0 auto 2.4rem; padding: 2.4rem 15px; text-align: center; color: #545658; }
+.rs-empty[hidden] { display: none; }
+.rs-empty p { margin: 0; font: 400 1.1rem 'Source Serif 4', Georgia, serif; text-align: center; }
+.bbc-adrow.is-filtered { display: none; }
+/* a paper's cover where the news has a photograph */
+.bbc-cover { display: grid; place-items: center; width: 100%; aspect-ratio: 16 / 9; background: linear-gradient(160deg, #EEF2F8 0%, #E1E8F2 100%); overflow: hidden; }
+.bbc-thumb .bbc-cover .rp-cover { width: 38%; }
+.bbc-lead-img .bbc-cover .rp-cover { width: 30%; }
+.bbc-cover .rp-cover { transition: transform .6s cubic-bezier(.16,1,.3,1); transform-origin: 0 50%; }
+.bbc-row:hover .bbc-cover .rp-cover, .bbc-lead:hover .bbc-cover .rp-cover { transform: rotateY(-14deg) translateY(-3px); }
+.bbc-cover { perspective: 900px; }
+@media (max-width: 900px) {
+  .rs-cmd-in { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: .75rem 15px; }
+  .rs-q { grid-column: 1 / -1; }
+  .rs-count { grid-column: 1 / -1; margin: 0; }
+  .rs-cmd.dx-cmd { position: static; }
+}
+@media (prefers-reduced-motion: reduce) { .bbc-cover .rp-cover { transition: none; } .bbc-row:hover .bbc-cover .rp-cover, .bbc-lead:hover .bbc-cover .rp-cover { transform: none; } }

@@ -1503,6 +1503,7 @@ exports.dataExplorer = (ctx, { indicators, indicatorsByDomain, domainOrder, doma
     </aside>
 
     <main class="dx-main" id="dx-main">
+      <span class="cite-cfg" hidden data-title="#explorer-title" data-unit="#dx-unit" data-agency="#dx-agency" data-mock="#dx-mock" data-span="#dx-years-span"></span>
       <section class="dx-sec dx-intro" id="dx-intro">
         <p class="dx-eyebrow" id="explorer-domain-tag">${esc(domainLabels[meta.domain])}</p>
         <h1 class="dx-title" id="explorer-title">${esc(meta.name)}</h1>
@@ -1555,6 +1556,7 @@ exports.dataExplorer = (ctx, { indicators, indicatorsByDomain, domainOrder, doma
                 </div>
                 <button type="button" class="dx-expand" data-expand="choropleth" title="View full screen" aria-label="View full screen">${icon('expand')}</button>
               </div>
+              <div class="fig-src" data-fig-src="span"></div>
             </div>
           </div>
         </div>
@@ -1570,6 +1572,7 @@ exports.dataExplorer = (ctx, { indicators, indicatorsByDomain, domainOrder, doma
         </header>
         ${vizSize('viz-ranking')}
         <div id="viz-ranking" class="dx-viz"></div>
+        <div class="fig-src" data-fig-src="span"></div>
       </section>
 
       <section class="dx-sec dx-view" id="dx-trend">
@@ -1581,6 +1584,7 @@ exports.dataExplorer = (ctx, { indicators, indicatorsByDomain, domainOrder, doma
         ${vizSize('explorer-trend')}
         <div id="explorer-trend" class="dx-viz dx-viz-tall"></div>
         <div class="dx-legend" id="trend-legend"></div>
+        <div class="fig-src" data-fig-src="span"></div>
       </section>
 
       <section class="dx-sec dx-view" id="dx-change">
@@ -1591,6 +1595,7 @@ exports.dataExplorer = (ctx, { indicators, indicatorsByDomain, domainOrder, doma
         </header>
         ${vizSize('viz-change')}
         <div id="viz-change" class="dx-viz"></div>
+        <div class="fig-src" data-fig-src="span"></div>
       </section>
 
       <section class="dx-sec dx-view" id="dx-compare">
@@ -1602,6 +1607,7 @@ exports.dataExplorer = (ctx, { indicators, indicatorsByDomain, domainOrder, doma
         ${vizSize('viz-compare')}
         <div id="viz-compare" class="dx-viz"></div>
         <div class="compare-stat-row" id="compare-stats"></div>
+        <div class="fig-src" data-fig-src="span"></div>
       </section>
 
       <section class="dx-sec dx-view" id="dx-heat">
@@ -1612,6 +1618,7 @@ exports.dataExplorer = (ctx, { indicators, indicatorsByDomain, domainOrder, doma
         </header>
         ${vizSize('viz-heat')}
         <div id="viz-heat" class="dx-viz viz-heat-wrap"></div>
+        <div class="fig-src" data-fig-src="span"></div>
       </section>
 
       <section class="dx-sec dx-view dx-data" id="dx-data">
@@ -1676,6 +1683,7 @@ exports.landscape = (ctx, { indicators, meta, year, years, counties }) => shell(
   </div></div>
 
   <div class="wrap section lsc-wrap">
+    <span class="cite-cfg" hidden data-title="#lsc-title" data-unit="#lsc-unit" data-agency="#lsc-agency" data-mock="#lsc-mock" data-year="#lsc-year-val" data-range="#lsc-year"></span>
     <div class="lsc-head">
       <p class="dx-eyebrow" id="lsc-domain">${esc(meta.domainLabel || '')}</p>
       <h1 class="dx-title" id="lsc-title">${esc(meta.name)}</h1>
@@ -1706,6 +1714,7 @@ exports.landscape = (ctx, { indicators, meta, year, years, counties }) => shell(
         <a class="lsc-go" id="lsc-go" href="/data">Open in Data Explorer</a>
       </aside>
     </div>
+    <div class="fig-src" data-fig-src="year"></div>
 
     <section class="lsc-analysis" id="lsc-analysis">
       <div class="lsc-an-head">
@@ -1736,6 +1745,7 @@ exports.landscape = (ctx, { indicators, meta, year, years, counties }) => shell(
             </button>
           </figcaption>
           <div class="lsc-an-plot" id="lsc-an-${id}"></div>
+          <div class="fig-src" data-fig-src="span"></div>
         </figure>`).join('')}
       </div>
     </section>
@@ -2841,6 +2851,7 @@ exports.paper = (ctx, p, canManage = false) => shell(ctx, {
         <h1>${esc(p.title)}</h1>
         <p class="authors">${esc(p.authors)} · <span class="mono">${esc(p.published_on)}</span></p>
         ${p.downloadable ? `<a class="btn btn-teal" href="/papers/${p.id}/download">${icon('download')} Download</a>` : '<span class="muted">This paper is read-only, download is not available.</span>'}
+        ${shareBar(ctx, '/research/' + p.id, p.title)}
       </div>
     </div>
     <h2>Abstract</h2><p class="muted">${esc(p.abstract)}</p>
@@ -2853,6 +2864,29 @@ exports.paper = (ctx, p, canManage = false) => shell(ctx, {
 function riseWords(text, inner = 'rw-in') {
   return String(text || '').split(/\s+/).filter(Boolean)
     .map((w, i) => `<span class="rw"><span class="${inner}" style="--i:${i}">${esc(w)}</span></span>`).join(' ');
+}
+
+// Share links for a paper or an update: WhatsApp, Facebook, X, LinkedIn, email, copy the link, and the
+// phone's own share sheet where it has one (app.js). Plain links, so nothing loads from the networks.
+const WHATSAPP_PATH = 'M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z';
+function shareBar(ctx, path, title) {
+  const url = (ctx.origin || '') + path;
+  const u = encodeURIComponent(url), t = encodeURIComponent(title);
+  const brand = (k) => `<svg viewBox="${SOCIAL[k].vb}" aria-hidden="true"><path d="${SOCIAL[k].d}"/></svg>`;
+  const links = [
+    ['wa', 'WhatsApp', `https://wa.me/?text=${t}%20${u}`, `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${WHATSAPP_PATH}"/></svg>`],
+    ['fb', 'Facebook', `https://www.facebook.com/sharer/sharer.php?u=${u}`, brand('fb')],
+    ['x', 'X', `https://twitter.com/intent/tweet?text=${t}&url=${u}`, brand('x')],
+    ['in', 'LinkedIn', `https://www.linkedin.com/sharing/share-offsite/?url=${u}`, brand('in')],
+    ['mail', 'Email', `mailto:?subject=${t}&body=${t}%0A${u}`, icon('mail')],
+  ];
+  return `<div class="share" role="group" aria-label="Share this">
+      <span class="share-l">Share</span>
+      ${links.map(([k, label, href, svg]) => `<a class="share-b is-${k}" href="${esc(href)}"${k === 'mail' ? '' : ' target="_blank" rel="noopener noreferrer"'} aria-label="Share on ${label}" title="${label}">${svg}</a>`).join('')}
+      <button type="button" class="share-b is-copy" data-share-copy="${esc(url)}" aria-label="Copy the link" title="Copy the link">${icon('copy')}</button>
+      <button type="button" class="share-b is-native" data-share-native data-share-title="${esc(title)}" data-share-url="${esc(url)}" aria-label="More ways to share" title="More ways to share" hidden>${icon('share')}</button>
+      <span class="share-done" role="status" aria-live="polite"></span>
+    </div>`;
 }
 
 // ============ NEWS & UPDATES (/updates) ============
@@ -3019,7 +3053,7 @@ exports.updatePage = (ctx, { items, index }) => {
     body: `
   <article class="upd wrap" aria-labelledby="updTitle">
     <nav class="upd-crumbs" aria-label="Breadcrumb">
-      <a href="/">Home</a><span aria-hidden="true">/</span><a href="/updates">News &amp; notices</a><span aria-hidden="true">/</span><span aria-current="page">${esc(title)}</span>
+      <a href="/">Home</a><span aria-hidden="true">/</span><a href="/updates">News &amp; Updates</a><span aria-hidden="true">/</span><span aria-current="page">${esc(title)}</span>
     </nav>
     <div class="upd-grid">
       <aside class="upd-rail" aria-label="About this update">
@@ -3032,6 +3066,7 @@ exports.updatePage = (ctx, { items, index }) => {
       <div class="upd-main">
         <h1 id="updTitle" aria-label="${esc(title)}"><span aria-hidden="true">${riseWords(title)}</span></h1>
         <p class="upd-lead">${esc(body)}</p>
+        ${shareBar(ctx, '/updates/' + updateSlug(u), title)}
         ${demo ? `<p class="upd-demo" role="note">${icon('info')}<span><strong>Demonstration data.</strong> The figures in this update come from NIIS's demonstration dataset. Live Ministry feeds are not public yet, so they are not official statistics.</span></p>` : ''}
         <figure class="upd-figure">
           <img src="${esc(photo)}" alt="" width="1200" height="675" decoding="async">

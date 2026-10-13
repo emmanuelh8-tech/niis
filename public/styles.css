@@ -5901,3 +5901,41 @@ html:has(.bbc) { background-image: none; background-color: #fff; }
   .sp-brand::before { background: url('/img/brand/seal-large.webp') center top 1.2rem / auto min(170px, 42vw) no-repeat; }
   .sp-brand .lg-brand-in h2 { display: block; font-size: 1.45rem; }
 }
+
+/* ============ SOURCE NOTES UNDER THE CHARTS ============
+   Set as the statistical press and journals set them: small, grey, left-aligned under the figure, a
+   hairline above, "Source:" and "Note:" in bold, then a quiet "Copy citation". */
+.fig-src { display: grid; gap: .2rem; margin: .8rem 0 0; padding-top: .6rem; border-top: 1px solid #E3E7EC; font: 400 .74rem/1.45 'Public Sans', Arial, sans-serif; color: #5A6273; text-align: left; }
+.fig-src:empty { display: none; }
+.fig-src-l { margin: 0; text-align: left; hyphens: manual; }
+.fig-src-l b { font-weight: 700; color: #2B3240; }
+.fig-cite { justify-self: start; display: inline-flex; align-items: center; gap: .35rem; margin-top: .25rem; padding: .2rem .45rem; border: 1px solid #D5DAE1; border-radius: 3px;
+  background: #fff; font: 600 .7rem/1.2 'Public Sans', Arial, sans-serif; color: #2B3240; cursor: pointer; transition: border-color .2s, color .2s, background-color .2s; }
+.fig-cite .icn { width: 12px; height: 12px; }
+.fig-cite:hover { border-color: #0B2C63; color: #0B2C63; }
+.fig-cite.is-done { border-color: #1E6B3A; background: #E3F4E8; color: #1E6B3A; }
+.fig-cite:focus-visible { outline: 2px solid #0B2C63; outline-offset: 2px; }
+.dx-map-frame .fig-src { padding-left: .2rem; padding-right: .2rem; }
+.lsc-an-card .fig-src { margin-top: .6rem; }
+
+/* ============ SHARE LINKS (papers, news) ============
+   A row of round buttons: WhatsApp, Facebook, X, LinkedIn, email, copy the link, and the phone's own
+   share sheet. Grey at rest, each in its network's colour on hover. */
+.share { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; margin: 1.2rem 0; }
+.share-l { margin-right: .2rem; font: 400 .74rem/1 var(--font-label); letter-spacing: .14em; text-transform: uppercase; color: #4A5160; }
+.share-b { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid #D5DAE1; border-radius: 50%; background: #fff; color: #2B3240; cursor: pointer;
+  transition: background-color .2s, color .2s, border-color .2s, transform .2s; }
+.share-b svg { width: 16px; height: 16px; fill: currentColor; }
+.share-b .icn { width: 16px; height: 16px; fill: none; }
+.share-b:hover, .share-b:focus-visible { transform: translateY(-2px); color: #fff; text-decoration: none; }
+.share-b:focus-visible { outline: 2px solid #0B2C63; outline-offset: 2px; }
+.share-b.is-wa:hover, .share-b.is-wa:focus-visible { background: #25D366; border-color: #25D366; }
+.share-b.is-fb:hover, .share-b.is-fb:focus-visible { background: #1877F2; border-color: #1877F2; }
+.share-b.is-x:hover, .share-b.is-x:focus-visible { background: #000; border-color: #000; }
+.share-b.is-in:hover, .share-b.is-in:focus-visible { background: #0A66C2; border-color: #0A66C2; }
+.share-b.is-mail:hover, .share-b.is-mail:focus-visible, .share-b.is-copy:hover, .share-b.is-copy:focus-visible, .share-b.is-native:hover, .share-b.is-native:focus-visible { background: #0B2C63; border-color: #0B2C63; }
+.share-b.is-done { background: #1E6B3A; border-color: #1E6B3A; color: #fff; }
+.share-b[hidden] { display: none; }
+.share-done { font: 600 .74rem/1 'Public Sans', Arial, sans-serif; color: #1E6B3A; }
+.paper-detail-head .share { margin-bottom: 0; }
+@media (prefers-reduced-motion: reduce) { .share-b, .fig-cite { transition: none; } .share-b:hover { transform: none; } }

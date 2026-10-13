@@ -362,7 +362,9 @@ async function handler(req, res) {
     imagestore.refreshIfStale();
 
     const user = await currentUser(req);
-    const ctx = { user, perms: user ? [...(cache.permsByRole.get(user.role) || [])] : [] };
+    const ctx = { user, perms: user ? [...(cache.permsByRole.get(user.role) || [])] : [],
+      // the site's own address, for share links (Vercel says https in x-forwarded-proto)
+      origin: `${String(req.headers['x-forwarded-proto'] || 'http').split(',')[0]}://${req.headers.host || 'localhost'}` };
     if (user && (hasPerm(user, 'messaging') || hasPerm(user, 'admin_inbox'))) {
       const badges = await sdb.rpc('user_badges', { p_user_id: user.id, p_is_admin: hasPerm(user, 'admin_inbox') });
       ctx.unreadMsgs = badges.unreadMsgs || 0;

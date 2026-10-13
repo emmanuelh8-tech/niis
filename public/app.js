@@ -1238,3 +1238,90 @@
     try { sessionStorage.setItem(KEY, JSON.stringify(c)); } catch (e2) {}
   });
 })();
+
+// ---------- a source note under every chart, as journals and the statistical press set them ----------
+// "Source:" names the agency the figures come from and NIIS, which compiles and publishes them;
+// "Note:" names the indicator, its unit and the years shown (and flags demonstration figures). A
+// "Copy citation" button copies a full data-set reference. The page's own indicator heading, unit,
+// source and years are the record (.cite-cfg points at them), so every note follows the reader's
+// choice of indicator and year.
+(function () {
+  var cfg = document.querySelector('.cite-cfg');
+  var figs = [].slice.call(document.querySelectorAll('[data-fig-src]'));
+  if (!cfg || !figs.length) return;
+  function el(sel) { return sel ? document.querySelector(sel) : null; }
+  function txt(sel) { var e = el(sel); return e ? e.textContent.replace(/\s+/g, ' ').trim() : ''; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function period(kind) {
+    if (kind === 'year' && cfg.dataset.year) return txt(cfg.dataset.year);
+    if (cfg.dataset.span) return txt(cfg.dataset.span);
+    var r = el(cfg.dataset.range);
+    return r && r.min && r.max ? (r.min === r.max ? r.min : r.min + '–' + r.max) : '';
+  }
+  var COPY = '<svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+  function render() {
+    var name = txt(cfg.dataset.title), unit = txt(cfg.dataset.unit), agency = txt(cfg.dataset.agency);
+    var mockEl = el(cfg.dataset.mock), mock = !!(mockEl && !mockEl.hidden);
+    if (!agency || agency === 'n/a') agency = '';
+    var year = new Date().getFullYear();
+    var today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    var href = location.href.split('#')[0];
+    var src = (agency ? agency + '; ' : '') + 'National ICT Intelligence System (NIIS), Liberia, ' + year + '.';
+    figs.forEach(function (f) {
+      var p = period(f.getAttribute('data-fig-src'));
+      if (p === 'n/a') p = '';
+      var note = name + (unit ? ', ' + unit : '') + (p ? ', ' + p : '') + '.' + (mock ? ' Demonstration figures, not official statistics.' : '');
+      var cite = 'National ICT Intelligence System (NIIS). (' + year + '). ' + name + (unit ? ' (' + unit + ')' : '') + ', Liberia' + (p ? ', ' + p : '') +
+        ' [Data set]. ' + (agency ? 'Data from ' + agency + '. ' : '') + (mock ? 'Demonstration figures. ' : '') + 'Retrieved ' + today + ', from ' + href;
+      f.innerHTML = '<p class="fig-src-l"><b>Source:</b> ' + esc(src) + '</p>' +
+        '<p class="fig-src-l"><b>Note:</b> ' + esc(note) + '</p>' +
+        '<button type="button" class="fig-cite" data-cite="' + esc(cite) + '">' + COPY + '<span>Copy citation</span></button>';
+    });
+  }
+  render();
+  var t = 0;
+  var mo = new MutationObserver(function () { clearTimeout(t); t = setTimeout(render, 80); });
+  [cfg.dataset.title, cfg.dataset.unit, cfg.dataset.agency, cfg.dataset.mock, cfg.dataset.span, cfg.dataset.year].forEach(function (sel) {
+    var e = el(sel); if (e) mo.observe(e, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
+  });
+  window.addEventListener('popstate', render);
+})();
+
+// ---------- copy to the clipboard (citations, share links), with a word to say it worked ----------
+(function () {
+  function copy(text, done) {
+    function fallback() {
+      var ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(true); } catch (e) { done(false); }
+      ta.remove();
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+    else fallback();
+  }
+  document.addEventListener('click', function (e) {
+    var c = e.target.closest && e.target.closest('.fig-cite');
+    if (c) {
+      copy(c.getAttribute('data-cite'), function (ok) {
+        var s = c.querySelector('span'); if (!s) return;
+        s.textContent = ok ? 'Citation copied' : 'Copy failed';
+        c.classList.toggle('is-done', ok);
+        setTimeout(function () { s.textContent = 'Copy citation'; c.classList.remove('is-done'); }, 2200);
+      });
+      return;
+    }
+    var b = e.target.closest && e.target.closest('[data-share-copy]');
+    if (b) {
+      copy(b.getAttribute('data-share-copy'), function (ok) {
+        var bar = b.closest('.share'), out = bar && bar.querySelector('.share-done');
+        if (out) { out.textContent = ok ? 'Link copied' : 'Copy failed'; setTimeout(function () { out.textContent = ''; }, 2200); }
+        b.classList.toggle('is-done', ok); setTimeout(function () { b.classList.remove('is-done'); }, 2200);
+      });
+      return;
+    }
+    var n = e.target.closest && e.target.closest('[data-share-native]');
+    if (n && navigator.share) navigator.share({ title: n.getAttribute('data-share-title'), url: n.getAttribute('data-share-url') }).catch(function () {});
+  });
+  // the phone's own share sheet, where the browser has one
+  if (navigator.share) [].forEach.call(document.querySelectorAll('[data-share-native]'), function (n) { n.hidden = false; });
+})();

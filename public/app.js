@@ -775,6 +775,155 @@
     });
   }
 
+  // ---- Our Team: the members ride a bicycle tyre. It turns slowly to the left on its own; each card
+  // pops up on the right as it comes over the top and sinks away on the left. A drag or a swipe spins
+  // it either way and it coasts back into its slow turn; the arrow keys step it a card at a time, and
+  // a card reached with the keyboard turns to the top. The geometry lives in the CSS (.tw-stage).
+  function teamWheel(stage, onTap) {
+    var cards = qsa('.tw-card', stage), N = cards.length, spin = qs('.tw-spin', stage);
+    if (!N || !spin) return;
+    var CRUISE = 0.16;                       // cards a second: a new face every six seconds or so
+    var G = {}, off = 0, vel = 0, hover = false, drag = null, dragged = false, target = null, wheelT = -1e4;
+    var raf = 0, last = 0, seen = false;
+    // per card: >0 shown since that time, <0 gone since; the server laid out the first five
+    var state = cards.map(function (c) { return c.classList.contains('is-off') ? -1 : 1; });
+    function geo() {
+      var cs = getComputedStyle(stage), n = function (k) { return parseFloat(cs.getPropertyValue(k)) || 0; };
+      G = { W: stage.clientWidth, rc: n('--tw-rc'), lift: n('--tw-lift'), step: n('--tw-step') || 27, cy: n('--tw-cy') };
+    }
+    function slotOf(i) { var s = ((i - off) % N + N) % N; return s >= N / 2 ? s - N : s; }
+    function backOut(p) { var c = 1.9; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); }
+    function locked() { return document.documentElement.classList.contains('ui-locked'); }
+    function place(now) {
+      spin.style.transform = 'rotate(' + (-off * G.step).toFixed(3) + 'deg)';
+      for (var i = 0; i < N; i++) {
+        var c = cards[i], s = slotOf(i), a = Math.abs(s), st = state[i];
+        var on = st > 0 ? a < 2.56 : a < 2.44;       // a little slack, so a card at the edge doesn't flicker
+        if (on && st < 0) st = state[i] = REDUCE ? 1 : now;
+        else if (!on && st > 0) st = state[i] = REDUCE ? -1 : -now;
+        // the card at the top is the largest and stands a little proud; the outer ones are smaller
+        var k = a <= 1 ? 1 - .1 * a : a <= 2 ? .9 - .04 * (a - 1) : .86;
+        var f = Math.max(0, 1 - a), up = G.lift * f * f * (3 - 2 * f), o, p;
+        if (st > 0) {                                   // popping up from the tyre, with a little overshoot
+          p = Math.min(1, (now - st) / 640);
+          k *= .5 + .5 * backOut(p); up -= .05 * Math.pow(1 - p, 3); o = Math.min(1, p * 2.6);
+          c._g = 0;
+        } else {                                        // sinking away
+          p = Math.min(1, (now + st) / 420);
+          if (p >= 1 && c._g) continue;                 // long gone: nothing to redraw
+          c._g = p >= 1 ? 1 : 0;
+          k *= 1 - .35 * p; up -= .04 * p * p; o = 1 - p;
+        }
+        c.style.setProperty('--s', s.toFixed(4));
+        c.style.setProperty('--k', k.toFixed(4));
+        c.style.setProperty('--up', up.toFixed(4));
+        c.style.opacity = o.toFixed(3);
+        c.style.zIndex = 10 - Math.round(a);
+        c.classList.toggle('is-off', o < .3);
+      }
+    }
+    function frame(now) {
+      raf = 0;
+      var dt = last ? Math.min(.05, (now - last) / 1000) : 0; last = now;
+      if (!drag) {
+        if (target !== null) {                          // a critically damped spring onto the chosen card
+          var w = 9, d = target - off;
+          vel += (w * w * d - 2 * w * vel) * dt;
+          if (REDUCE || (Math.abs(d) < .0015 && Math.abs(vel) < .02)) { off = target; vel = 0; target = null; }
+        } else {
+          // a spin coasts down; the slow turn to the left eases back in. It holds still under the
+          // mouse, while a profile is open, and for a moment after a trackpad swipe.
+          var goal = REDUCE || hover || locked() || now - wheelT < 900 ? 0 : CRUISE;
+          var tau = Math.abs(vel) > Math.abs(goal) + .02 ? .85 : 1.4;
+          vel += (goal - vel) * (1 - Math.exp(-dt / tau));
+        }
+        off += vel * dt;
+      }
+      place(now);
+      if (seen && !document.hidden) raf = requestAnimationFrame(frame);
+      else last = 0;
+    }
+    function run() { if (!raf && seen && !document.hidden) { last = 0; raf = requestAnimationFrame(frame); } }
+    // the pointer's angle round the hub, in degrees clockwise from the top
+    function ang(e) {
+      var b = stage.getBoundingClientRect();
+      return Math.atan2(e.clientX - b.left - G.W / 2, b.top + G.cy * G.W - e.clientY) * 180 / Math.PI;
+    }
+    stage.addEventListener('pointerdown', function (e) {
+      if (e.button) return;
+      geo();
+      drag = { id: e.pointerId, x: e.clientX, y: e.clientY, live: false, touch: e.pointerType !== 'mouse' };
+      dragged = false;
+    });
+    stage.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'mouse') hover = !drag && !!e.target.closest('.tw-card');
+      if (!drag || e.pointerId !== drag.id) return;
+      if (!drag.live) {
+        var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+        if (dx * dx + dy * dy < 36) return;
+        if (drag.touch && Math.abs(dy) > Math.abs(dx)) { drag = null; return; }   // that one scrolls the page
+        drag.live = dragged = true; target = null;
+        try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+        stage.classList.add('is-drag');
+        drag.a = ang(e); drag.off = off; drag.hist = [];
+      }
+      // the wheel follows the pointer round its hub, so the card under it stays under it
+      var da = ang(e) - drag.a;
+      off = drag.off - da / G.step;
+      drag.hist.push([e.timeStamp, off]);
+      while (drag.hist.length > 2 && e.timeStamp - drag.hist[0][0] > 90) drag.hist.shift();
+      run();
+    });
+    function release(e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      if (drag.live) {
+        var h = drag.hist, v = 0, z = h[h.length - 1];
+        if (h.length > 1 && e.timeStamp - z[0] < 70) v = (z[1] - h[0][1]) / Math.max(16, z[0] - h[0][0]) * 1000;
+        vel = Math.max(-9, Math.min(9, v));             // let go mid-swing and it spins on
+        stage.classList.remove('is-drag');
+        setTimeout(function () { dragged = false; }, 0);
+      }
+      drag = null;
+    }
+    stage.addEventListener('pointerup', release);
+    stage.addEventListener('pointercancel', release);
+    stage.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') hover = false; });
+    stage.addEventListener('click', function (e) {
+      var c = e.target.closest('.tw-card');
+      if (!c || dragged) return;
+      onTap(c);
+    });
+    // a sideways trackpad swipe turns it too; an up-and-down one still scrolls the page
+    stage.addEventListener('wheel', function (e) {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      e.preventDefault();
+      geo();
+      var px = e.deltaMode === 1 ? e.deltaX * 16 : e.deltaX;
+      off += px / (G.rc * G.W * G.step * Math.PI / 180);
+      vel = 0; target = null; wheelT = performance.now();
+      run();
+    }, { passive: false });
+    stage.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      target = (target !== null ? target : Math.round(off)) + (e.key === 'ArrowRight' ? 1 : -1);
+      var c = cards[((target % N) + N) % N];
+      try { c.focus({ preventScroll: true }); } catch (_) { c.focus(); }
+      run();
+    });
+    stage.addEventListener('focusin', function (e) {
+      var c = e.target.closest('.tw-card');
+      if (!c || drag || !c.matches(':focus-visible')) return;
+      var s = slotOf(Number(c.dataset.i));
+      if (Math.abs(s) > .01) { target = off + s; run(); }
+    });
+    geo();
+    window.addEventListener('resize', geo);
+    document.addEventListener('visibilitychange', run);
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { seen = es[es.length - 1].isIntersecting; run(); }).observe(stage);
+    else { seen = true; run(); }
+  }
+
   function initTeam() {
     var root = qs('.tm');
     if (!root) return;
@@ -790,6 +939,9 @@
         prev: qs('[data-row-step="-1"]', sec), next: qs('[data-row-step="1"]', sec), onTap: openCard,
       });
     });
+
+    var wheel = qs('[data-wheel]');
+    if (wheel) teamWheel(wheel, openCard);
 
     // ---- the talent pool: a league table in white columns, filtered by field. The rows still shown
     // are shared out evenly across the columns, in order, and numbered from one.

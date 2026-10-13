@@ -3379,20 +3379,6 @@ const SOCIAL = {
 const SOCIAL_ORDER = ['gh', 'ig', 'fb', 'in', 'x'];
 // the sample profiles have no accounts yet, so every link is a placeholder
 const socialLinks = (name, focusable) => SOCIAL_ORDER.map((k) => `<a href="#" aria-label="${esc(name)} on ${SOCIAL[k].label}"${focusable ? '' : ' tabindex="-1"'}><svg viewBox="${SOCIAL[k].vb}" aria-hidden="true"><path d="${SOCIAL[k].d}"/></svg></a>`).join('');
-// a laptop in its own colours: silver body, dark bezel, a lit blue screen
-const LAPTOP = `<svg class="tc-laptop" viewBox="0 0 48 34" aria-hidden="true">
-  <defs>
-    <linearGradient id="lpBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EEF0F3"/><stop offset="1" stop-color="#A3A9B1"/></linearGradient>
-    <linearGradient id="lpScreen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5B9BF5"/><stop offset=".55" stop-color="#1F52B4"/><stop offset="1" stop-color="#0C2766"/></linearGradient>
-  </defs>
-  <rect x="7" y="2" width="34" height="23.5" rx="2.4" fill="#2A2D33"/>
-  <rect x="9.2" y="4.2" width="29.6" height="19" rx=".9" fill="url(#lpScreen)"/>
-  <path d="M9.2 4.2h12.5L12.6 23.2H9.2z" fill="#fff" opacity=".13"/>
-  <circle cx="24" cy="3.1" r=".55" fill="#5C6068"/>
-  <path d="M1.5 26.2h45l-2.4 4.9c-.4.8-1.1 1.2-2 1.2H5.9c-.9 0-1.6-.4-2-1.2z" fill="url(#lpBody)"/>
-  <rect x="1.5" y="25.3" width="45" height="1.7" rx=".85" fill="#C7CCD3"/>
-  <path d="M19.5 26.2h9l-.7 1.3h-7.6z" fill="#8A9099"/>
-</svg>`;
 // National ICT System Patrons: people who support ICT in Liberia. The first four are real (below);
 // the rest are sample profiles (the owner asked for mock patrons), with AI-generated portraits in
 // public/img/patrons of people who do not exist; the page says so.
@@ -3441,6 +3427,62 @@ const MEDAL = `<svg class="tc-laptop" viewBox="0 0 40 40" aria-hidden="true">
   <circle cx="20" cy="26" r="7.4" fill="none" stroke="#FFF3C4" stroke-opacity=".7" stroke-width="1"/>
   <path d="M20 20.6l1.6 3.3 3.6.5-2.6 2.5.6 3.6-3.2-1.7-3.2 1.7.6-3.6-2.6-2.5 3.6-.5z" fill="#FFF6D6"/>
 </svg>`;
+// The team wheel's bicycle tyre: knobby black rubber on a silver rim, 32 laced spokes and a valve.
+// Three layers, so the light stays put while the wheel turns: a soft shadow (still), the rubber,
+// spokes and valve (they turn), and the rim with the light on the rubber (still).
+const TW_TYRE = (() => {
+  const f = (n) => +n.toFixed(2);
+  const pt = (r, deg) => { const a = deg * Math.PI / 180; return `${f(r * Math.sin(a))} ${f(-r * Math.cos(a))}`; };
+  // a block of tread from radius r0 to r1, w degrees wide, centred on deg (0 is the top)
+  const block = (r0, r1, deg, w) => `M${pt(r0, deg - w / 2)}L${pt(r1, deg - w / 2)}A${r1} ${r1} 0 0 1 ${pt(r1, deg + w / 2)}L${pt(r0, deg + w / 2)}A${r0} ${r0} 0 0 0 ${pt(r0, deg - w / 2)}Z`;
+  const ring = (r0, r1) => `M0 ${-r1}A${r1} ${r1} 0 1 1 0 ${r1}A${r1} ${r1} 0 1 1 0 ${-r1}ZM0 ${-r0}A${r0} ${r0} 0 1 0 0 ${r0}A${r0} ${r0} 0 1 0 0 ${-r0}Z`;
+  const K = 100, step = 360 / K;
+  // one sector of tread, repeated round the tyre: a big crown knob and a small one between, two
+  // staggered shoulder blocks on the sidewall, and a small block by the bead
+  const sector = [
+    `<path d="${block(96.4, 99.9, 0, 2.1)}" fill="#141416" stroke="#2C2C30" stroke-width=".26"/>`,
+    `<path d="${block(96.4, 98.5, step / 2, 1)}" fill="#141416" stroke="#28282C" stroke-width=".22"/>`,
+    `<path d="${block(91.4, 95.4, step / 2, 2)}" fill="#19191C" stroke="#2B2B2F" stroke-width=".22"/>`,
+    `<path d="${block(92.6, 95.4, 0, 1)}" fill="#18181B" stroke="#28282C" stroke-width=".2"/>`,
+    `<path d="${block(88.2, 90.3, 0, 1.4)}" fill="#171719" stroke="#26262A" stroke-width=".2"/>`,
+  ].join('');
+  const tread = Array.from({ length: K }, (_, k) => `<use href="#twK" transform="rotate(${f(k * step)})"/>`).join('');
+  // 32 spokes laced tangentially: each leaves the hub flange 34 degrees ahead of or behind its nipple
+  const H = 32, spokes = [], nipples = [];
+  for (let k = 0; k < H; k++) {
+    const a = k * 360 / H, hub = a + (k % 2 ? 34 : -34);
+    spokes.push(`M${pt(6.6, hub)}L${pt(78.4, a)}`);
+    nipples.push(block(75.8, 78.8, a, .9));
+  }
+  return `<div class="tw-tyre tw-shadow"><svg viewBox="-106 -106 212 212" aria-hidden="true">
+          <defs><filter id="twBlur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.6"/></filter></defs>
+          <path d="${ring(79, 100.5)}" fill="#1B2330" fill-opacity=".26" filter="url(#twBlur)" transform="translate(2.2 3.4)" fill-rule="evenodd"/>
+        </svg></div>
+        <div class="tw-tyre tw-spin"><svg viewBox="-106 -106 212 212" aria-hidden="true">
+          <defs><g id="twK">${sector}</g>
+            <radialGradient id="twHub" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#FBFCFD"/><stop offset="1" stop-color="#9AA1A9"/></radialGradient></defs>
+          <path d="${spokes.join('')}" stroke="#A3A9B0" stroke-width=".42" stroke-linecap="round" fill="none"/>
+          <path d="${nipples.join('')}" fill="#8A9097"/>
+          <circle r="8.2" fill="url(#twHub)" stroke="#8A9199" stroke-width=".4"/><circle r="2.4" fill="#4A5059"/>
+          <path d="${ring(86, 97.2)}" fill="#0E0E10" fill-rule="evenodd"/>
+          ${tread}
+          <circle r="86.6" fill="none" stroke="#2C2C30" stroke-width=".45"/>
+          <rect x="-1.15" y="-78.9" width="2.3" height="8.6" rx=".5" fill="#1E1F22"/>
+          <rect x="-1.5" y="-71.4" width="3" height="3.1" rx=".7" fill="#3C3E43"/>
+        </svg></div>
+        <div class="tw-tyre tw-rim"><svg viewBox="-106 -106 212 212" aria-hidden="true">
+          <defs>
+            <linearGradient id="twRim" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".3" stop-color="#E4E7EA"/><stop offset=".55" stop-color="#F6F7F8"/><stop offset="1" stop-color="#B9BEC4"/></linearGradient>
+            <linearGradient id="twSheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".17"/><stop offset=".22" stop-color="#fff" stop-opacity=".05"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/></linearGradient>
+          </defs>
+          <path d="${ring(78.6, 86.2)}" fill="url(#twRim)" fill-rule="evenodd"/>
+          <circle r="85.7" fill="none" stroke="#FFFFFF" stroke-width=".7"/>
+          <circle r="84.3" fill="none" stroke="#9BA1A8" stroke-width=".35"/>
+          <circle r="81.3" fill="none" stroke="#FFFFFF" stroke-opacity=".85" stroke-width=".55"/>
+          <circle r="79" fill="none" stroke="#7D848C" stroke-width=".55"/>
+          <path d="${ring(86.2, 100)}" fill="url(#twSheen)" fill-rule="evenodd"/>
+        </svg></div>`;
+})();
 exports.team = (ctx) => {
   const pad = (v) => String(v).padStart(2, '0');
   // two rows filled column by column, so the first eight are laid in reading order
@@ -3511,6 +3553,31 @@ exports.team = (ctx) => {
     const start = c * base + Math.min(c, extra), take = base + (c < extra ? 1 : 0);
     return TALENTS.slice(start, start + take).map((t, j) => tRow(t, start + j)).join('');
   });
+  // the team on a turning wheel: five cards ride the top of a bicycle tyre, the next one popping up on
+  // the right as it turns to the left. The slot each card starts in is set here, so the page arrives
+  // already laid out; app.js then turns it, and a drag or a swipe spins it either way.
+  const twCard = (m, i) => {
+    const n = TEAM_MEMBERS.length;
+    let slot = i % n; if (slot >= n / 2) slot -= n;
+    const on = Math.abs(slot) < 2.5;
+    return `<li class="tw-slot"><button type="button" class="tw-card${on ? '' : ' is-off'}" data-person="team" data-i="${i}" style="--s:${slot};--up:${slot === 0 ? 'var(--tw-lift)' : 0};--k:${[1, .9, .86][Math.abs(slot)] || .6};z-index:${10 - Math.abs(slot)}" aria-label="${esc(m.name)}, ${esc(m.role)}. Open profile">
+            <span class="tw-ph"><img src="/img/team/${m.img}.jpg?v=${ASSET_V}" alt="" width="600" height="600" decoding="async" draggable="false"></span>
+            <span class="tw-lab"><small>${esc(m.role)}</small><b>${esc(m.name)}</b></span>
+          </button></li>`;
+  };
+  const teamWheel = `<section class="tw wrap" id="team" aria-labelledby="tw-h">
+      <h2 id="tw-h" class="sr-only">The people behind NIIS</h2>
+      <div class="tw-panel">
+        <div class="tw-stage" data-wheel role="group" aria-label="Team members, ${TEAM_MEMBERS.length} in all. Use the arrow keys or drag to turn the wheel.">
+          <div class="tw-hub">
+            ${TW_TYRE}
+            <ul class="tw-cards" role="list">${TEAM_MEMBERS.map(twCard).join('')}</ul>
+          </div>
+          <p class="tw-words" aria-hidden="true">Collect<i></i>Check<i></i>Publish</p>
+        </div>
+      </div>
+      <p class="tw-note">Sample profiles with AI-generated placeholder photos, shown until appointments are confirmed. Drag or swipe the wheel to turn it either way.</p>
+    </section>`;
   // what the profile window shows
   const people = {
     team: TEAM_MEMBERS.map((m) => ({ name: m.name, role: m.role, img: `/img/team/${m.img}.jpg?v=${ASSET_V}`, bio: m.bio, ...(PERSON_MORE[m.name] || {}) })),
@@ -3524,8 +3591,7 @@ exports.team = (ctx) => {
     ${studio({ id: 'pc', kind: 'patron', list: PATRONS, folder: 'patrons', mark: MEDAL, words: [], extra: 'is-patrons', anchor: 'patrons',
       title: 'National ICT System<br>Patrons', label: 'Patrons', note: 'The first four are the patrons named so far; the others are sample profiles with AI-generated placeholder photos.' })}
 
-    ${studio({ id: 'tc', kind: 'team', list: TEAM_MEMBERS, folder: 'team', mark: LAPTOP, words: ['Who', 'we', 'are'],
-      title: 'The people<br>behind NIIS.', label: 'Team members', note: 'Sample profiles with AI-generated placeholder photos, shown until appointments are confirmed.' })}
+    ${teamWheel}
 
     <section class="tp wrap" id="talent" aria-labelledby="tp-h">
       <div class="tp-panel">

@@ -20,3 +20,6 @@ niip-3d/brag-output*/
 .impeccable/*.png
 
 *.bak
+
+# /brag launch-video renders
+brag-output*/

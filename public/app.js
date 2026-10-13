@@ -1261,7 +1261,8 @@
   function render() {
     var name = txt(cfg.dataset.title), unit = txt(cfg.dataset.unit), agency = txt(cfg.dataset.agency);
     var mockEl = el(cfg.dataset.mock), mock = !!(mockEl && !mockEl.hidden);
-    if (!agency || agency === 'n/a') agency = '';
+    // the agency is named beside NIIS only when it is someone else
+    if (!agency || agency === 'n/a' || /NIIS/.test(agency)) agency = '';
     var year = new Date().getFullYear();
     var today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
     var href = location.href.split('#')[0];

@@ -82,9 +82,13 @@ async function refreshCounties() {
 }
 async function refreshIndicators() {
   const rows = await sdb.sel('indicator_catalog?select=*&order=domain,name');
-  cache.indicators = rows.map((r) => ({ ...r, domainLabel: DOMAIN_LABELS[r.domain] || r.domain, lastUpdated: r.last_year ? String(r.last_year) : 'n/a' }));
+  // Every figure is credited to NIIS until the data-sharing agreements with the agencies are signed
+  // (the owner's call). The database keeps each indicator's own agency (agencyOriginal here, never
+  // sent out) for when they are.
+  cache.indicators = rows.map((r) => ({ ...r, agency: SOURCE_NIIS, agencyOriginal: r.agency, domainLabel: DOMAIN_LABELS[r.domain] || r.domain, lastUpdated: r.last_year ? String(r.last_year) : 'n/a' }));
   cache.indicatorByCode = new Map(cache.indicators.map((i) => [i.code, i]));
 }
+const SOURCE_NIIS = 'National ICT Intelligence System (NIIS)';
 async function refreshPerms() {
   const rows = await sdb.sel('role_permissions?select=*');
   cache.permsByRole = new Map();
@@ -284,7 +288,12 @@ async function openDataRows(user, indicatorFilter, countyFilter, yearFilter) {
   if (countyFilter) q += `&county=eq.${sdb.enc(countyFilter)}`;
   if (yearFilter) q += `&year=eq.${Number(yearFilter)}`;
   q += '&order=indicator_code,year,county&limit=20000';
-  return sdb.sel(q);
+  return creditNIIS(await sdb.sel(q));
+}
+// Downloads credit NIIS as the source of every row too, until the data-sharing agreements are signed;
+// demonstration figures keep saying so.
+function creditNIIS(rows) {
+  return rows.map((r) => ({ ...r, source: SOURCE_NIIS + (/demonstration/i.test(String(r.source || '')) ? ' (demonstration data)' : '') }));
 }
 function validateSubmission(code, value) {
   const ind = cache.indicatorByCode.get(code);
@@ -459,7 +468,7 @@ async function handler(req, res) {
         }
         const q = `data_export?select=indicator_code,indicator,unit,county,year,value,source&access_level=${sdb.inList(accessLevels(user))}` +
           `&indicator_code=${sdb.inList(codes)}&county=${sdb.inList(countyNames)}&year=gte.${yf}&year=lte.${yt}&order=indicator,county,year&limit=20000`;
-        const rows = await sdb.sel(q);
+        const rows = creditNIIS(await sdb.sel(q));
         if (isPreview) return json(res, 200, { count: rows.length, rows: rows.slice(0, 500) });
         const format = url.searchParams.get('format') || 'csv';
         if (format === 'json') return json(res, 200, { dataset: 'niis-query', count: rows.length, data: rows });

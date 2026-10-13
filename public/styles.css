@@ -5939,3 +5939,19 @@ html:has(.bbc) { background-image: none; background-color: #fff; }
 .share-done { font: 600 .74rem/1 'Public Sans', Arial, sans-serif; color: #1E6B3A; }
 .paper-detail-head .share { margin-bottom: 0; }
 @media (prefers-reduced-motion: reduce) { .share-b, .fig-cite { transition: none; } .share-b:hover { transform: none; } }
+
+/* share buttons in their own colours at rest (white marks), a shade deeper on hover; email, copy
+   and the phone's share sheet in the site navy */
+.share-b { border: 0; color: #fff; box-shadow: 0 1px 2px rgba(16,20,28,.14); }
+.share-b.is-wa { background: #25D366; }
+.share-b.is-fb { background: #1877F2; }
+.share-b.is-x { background: #000; }
+.share-b.is-in { background: #0A66C2; }
+.share-b.is-mail, .share-b.is-copy, .share-b.is-native { background: #0B2C63; }
+.share-b.is-wa:hover, .share-b.is-wa:focus-visible { background: #1EBE5A; }
+.share-b.is-fb:hover, .share-b.is-fb:focus-visible { background: #0F65D8; }
+.share-b.is-x:hover, .share-b.is-x:focus-visible { background: #2B2B2B; }
+.share-b.is-in:hover, .share-b.is-in:focus-visible { background: #08549F; }
+.share-b.is-mail:hover, .share-b.is-mail:focus-visible, .share-b.is-copy:hover, .share-b.is-copy:focus-visible, .share-b.is-native:hover, .share-b.is-native:focus-visible { background: #123B80; }
+.share-b:hover, .share-b:focus-visible { box-shadow: 0 6px 12px -4px rgba(16,20,28,.35); }
+.share-b.is-done { background: #1E6B3A; }

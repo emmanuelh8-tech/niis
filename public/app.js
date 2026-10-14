@@ -1212,16 +1212,16 @@
   // heavy near-black words, a few in neon green, on light grey. Each short text is dealt into lines
   // sized to one width, now and then a word on end beside the lines it spans, set on two walls that meet
   // at a corner. The stage holds still while the reader scrolls, and the scroll drives the camera: each
-  // text shows whole, the camera dives through it a few words at a time, turning in 3D, pulls back to
-  // the whole block, and the block turns away like a wall as the next turns in. Scrolling back runs it
-  // backwards.
+  // text stays whole and readable, drifting a little in 3D as the reader scrolls, then turns away like a
+  // wall as the next turns in. Scrolling back runs it backwards.
   function initKinetic() {
     var box = qs('[data-kt]'), src = qs('.kt-src');
     if (!box || !src) return;
     var stage = qs('.kt', box), blurEl = qs('.kt-blur', box), cam = qs('.kt-cam', box);
     var bar = qs('.kt-bar b', box), count = qs('.kt-count b', box), hint = qs('.kt-hint', box), nav = qs('.gov-nav');
     // world units: each wall is W wide; lines are sized to fill it; FOLD is the angle of the left wall
-    var FAMILY = 'Montserrat', FONT = '800 100px ' + FAMILY, W = 1600, G = 40, LH = .86, GAP = .07, FOLD = 46, CAP = .34 * W;
+    // (on a tall phone screen the walls stack instead, the top one folded back along a level line, FOLDX)
+    var FAMILY = 'Montserrat', FONT = '800 100px ' + FAMILY, W = 1600, G = 40, LH = .86, GAP = .07, FOLD = 46, FOLDX = 38, CAP = .34 * W;
     var RHYTHM = [9, 15, 11, 7, 16, 10, 13];
     var texts = qsa('.kt-row', src).map(function (row) {
       return { label: qs('dt', row).textContent.trim(), text: row.getAttribute('data-kt-text') || qs('dd', row).textContent.trim() };
@@ -1230,7 +1230,7 @@
     var ctx = document.createElement('canvas').getContext('2d');
     function w1(str) { ctx.font = FONT; return ctx.measureText(str).width / 100; }   // width at 1px
     var bare = function (w) { return w.replace(/[^A-Za-z0-9'’-]/g, ''); };
-    var worlds = [], segs = [], total = 0, Ws = 0, Hs = 0, top = 0, raf = 0, last = 0, built = false;
+    var worlds = [], segs = [], total = 0, Ws = 0, Hs = 0, top = 0, raf = 0, last = 0, built = false, tall = null;
     var target = 0, shown = -1, prev = null, blurOn = true, blurN = 0, blurDt = 0;
 
     // the text's words, those between asterisks marked green
@@ -1281,15 +1281,16 @@
       }
       return out;
     }
-    // one text's world: the blocks split across two walls that meet at a corner, the left wall turned
-    // back; and the camera's stops, a few words at a time, in reading order
+    // one text's world: the blocks split across two walls that meet at a corner, the first wall turned
+    // back: side by side on a wide screen, one above the other on a tall one
     function build(tx) {
       var bl = blocks(deal(tx)), all = bl.reduce(function (a, b) { return a + b.adv; }, 0), acc = 0, split = bl.length;
       for (var q = 0; q < bl.length; q++) { if (acc + bl[q].adv / 2 > all / 2) { split = Math.max(1, q); break; } acc += bl[q].adv; }
+      var H0 = bl.slice(0, split).reduce(function (a, b) { return a + b.adv; }, 0), H1 = all - H0;
       var world = document.createElement('div');
       world.className = 'kt-world'; world.hidden = true;
-      var stops = [], heights = [0, 0], line = 0;
-      function put(l, f, tf, vert) {
+      var heights = [0, 0];
+      function put(l, f, tf) {
         var e = document.createElement('span');
         e.className = 'kt-w';
         l.words.forEach(function (t, j) {
@@ -1300,65 +1301,47 @@
         e.style.fontSize = f.toFixed(2) + 'px';
         e.style.transform = tf;
         world.appendChild(e);
-        var m = new DOMMatrix(tf), h = LH * f, at = function (x) { return m.transformPoint(new DOMPoint(x, h / 2, 0)); };
-        var wall = tf.indexOf('rotateY') === 0 ? FOLD : 0, ln = line++;
-        if (vert) { var c = at(l.w1 * f / 2); stops.push({ x: c.x, y: c.y, z: c.z, w: l.w1 * f, h: h, yaw: wall, roll: 90, line: ln }); return; }
-        // the line's words, gathered into runs of about twelve letters
-        var ws = l.words.map(function (t) { return t.w; }), j = 0;
-        while (j < ws.length) {
-          var run = [ws[j++]];
-          while (j < ws.length && (run.join(' ') + ' ' + ws[j]).length <= 12) run.push(ws[j++]);
-          var before = ws.slice(0, j - run.length).join(' '), x0 = before ? w1(before + ' ') * f : 0, x1 = w1(ws.slice(0, j).join(' ')) * f;
-          var p = at((x0 + x1) / 2);
-          stops.push({ x: p.x, y: p.y, z: p.z, w: x1 - x0, h: h, yaw: wall, roll: 0, line: ln });
-        }
       }
       bl.forEach(function (b, q) {
-        var side = q < split ? 0 : 1, y = heights[side];
-        var wallTf = side ? '' : 'rotateY(' + (-FOLD) + 'deg) ';
-        var x = side ? G : -(W + G);
+        var side = q < split ? 0 : 1, h = heights[side];
+        var wallTf = side ? '' : tall ? 'rotateX(' + FOLDX + 'deg) ' : 'rotateY(' + (-FOLD) + 'deg) ';
+        var x = tall ? 0 : side ? G : -(W + G), y = tall ? (side ? G + h : h - (H0 + G)) : h;
         if (b.vert) {
-          put(b.vert, b.fv, wallTf + 'translate(' + x.toFixed(1) + 'px,' + (y + b.Lv).toFixed(1) + 'px) rotate(-90deg)', true);
+          put(b.vert, b.fv, wallTf + 'translate(' + x.toFixed(1) + 'px,' + (y + b.Lv).toFixed(1) + 'px) rotate(-90deg)');
           var yc = y;
           b.lines.forEach(function (l, j) { put(l, b.fs[j], wallTf + 'translate(' + (x + b.T + b.g).toFixed(1) + 'px,' + yc.toFixed(1) + 'px)'); yc += b.fs[j] * (LH + GAP); });
         } else {
           put(b.lines[0], b.fs[0], wallTf + 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)');
         }
-        heights[side] = y + b.adv;
+        heights[side] = h + b.adv;
       });
       cam.appendChild(world);
-      return { el: world, stops: stops, H: Math.max(heights[0], heights[1]) };
+      return { el: world, H: Math.max(H0, H1), H0: H0, H1: H1 };
     }
 
-    // the path, in lengths of scroll: for each text, the whole block, a dive through its words and back
-    // to the whole block; between texts, the block turns away as the next one turns in
-    function rnd(j) { var a = Math.sin(j * 12.9898 + 78.233) * 43758.5453; return a - Math.floor(a); }
+    // the path, in lengths of scroll: each text whole, drifting a little in 3D as the reader scrolls (it
+    // stays readable all the way); between texts, the block turns away as the next one turns in
     function whole(wd) {
+      if (tall) {
+        var up = (wd.H0 + G) * Math.cos(FOLDX * Math.PI / 180), down = wd.H1 + G;
+        return { x: W / 2, y: (down - up) / 2, z: 0, s: Math.min(.9 * Ws / W, .8 * Hs / (up + down)), yaw: 0, pitch: 0, roll: 0 };
+      }
       var cs = Math.cos(FOLD * Math.PI / 180), span = (W + G) * (1 + cs);
       return { x: ((W + G) - (W + G) * cs) / 2, y: wd.H / 2, z: 0, s: Math.min(.88 * Ws / span, .78 * Hs / wd.H), yaw: 0, pitch: 4, roll: 0 };
     }
     function plan() {
       segs = []; total = 0;
       function add(sg) { sg.at = total; total += sg.len; segs.push(sg); }
+      var drift = REDUCE ? 0 : 1;
       worlds.forEach(function (wd, i) {
         var V = whole(wd);
-        add({ wd: i, A: V, B: V, len: i ? .5 : .7 });
-        if (!REDUCE) {
-          var from = V;
-          wd.stops.forEach(function (st) {
-            var j = st.line + i * 9;   // the same turn all along one line, a new one on the next
-            var c = { x: st.x, y: st.y, z: st.z, s: Math.min(.6 * Ws / st.w, .36 * Hs / st.h),
-              yaw: st.yaw + (rnd(j) - .5) * 28, pitch: (rnd(j + 7) - .5) * 18, roll: st.roll + (rnd(j + 3) - .5) * 9 };
-            add({ wd: i, A: from, B: c, len: .3, move: true });
-            add({ wd: i, A: c, B: c, len: .1 });
-            from = c;
-          });
-          add({ wd: i, A: from, B: V, len: .6, move: true });
-        }
-        add({ wd: i, A: V, B: V, len: .55 });
+        var A = Object.assign({}, V, { yaw: V.yaw - 7 * drift, pitch: V.pitch + 3 * drift, s: V.s * (1 - .04 * drift) });
+        var B = Object.assign({}, V, { yaw: V.yaw + 7 * drift, pitch: V.pitch - 2 * drift });
+        add({ wd: i, A: A, B: B, len: 1.2, move: true, flat: true });
         if (i < worlds.length - 1) {
-          var N = whole(worlds[i + 1]), turn = REDUCE ? 0 : 70;
-          add({ wd: i, to: i + 1, A: V, B: Object.assign({}, V, { yaw: turn, s: V.s * .8 }), A2: Object.assign({}, N, { yaw: -turn, s: N.s * .8 }), B2: N, len: .9, move: true });
+          var N = whole(worlds[i + 1]), turn = REDUCE ? 0 : 62;
+          var N0 = Object.assign({}, N, { yaw: N.yaw - 7 * drift, pitch: N.pitch + 3 * drift, s: N.s * (1 - .04 * drift) });
+          add({ wd: i, to: i + 1, A: B, B: Object.assign({}, B, { yaw: turn, s: B.s * .86 }), A2: Object.assign({}, N0, { yaw: -turn, s: N0.s * .86 }), B2: N0, len: .7, move: true });
         }
       });
     }
@@ -1378,7 +1361,7 @@
     function render(d) {
       var pos = d * total, sg = segs[segs.length - 1];
       for (var k = 0; k < segs.length; k++) if (pos < segs[k].at + segs[k].len) { sg = segs[k]; break; }
-      var u = Math.max(0, Math.min(1, (pos - sg.at) / sg.len)), e = sg.move ? ease(u) : 0, c = mix(sg.A, sg.B, e);
+      var u = Math.max(0, Math.min(1, (pos - sg.at) / sg.len)), e = !sg.move ? 0 : sg.flat ? u : ease(u), c = mix(sg.A, sg.B, e);
       worlds.forEach(function (wd, i) { if (i !== sg.wd && i !== sg.to) wd.el.hidden = true; });
       if (sg.to != null) {
         var f = Math.min(1, Math.max(0, (e - .35) / .3));
@@ -1418,17 +1401,23 @@
       top = nav ? nav.offsetHeight : 0;
       box.style.setProperty('--kt-top', top + 'px');
       Ws = stage.clientWidth; Hs = stage.clientHeight;
-      cam.style.perspective = Math.round(Ws * 1.4) + 'px';
+      cam.style.perspective = Math.round(Math.max(Ws, Hs) * 1.4) + 'px';
+      // the walls stand side by side on a wide screen, one above the other on a tall one
+      var t = Hs > Ws * 1.15;
+      if (t !== tall) {
+        tall = t;
+        worlds.forEach(function (wd) { wd.el.remove(); });
+        worlds = texts.map(build);
+      }
       plan();
       // the length of scroll the whole path takes
-      box.style.height = Math.round(Hs + total * innerHeight * .34) + 'px';
+      box.style.height = Math.round(Hs + total * innerHeight * .62) + 'px';
       target = at = progress(); prev = null;
       render(at);
     }
     function start() {
       if (built) return;
       built = true;
-      worlds = texts.map(build);
       measure();
       box.classList.add('is-on');
     }

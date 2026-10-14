@@ -1942,15 +1942,20 @@ function peerFlag(code) {
   return `<svg class="m-peer-flag" viewBox="0 0 30 20" role="img" aria-hidden="true">${g}</svg>`;
 }
 
-function policyEmblem(kind) {
-  if (kind === 'lr') return liberiaFlag(72);
-  if (kind === 'sdg') {
-    const u = imgs.url('partnerLogos', 'sdg');
-    return u ? `<img src="${esc(u)}" alt="United Nations Sustainable Development Goals">` : '';
-  }
-  if (kind === 'au') return `<img src="/img/partnerLogos/au.png" alt="African Union">`;
-  return `<span class="m-pol-mono">ECOWAS</span>`;
-}
+// The About page's slides (public/img/about/slides: slide-NN.webp, and flyer-NN.webp for phones), made
+// from the page's own copy in the style of the owner's SDG slide; each card covers the last as the reader
+// scrolls. [alt text, link]
+const SLIDES = [
+  ['Providing Liberia ICT data in real time. 15 counties. We collect, validate and publish Liberia’s ICT statistics for all 15 counties, and we build the infrastructure that keeps them at home.'],
+  ['A dataset is also a workforce. 174 positions across eight role types: enumerators and supervisors in every county, research leads, data engineers, GIS and sampling specialists, quality analysts and developers, recruited from Liberian STEM graduates and researchers. Hosted in-country, methodology published, staff trained locally. See open roles.', '/careers'],
+  ['Commitments already made. Not a new agenda: this is the measurement capability six existing commitments already assume Liberia has. ARREST Agenda, National Digital Strategy, Data Protection Act, AU Data Policy Framework, SDG Target 17.18, and Regional Digital Integration (ECOWAS, WARDIP).'],
+  ['Commitment 1 of 6: ARREST Agenda for Inclusive Development, 2025 to 2029. ICT modernization sits in the Infrastructure pillar. NIIS is the measurement layer it is judged against.'],
+  ['Commitment 2 of 6: National Digital Strategy, 2025 to 2029. Cybersecurity and data sovereignty is one of its eight priorities. This is that pillar, made operational.'],
+  ['Commitment 3 of 6: Data Protection Act, enacted 2026. Built to Liberia’s first personal-data law: aggregate, anonymized statistics only.'],
+  ['Commitment 4 of 6: AU Data Policy Framework, adopted 2022. Continental policy since 2022: member states are expected to hold and govern their own data.'],
+  ['Commitment 5 of 6: United Nations Sustainable Development Goals, Target 17.18. Increase significantly the availability of high-quality, timely and reliable data disaggregated by income, gender, age, race, ethnicity, migratory status, disability, geographic location and other characteristics relevant in national contexts. County-level is the target, verbatim.'],
+  ['Commitment 6 of 6: Regional Digital Integration, ECOWAS and WARDIP. You cannot negotiate on indicators you cannot produce, or benchmark against neighbours without them.'],
+];
 
 // ============ ABOUT (/about) ============
 // Built on the Careers page's system (reference: Sharplink's about page, pinned by the user): the
@@ -1976,21 +1981,6 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
     ['“THE ANSWER”', 'The law is in place. NIIS is the *missing layer* that makes it work.'],
   ];
 
-  const alignment = [
-    ['ARREST Agenda for Inclusive Development', '2025-2029',
-      'ICT modernization sits in the Infrastructure pillar. NIIS is the measurement layer it is judged against.', 'lr'],
-    ['National Digital Strategy', '2025-2029',
-      'Cybersecurity and data sovereignty is one of its eight priorities. This is that pillar, made operational.', 'lr'],
-    ['Data Protection Act', 'Enacted 2026',
-      'Built to Liberia’s first personal-data law: aggregate, anonymized statistics only.', 'lr'],
-    ['AU Data Policy Framework', 'Adopted 2022',
-      'Continental policy since 2022: member states are expected to hold and govern their own data.', 'au'],
-    ['SDG Target 17.18', 'Global goal',
-      'Data “disaggregated by … geographic location.” County-level is the target, verbatim.', 'sdg'],
-    ['Regional Digital Integration', 'ECOWAS · WARDIP',
-      'You cannot negotiate on indicators you cannot produce, or benchmark against neighbours without them.', 'ecowas'],
-  ];
-
   const bench = [
     ['Rwanda', 'Data-residency rules enforced; hosts the UN Big Data hub in Kigali; national AI agency.', 'Ahead', 'rw'],
     ['Kenya', 'Government data held in-territory by policy; sovereign-hosted cloud launched 2026.', 'Ahead', 'ke'],
@@ -2011,10 +2001,8 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
     ['Can I use this data in a publication?', 'Yes, cite NIIS and the ICT Statistics & Policy Unit. Values are demonstration data pending production feeds; check the methodology note on each indicator before publication.'],
   ];
 
-  const sdg = imgs.url('partnerLogos', 'sdg');
   const rise = (i = 0) => ` data-rise style="--i:${i}"`;
   // the reference's quote marks, drawn as dashed outlines
-  const qmark = `<svg class="ab-qmark" viewBox="0 0 120 84" aria-hidden="true"><path d="M4 4h44v40L30 80H12l10-36H4z"/><path d="M68 4h44v40L94 80H76l10-36H68z"/></svg>`;
 
   return shell(ctx, {
     title: 'About', active: '/about', workspaceActive: 'about', extraHead: CAREERS_HEAD, body: `
@@ -2060,51 +2048,14 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
       </dl>
     </section>
 
-    <section class="ab-quote" data-star="quiet" aria-label="The global target">
-      <div class="cs-wrap ab-quote-in">
-        ${qmark}
-        <figure class="ab-quote-fig">
-          <blockquote><p>…increase significantly the availability of high-quality, timely and reliable data disaggregated by income, gender, age, race, ethnicity, migratory status, disability, geographic location and other characteristics relevant in national contexts.</p></blockquote>
-          <figcaption><b>United Nations Sustainable Development Goals</b><span>Target 17.18</span></figcaption>
-        </figure>
-        ${sdg ? `<div class="ab-frame ab-frame--white ab-quote-frame"><img src="${esc(sdg)}" alt="Sustainable Development Goal 17: Partnerships for the goals" loading="lazy" decoding="async"></div>` : ''}
-      </div>
-    </section>
-
-    <section class="ab-team" data-star="quiet">
-      <div class="cs-wrap">
-        <span class="cs-mark" aria-hidden="true"></span>
-        <h2 class="ab-lead" aria-label="Providing Liberia ICT data in real time. We collect, validate and publish Liberia’s ICT statistics for all 15 counties, and we build the infrastructure that keeps them at home.">${csDecode('Providing Liberia ICT data in real time.')}${csDecode('We collect, validate and publish Liberia’s ICT statistics for all 15 counties, and we build the infrastructure that keeps them at home.', 'cs-dim')}</h2>
-      </div>
-    </section>
-
-    <section class="cs-dark ab-dark" data-star="dark" aria-labelledby="abCapTitle">
-      <div class="cs-wrap cs-dark-in">
-        <span class="cs-frame" aria-hidden="true"></span>
-        <h2 id="abCapTitle" class="cs-h2 cs-h2-lg" aria-label="A dataset is also a workforce. 174 positions across eight role types.">${csDecode('A dataset is also a workforce.')}${csDecode('174 positions across eight role types.', 'cs-dim')}</h2>
-        <p class="ab-dark-p">Enumerators and supervisors in every county, research leads, data engineers, GIS and sampling specialists, quality analysts and developers, recruited from Liberian STEM graduates and researchers. Hosted in-country, methodology published, staff trained locally: the measure of this programme is whether Liberia can run it without us.</p>
-        <div class="cs-ctas">${csBtn('/careers', 'See open roles')}</div>
-      </div>
-    </section>
-
-    <section class="ab-commit" data-star="commit" aria-labelledby="abPolTitle">
-      <div class="cs-wrap">
-        <div class="ab-commit-in">
-          <span class="cs-mark" aria-hidden="true"></span>
-          <h2 id="abPolTitle" class="cs-h2" aria-label="Commitments already made.">${csDecode('Commitments already made.')}</h2>
-          <p class="ab-sub">Not a new agenda. This is the measurement capability six existing commitments already assume Liberia has.</p>
-          <ol class="ab-pols">${alignment.map(([t, y, b, kind], i) => `
-            <li class="ab-pol"${rise(i % 2)}>
-              <span class="ab-pol-mark" aria-hidden="true">${policyEmblem(kind)}</span>
-              <div>
-                <p class="ab-pol-y">${esc(y)}</p>
-                <h3>${esc(t)}</h3>
-                <p class="ab-pol-b">${esc(b)}</p>
-              </div>
-            </li>`).join('')}
-          </ol>
-        </div>
-      </div>
+    <section class="ab-slides" data-star="quiet" aria-label="What NIIS does, and the commitments it serves" data-slides>
+      <ol class="sl" role="list">${SLIDES.map(([alt, href], i) => {
+        const n = String(i + 1).padStart(2, '0'), v = `?v=${ASSET_V}`;
+        const pic = `<picture><source media="(max-width: 760px)" srcset="/img/about/slides/flyer-${n}.webp${v}" width="1440" height="1800"><img src="/img/about/slides/slide-${n}.webp${v}" alt="${esc(alt)}" width="2400" height="1350" ${i ? 'loading="lazy" ' : ''}decoding="async"></picture>`;
+        return `
+        <li class="sl-card" style="--i:${i}">${href ? `<a href="${href}" class="sl-link">${pic}</a>` : pic}</li>`;
+      }).join('')}
+      </ol>
     </section>
 
     <section class="ab-bench" data-star="quiet" aria-labelledby="abBenchTitle">

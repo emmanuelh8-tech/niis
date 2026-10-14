@@ -1865,53 +1865,7 @@ tr.unread td { background: var(--gold-soft); }
 .ab-stat-l { margin-top: 1rem !important; font: 500 .7rem/1.3 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--cs-ink); }
 .ab-stat-s { margin-top: .35rem !important; font-size: .9rem; line-height: 1.5; color: var(--cs-ink2); }
 
-/* ---- the pull quote, on the fall from ice into black */
-.ab-quote { padding: clamp(9rem, 22vh, 13rem) 0 clamp(4rem, 9vh, 6rem);
-  background: linear-gradient(180deg, var(--cs-paper) 0%, #9DB6DE 8%, #3563B3 22%, #173A7E 44%, #0A1A3E 70%, var(--cs-black) 100%); }
-.ab-quote-in { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 5fr) minmax(0, 4fr); column-gap: 2rem; align-items: start; }
-.ab-qmark { width: clamp(5.5rem, 8vw, 7.5rem); height: auto; margin-top: .4rem; fill: none; stroke: rgb(255 255 255 / .34); stroke-width: 1; stroke-dasharray: 3 3; }
-.ab-quote-fig { margin: 0; }
-.ab-quote blockquote { margin: 0; padding: 0; border: 0; }
-.ab-quote blockquote p { max-width: 21em; font: 300 clamp(1.3rem, 1.85vw, 1.7rem)/1.3 var(--sans); letter-spacing: -.02em; color: #fff; text-wrap: pretty; }
-.ab-quote figcaption { margin-top: clamp(3rem, 8vh, 5rem); }
-.ab-quote figcaption b { display: block; font-size: .92rem; font-weight: 500; }
-.ab-quote figcaption span { display: block; margin-top: .45rem; font: 500 .66rem/1.3 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: rgb(255 255 255 / .62); }
-.ab-quote-frame { justify-self: end; width: min(100%, 13.5rem); aspect-ratio: 1 / 1; }
-
-/* ---- frames: the reference's portrait grounds */
-.ab-frame { position: relative; display: grid; place-items: center; overflow: hidden; aspect-ratio: 1 / 1.12; }
-.ab-frame::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
-  background-image: linear-gradient(to right, var(--g) 1px, transparent 1px), linear-gradient(to bottom, var(--g) 1px, transparent 1px);
-  background-size: calc(100% / 6) calc(100% / 6.72); }
-.ab-frame::before { content: ''; position: absolute; left: 0; top: 0; z-index: 3; width: 5px; height: 5px; background: var(--cs-blue); }
-.ab-frame--blue { --g: rgb(255 255 255 / .13); background: linear-gradient(180deg, #2F66D8 0%, #5E86CF 50%, #A6BFE6 100%); }
-.ab-frame--blue img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover;
-  mix-blend-mode: luminosity; filter: grayscale(1) contrast(1.12) brightness(1.04); transition: transform 1.2s var(--cs-ease); }
-.ab-frame--white { --g: rgb(11 30 69 / .08); background: #F6F8FB; }
-.ab-frame--white img { position: relative; z-index: 1; width: auto; height: auto; max-width: 58%; max-height: 42%; object-fit: contain;
-  mix-blend-mode: multiply; filter: grayscale(1) contrast(1.08); transition: filter .5s var(--cs-ease), transform 1.2s var(--cs-ease); }
-.ab-quote-frame img { max-width: 56%; max-height: 56%; filter: none; }
-
-/* ---- what we do */
-.ab-team { padding: clamp(3.5rem, 8vh, 5.5rem) 0 clamp(1.5rem, 4vh, 2.5rem); background: var(--cs-black); }
-.ab-lead { max-width: 23em; margin: 0; font-size: clamp(1.6rem, 2.35vw, 2.25rem); line-height: 1.17; }
-
-/* ---- the black band (careers' .cs-dark), with a working paragraph */
-.ab-dark-p { max-width: 34rem; font-size: 1rem; line-height: 1.65; color: rgb(255 255 255 / .74); }
-
-/* ---- commitments: the left half, the seal standing in the right */
-.ab-commit { padding: clamp(3.5rem, 8vh, 5rem) 0 clamp(2rem, 5vh, 3rem); color: var(--cs-ink);
-  background: linear-gradient(180deg, var(--cs-navy) 0%, #2A55A4 9%, #8FADDC 16%, #D3DFEF 22%, #EDF2F7 44%, var(--cs-paper) 100%); }
-.ab-commit-in { max-width: 44rem; }
 .ab-sub { max-width: 34rem; margin: -1rem 0 2.8rem !important; font-size: 1.02rem; line-height: 1.6; color: var(--cs-ink2); }
-.ab-pols { display: grid; gap: 2.4rem; margin: 0; padding: 0; list-style: none; }
-.ab-pol { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr); gap: 1.25rem; align-items: start; }
-.ab-pol-mark { display: grid; place-items: center; width: 3.6rem; height: 3.6rem; padding: .55rem; border: 1px dashed rgb(11 30 69 / .4); background: rgb(255 255 255 / .5); }
-.ab-pol-mark :is(img, svg) { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; }
-.ab-pol-mark .m-pol-mono { font: 600 .55rem/1 var(--sans); letter-spacing: .06em; color: var(--cs-ink); }
-.ab-pol-y { font: 500 .66rem/1.3 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--cs-blue); }
-.ab-pol h3 { margin: .4rem 0 .35rem; font-size: 1.08rem; font-weight: 500; letter-spacing: -.01em; }
-.ab-pol-b { max-width: 34rem; font-size: .97rem; line-height: 1.62; color: var(--cs-ink2); }
 
 /* ---- the region: rows in the FAQ's grammar; Liberia's row inverts, with the one red mark */
 .ab-bench { padding: clamp(1.5rem, 4vh, 2.5rem) 0 clamp(4rem, 10vh, 6rem); color: var(--cs-ink); background: var(--cs-paper); }
@@ -1940,23 +1894,14 @@ tr.unread td { background: var(--gold-soft); }
 .cs.can-rise [data-rise] { transition: opacity .9s ease-out calc(var(--i, 0) * 90ms), transform 1s var(--cs-ease) calc(var(--i, 0) * 90ms); }
 .cs.can-rise [data-rise]:not(.is-in) { opacity: 0; transform: translateY(26px); }
 
-@media (max-width: 1199px) {
-  .ab-commit-in { max-width: 56%; }
-}
 @media (max-width: 860px) {
   .ab-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem 1.2rem; }
-  .ab-quote { padding-top: clamp(6rem, 16vh, 8rem); }
-  .ab-quote-in { grid-template-columns: minmax(0, 1fr); row-gap: 2rem; }
-  .ab-qmark { width: 4.4rem; }
-  .ab-quote-frame { justify-self: start; width: 8.5rem; }
-  .ab-commit-in { max-width: none; }
   .ab-brow { grid-template-columns: minmax(0, 1fr) auto; gap: .45rem 1rem; }
   .ab-bw { grid-column: 1 / -1; grid-row: 2; }
   .ab-emblem { height: 72vh; }
 }
 @media (prefers-reduced-motion: reduce) {
   .cs [data-rise] { opacity: 1 !important; transform: none !important; transition: none !important; }
-  .ab-frame img { transition: none !important; }
 }
 @media print {
   .cs [data-rise] { opacity: 1 !important; transform: none !important; }
@@ -4038,9 +3983,6 @@ html { -webkit-text-size-adjust: 100%; }
   /* careers and about: the desktop-sized gaps where one section's colour runs into the next */
   .cs .cs-mission { padding-top: 3.2rem; padding-bottom: 3rem; }
   .cs .cs-roles, .cs .cs-join { padding-top: 4rem; }
-  .cs .ab-commit { padding-top: 2.5rem; }
-  .cs .ab-quote { padding-top: 5rem; padding-bottom: 3rem; }
-  .cs .ab-team { padding-top: 3rem; padding-bottom: 1.5rem; }
 }
 
 /* phones only: the Browse indicators button in the filter bar and the indicator sheet's header */
@@ -5037,17 +4979,13 @@ button.skip:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px;
    as transparency) is tinted pale grey on the light sections and faint white on the dark and blue
    ones, behind the content. The partner logo tiles carry it too. */
 html:has(.ab-hero) { background-image: linear-gradient(rgb(255 255 255 / .5), rgb(255 255 255 / .5)), url("/img/brand/mask-pattern-light.webp"); background-size: auto, 185px auto; }
-.cs .ab-story, .cs .ab-quote, .cs .ab-team, .cs .ab-dark, .cs .ab-commit, .cs .ab-bench, .cs .ab-faq, .cs .ab-close { position: relative; isolation: isolate; }
-.cs .ab-story::after, .cs .ab-quote::after, .cs .ab-team::after, .cs .ab-dark::after, .cs .ab-commit::after,
-.cs .ab-bench::after, .cs .ab-faq::after, .cs .ab-close::after, .ab-frame--white::after {
+.cs .ab-story, .cs .ab-bench, .cs .ab-faq, .cs .ab-close { position: relative; isolation: isolate; }
+.cs .ab-story::after, .cs .ab-bench::after, .cs .ab-faq::after, .cs .ab-close::after {
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background: var(--mask-ink, #5B6470); opacity: var(--mask-op, .085);
   -webkit-mask: url("/img/brand/mask-lines.webp") 0 0 / 185px auto repeat; mask: url("/img/brand/mask-lines.webp") 0 0 / 185px auto repeat;
   filter: blur(1.6px); }
-.cs .ab-team, .cs .ab-dark, .cs .ab-close { --mask-ink: #fff; --mask-op: .05; }
-/* the logo tiles: the masks take the place of the grid, under the logo */
-.ab-frame--white { background: #fff; }
-.ab-frame--white::after { z-index: 0; --mask-ink: #5B6470; --mask-op: .085; background-size: auto; }
+.cs .ab-close { --mask-ink: #fff; --mask-op: .05; }
 
 /* ============ TYPE: LABELS AND BYLINES ============
    Category labels ("Report", "Sector report", "Assessment"...) are set in Marvin Visions as plain
@@ -5223,7 +5161,7 @@ p, li { text-align: justify; -webkit-hyphens: auto; hyphens: auto; hyphenate-lim
 :is(.page-header, .stat-big-cell, .video-placeholder, .lib-empty, .rp-empty, .dx-empty, .pt-note, .pt-logo-note, .pt-focal,
   .bk-copy, .bk-hint, .bk-plate, .m-logo, .lsc-empty, .lsc-c-empty, .lsc-status, .ui-empty, .pg-date, .imglib-del-empty,
   .m-zig-panel, .m-pol-copy, [style*="text-align:center"], [style*="text-align: center"]) :is(p, li),
-.hs-quote p, .ab-quote blockquote p { text-align: inherit; -webkit-hyphens: manual; hyphens: manual; }
+.hs-quote p { text-align: inherit; -webkit-hyphens: manual; hyphens: manual; }
 nav li, .nav-sheet li, .sheet-list li, .tm-legend li, .ui-stats li, .rx-tl li { text-align: inherit; }
 
 /* ============ SELECTOR BOXES, PLAY BUTTONS, LABELS AND SLIDERS ============
@@ -5561,7 +5499,7 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
 .tag, .selector-field label, .xdd-item .grp, .xdd-group-label, .vq-head, .stat-label-dh, .map-size-row label, .compare-stat-card .lbl,
 .data-table th, .dash-hero-stats .lbl, .footer-dh h4, .kicker, .kpi-label, .sb-brand-text span, .sb-section-label, .role-chip,
 .fbar-facet-label, .hd-chip, .hv-cue, .cs-tag, .cs-role-m, .cs-faq-more, .cs-back, .cs-ap-meta dt, .cs-ap-role h2, .cs-label, .cs-drop-clear,
-.ab-stat-l, .ab-quote figcaption span, .ab-pol-y, .ab-bs, .imglib-state, .tree-title, .dx-fact i, .dx-stat-lbl, .dx-readout-lbl,
+.ab-stat-l, .ab-bs, .imglib-state, .tree-title, .dx-fact i, .dx-stat-lbl, .dx-readout-lbl,
 .dx-size label, .dx-mock, .pt-stat-lbl, .pt-logo-note, .pt-cat, .pt-status, .pt-contrib span, .pt-focal-label, .vhero-kicker, .bk-kicker,
 .bk-hint, .m-eyebrow, .m-hero-fig figcaption, .m-quote figcaption, .m-zig-meta, .m-tag, .m-logo span, .m-contact h4, .m-flow-chip,
 .m-pol-meta, .m-polbox-meta, .lsc-nat i, .lsc-natnote i, .lsc-an-pair label, .ui-eyebrow, .ui-k, .ui-stats dt, .ic-rail-h, .ic-flag,
@@ -6121,7 +6059,29 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 .kt-world[hidden] { display: none; }
 .kt-w { position: absolute; left: 0; top: 0; transform-origin: 0 0; white-space: pre; font-family: 'Montserrat', var(--sans); font-weight: 800; line-height: .86; letter-spacing: 0; color: #262626; }
 .kt-w b { font-weight: inherit; color: #2F66D8; }
-/* the section ends with the stage: the quote follows straight under it, its colour running on from the grey */
+/* the section ends with the stage: the slides follow straight under it, on the same grey */
 .cs .cs-mission.ab-story { padding-bottom: 0; }
-.cs .ab-quote { padding-top: clamp(4rem, 9vh, 6rem); background: linear-gradient(180deg, #EEEEEE 0%, #9DB6DE 8%, #3563B3 22%, #173A7E 44%, #0A1A3E 70%, var(--cs-black) 100%); }
-@media (max-width: 760px) { .cs .ab-quote { padding-top: 3rem; } }
+
+/* ---- About: the slides (public/img/about/slides). Each card holds still in the middle of the screen
+   while the next rises over it; the one beneath sinks back a little and darkens (app.js sets --p).
+   16:9 slides on a wide screen, 4:5 flyers on a phone. --sl-nav is the bar's height (app.js). */
+.ab-slides { --sl-nav: 64px; --sl-ar: .5625; --sl-w: min(100vw - 2.8rem, 1180px, (100vh - var(--sl-nav) - 56px) / var(--sl-ar));
+  padding: clamp(1.5rem, 4vh, 2.5rem) 0 clamp(3rem, 8vh, 5rem); background: #EEEEEE; }
+@supports (height: 100dvh) { .ab-slides { --sl-w: min(100vw - 2.8rem, 1180px, (100dvh - var(--sl-nav) - 56px) / var(--sl-ar)); } }
+.sl { display: grid; justify-items: center; align-items: start; gap: 14vh; margin: 0; padding: 0; list-style: none; }
+.sl-card { --p: 0; position: sticky; top: calc(var(--sl-nav) + (100vh - var(--sl-nav) - var(--sl-w) * var(--sl-ar)) / 2);
+  width: var(--sl-w); aspect-ratio: 1 / var(--sl-ar); transform-origin: 50% 0; transform: scale(calc(1 - .06 * var(--p)));
+  border-radius: 14px; overflow: hidden; background: #04235C; box-shadow: 0 30px 60px -28px rgb(4 35 92 / .55), 0 2px 6px rgb(4 35 92 / .18); }
+@supports (height: 100dvh) { .sl-card { top: calc(var(--sl-nav) + (100dvh - var(--sl-nav) - var(--sl-w) * var(--sl-ar)) / 2); } }
+.sl-card::after { content: ''; position: absolute; inset: 0; background: #021233; opacity: calc(.5 * var(--p)); pointer-events: none; }
+.sl-card :is(picture, img) { display: block; width: 100%; height: 100%; }
+.sl-card img { object-fit: cover; }
+.sl-link { display: block; height: 100%; }
+.sl-link:focus-visible { outline: 3px solid #A6D930; outline-offset: -3px; }
+@media (max-width: 760px) {
+  .ab-slides { --sl-ar: 1.25; --sl-w: min(100vw - 32px, (100vh - var(--sl-nav) - 32px) / var(--sl-ar)); }
+  @supports (height: 100dvh) { .ab-slides { --sl-w: min(100vw - 32px, (100dvh - var(--sl-nav) - 32px) / var(--sl-ar)); } }
+  .sl { gap: 10vh; }
+  .sl-card { border-radius: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .sl-card { transform: none; } .sl-card::after { opacity: 0; } }

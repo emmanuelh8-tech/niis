@@ -1438,6 +1438,30 @@
     window.addEventListener('resize', function () { if (built) measure(); });
   }
 
+  // ---- About: the slides. Each card holds still in the middle of the screen (CSS sticky) while the next
+  // rises over it; the one beneath sinks back a little and darkens as it is covered (--p, 0 to 1).
+  function initSlides() {
+    var sec = qs('[data-slides]');
+    if (!sec) return;
+    var cards = qsa('.sl-card', sec), nav = qs('.gov-nav'), raf = 0, stick = 0;
+    function measure() {
+      sec.style.setProperty('--sl-nav', (nav ? nav.offsetHeight : 64) + 'px');
+      stick = cards.length ? parseFloat(getComputedStyle(cards[0]).top) || 0 : 0;
+      update();
+    }
+    function update() {
+      raf = 0;
+      for (var i = 0; i < cards.length - 1; i++) {
+        var h = cards[i].offsetHeight, t = cards[i + 1].getBoundingClientRect().top;
+        var p = h ? Math.max(0, Math.min(1, (stick + h - t) / h)) : 0;
+        cards[i].style.setProperty('--p', p.toFixed(3));
+      }
+    }
+    window.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+    window.addEventListener('resize', measure);
+    measure();
+  }
+
   // ---------- boot ----------
   var page = window.__NICTD_PAGE__;
   document.addEventListener('DOMContentLoaded', function () {
@@ -1448,6 +1472,7 @@
     if (page === 'team') initTeam();
     if (qs('#rsLib')) initResearchLib();
     if (qs('[data-kt]')) initKinetic();
+    if (qs('[data-slides]')) initSlides();
     if (page === 'programs') initPrograms();
     if (page === 'login') initLogin();
     if (page === 'dashboard-topic') initDashboardTopic();

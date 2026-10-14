@@ -6111,8 +6111,10 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
    the reference film sets its words: Montserrat ExtraBold, near-black with the page's blue, on light grey.
    The stage holds still under the bar while the reader scrolls the box around it; app.js sets the
    box's height to the length of the path. */
-.kt-scroll { position: relative; margin-top: clamp(2.5rem, 6vh, 4rem); }
-.kt { position: sticky; top: var(--kt-top, 64px); overflow: hidden; height: calc(100vh - var(--kt-top, 64px)); height: calc(100svh - var(--kt-top, 64px));
+/* The box is grey too, so nothing of the page shows under the stage while it is held, even as a phone's
+   browser bar slides away (the stage follows the screen's height as it changes: dvh). */
+.kt-scroll { position: relative; margin-top: clamp(2.5rem, 6vh, 4rem); background: #EEEEEE; }
+.kt { position: sticky; top: var(--kt-top, 64px); overflow: hidden; height: calc(100vh - var(--kt-top, 64px)); height: calc(100dvh - var(--kt-top, 64px));
   background: #EEEEEE; user-select: none; -webkit-user-select: none; }
 .kt-cam { position: absolute; inset: 0; perspective-origin: 50% 50%; }
 .kt-world { position: absolute; left: 0; top: 0; transform-origin: 0 0; transform-style: preserve-3d; }

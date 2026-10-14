@@ -1209,17 +1209,17 @@
     toast: toast, copyText: copyText, COLORS: COLORS, SVG_NS: SVG_NS };
 
   // ---- About: the mission, the problem and the answer as kinetic type, after the reference film:
-  // heavy near-black words, a few in neon green, on light grey. Each short text is dealt into lines
+  // heavy near-black words, a few in the page's blue, on light grey. Each short text is dealt into lines
   // sized to one width, now and then a word on end beside the lines it spans, set on two walls that meet
   // at a corner (the same corner on a phone, its lines dealt shorter so the words stay large). The stage
   // holds still while the reader scrolls, and the scroll drives it: each text stays whole and readable,
   // drifting a little in 3D; then its lines break away one after another and fly past the camera,
-  // tumbling, while the next text's lines fly in from the depth and lock into their corner. Scrolling
-  // back runs it backwards.
+  // tumbling, while the next text's lines fly in from the depth and lock into their corner. Nothing is
+  // blurred: the words stay sharp all the way. Scrolling back runs it backwards.
   function initKinetic() {
     var box = qs('[data-kt]'), src = qs('.kt-src');
     if (!box || !src) return;
-    var stage = qs('.kt', box), blurEl = qs('.kt-blur', box), cam = qs('.kt-cam', box);
+    var stage = qs('.kt', box), cam = qs('.kt-cam', box);
     var bar = qs('.kt-bar b', box), count = qs('.kt-count b', box), hint = qs('.kt-hint', box), nav = qs('.gov-nav');
     // world units: each wall is W wide; lines are sized to fill it; FOLD is the angle of the left wall
     var FAMILY = 'Montserrat', FONT = '800 100px ' + FAMILY, W = 1600, G = 40, LH = .86, GAP = .07, FOLD = 46, CAP = .34 * W;
@@ -1233,15 +1233,15 @@
     var bare = function (w) { return w.replace(/[^A-Za-z0-9'’-]/g, ''); };
     function rnd(j) { var a = Math.sin(j * 12.9898 + 78.233) * 43758.5453; return a - Math.floor(a); }
     var worlds = [], segs = [], total = 0, Ws = 0, Hs = 0, persp = 0, top = 0, raf = 0, last = 0, built = false, tall = null;
-    var target = 0, at = 0, shown = -1, prev = null, blurOn = true, blurN = 0, blurDt = 0;
+    var target = 0, at = 0, shown = -1;
 
-    // the text's words, those between asterisks marked green
+    // the text's words, those between asterisks marked to be set in blue
     function tokens(text) {
       var on = false;
       return text.split(/\s+/).filter(Boolean).map(function (w) {
         var open = w.charAt(0) === '*', close = w.slice(-1) === '*' || /\*[.,:;!?]$/.test(w);
         if (open) on = true;
-        var t = { w: w.replace(/\*/g, ''), green: on };
+        var t = { w: w.replace(/\*/g, ''), hi: on };
         if (close) on = false;
         return t;
       });
@@ -1249,7 +1249,7 @@
     // deal a text into lines: the label first, then lines of varied length; one long word may stand on
     // end, beside the two short lines it spans
     function deal(tx) {
-      var words = tokens(tx.text), lines = [{ words: tx.label.split(' ').map(function (w) { return { w: w, green: true }; }), label: true }];
+      var words = tokens(tx.text), lines = [{ words: tx.label.split(' ').map(function (w) { return { w: w, hi: true }; }), label: true }];
       var rhythm = tall ? RHYTHM_TALL : RHYTHM_WIDE, i = 0, k = 0, short = 0, used = false;
       while (i < words.length) {
         if (!used && k === 2 && bare(words[i].w).length >= 5 && words.length - i > 4) { lines.push({ words: [words[i++]], vert: true }); short = 2; used = true; k++; continue; }
@@ -1296,7 +1296,7 @@
         e.className = 'kt-w';
         l.words.forEach(function (t, j) {
           if (j) e.appendChild(document.createTextNode(' '));
-          if (t.green) { var b = document.createElement('b'); b.textContent = t.w; e.appendChild(b); }
+          if (t.hi) { var b = document.createElement('b'); b.textContent = t.w; e.appendChild(b); }
           else e.appendChild(document.createTextNode(t.w));
         });
         e.style.fontSize = f.toFixed(2) + 'px';
@@ -1375,16 +1375,15 @@
         it.el.style.opacity = q > .6 ? (1 - (q - .6) / .4).toFixed(3) : '';
       });
     }
-    // draw the frame for a point along the path (0 to 1); returns how hard to blur it
+    // draw the frame for a point along the path (0 to 1)
     function render(d) {
       var pos = d * total, sg = segs[segs.length - 1];
       for (var k = 0; k < segs.length; k++) if (pos < segs[k].at + segs[k].len) { sg = segs[k]; break; }
-      var u = clamp01((pos - sg.at) / sg.len), c, blur = 0, cur = sg.wd;
+      var u = clamp01((pos - sg.at) / sg.len), cur = sg.wd;
       worlds.forEach(function (wd, i) { if (i !== sg.wd && i !== sg.to) { wd.el.hidden = true; scatter(wd, 0); } });
       if (!sg.turn) {
-        c = mix(sg.A, sg.B, u);
         scatter(worlds[sg.wd], 0);
-        aim(worlds[sg.wd], c);
+        aim(worlds[sg.wd], mix(sg.A, sg.B, u));
       } else {
         // the first text's lines fly apart while the camera rolls and swings away; the next text's lines
         // fly in from the depth while the camera swings back level
@@ -1392,18 +1391,14 @@
         if (REDUCE) {
           aim(A, A.B, 1 - clamp01((u - .35) / .3)); aim(B, B.A, clamp01((u - .35) / .3));
         } else {
-          if (out < 1) { c = mix(A.B, shift(A.B, { yaw: 24, roll: -9, pitch: 6, s: 1.1 }), ease(out)); aim(A, c); scatter(A, out, false); } else { A.el.hidden = true; scatter(A, 0); }
-          if (inn > 0) { var cB = mix(shift(B.A, { yaw: -24, roll: 9, pitch: -6, s: 1.1 }), B.A, ease(inn)); aim(B, cB); scatter(B, 1 - inn, true); if (!c || inn > .5) c = cB; } else B.el.hidden = true;
-          blur = 3.2 * Math.sin(Math.PI * u);
+          if (out < 1) { aim(A, mix(A.B, shift(A.B, { yaw: 24, roll: -9, pitch: 6, s: 1.1 }), ease(out))); scatter(A, out, false); } else { A.el.hidden = true; scatter(A, 0); }
+          if (inn > 0) { aim(B, mix(shift(B.A, { yaw: -24, roll: 9, pitch: -6, s: 1.1 }), B.A, ease(inn))); scatter(B, 1 - inn, true); } else B.el.hidden = true;
         }
         cur = u > .5 ? sg.to : sg.wd;
       }
       if (cur !== shown) { shown = cur; count.textContent = '0' + (cur + 1); }
       bar.style.transform = 'scaleX(' + d.toFixed(4) + ')';
       hint.classList.toggle('is-gone', d > .01);
-      if (c && prev) blur = Math.max(blur, Math.min(6, (Math.hypot(c.x - prev.x, c.y - prev.y) * c.s + Math.abs(Math.log(c.s / prev.s)) * 260 + Math.abs(c.roll - prev.roll) * 4 + Math.abs(c.yaw - prev.yaw) * 3) / 22));
-      prev = c || prev;
-      return blur;
     }
     // where the scroll is, from 0 (the stage just pinned) to 1 (about to let go)
     function progress() {
@@ -1415,15 +1410,9 @@
       var dt = last ? Math.min(.05, (now - last) / 1000) : .016; last = now;
       at += (target - at) * (1 - Math.exp(-dt * 8));          // the motion eases after the scroll
       if (Math.abs(target - at) < 1e-4) at = target;
-      var blur = render(at);
-      if (REDUCE) blur = 0;
-      blurEl.style.filter = blurOn && blur > .4 ? 'blur(' + blur.toFixed(1) + 'px)' : '';
-      if (blurOn && blur > .4) {                                 // drop the blur on a machine too slow for it
-        blurDt += dt;
-        if (++blurN === 45) { if (blurDt / blurN > .026) blurOn = false; blurN = 0; blurDt = 0; }
-      }
+      render(at);
       if (at !== target) raf = requestAnimationFrame(frame);
-      else { last = 0; if (blur > .4) { blurEl.style.filter = ''; } }
+      else last = 0;
     }
     function onScroll() { if (!built) return; target = progress(); if (!raf) raf = requestAnimationFrame(frame); }
     var lastW = 0, lastH = 0;
@@ -1445,7 +1434,7 @@
       // the length of scroll the whole path takes (set only when the width changes, so a phone's bar
       // sliding away does not move the page)
       if (Ws !== lastW || Math.abs(innerHeight - lastH) > 160) { box.style.height = Math.round(Hs + total * innerHeight * .62) + 'px'; lastW = Ws; lastH = innerHeight; }
-      target = at = progress(); prev = null;
+      target = at = progress();
       render(at);
     }
     function start() {

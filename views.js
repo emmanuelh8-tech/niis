@@ -1969,7 +1969,7 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
   ].filter(([n]) => n > 0);
 
   // the mission, the problem and the answer, cut short for the kinetic type (the owner asked for few
-  // words); the words between asterisks are set in green
+  // words); the words between asterisks are set in blue
   const story = [
     ['the mission', 'Liberia’s *official* source of ICT data. All *15 counties.* One *trusted* place.'],
     ['the problem', 'For two decades, Liberia’s digital story was told with numbers from *somewhere else.*'],
@@ -2052,7 +2052,7 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
            sets it from the list below, which stays in the page as the text screen readers read) -->
       <div class="kt-scroll" data-kt>
         <div class="kt" aria-hidden="true">
-          <div class="kt-blur"><div class="kt-cam"></div></div>
+          <div class="kt-cam"></div>
           <div class="kt-ui"><span class="kt-count"><b>01</b> / 0${story.length}</span><i class="kt-bar"><b></b></i><span class="kt-hint">Scroll</span></div>
         </div>
       </div>

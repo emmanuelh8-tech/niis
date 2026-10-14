@@ -2053,7 +2053,6 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
       <div class="kt-scroll" data-kt>
         <div class="kt" aria-hidden="true">
           <div class="kt-cam"></div>
-          <div class="kt-ui"><span class="kt-count"><b>01</b> / 0${story.length}</span><i class="kt-bar"><b></b></i><span class="kt-hint">Scroll</span></div>
         </div>
       </div>
       <dl class="kt-src sr-only">${story.map(([tag, text]) => `

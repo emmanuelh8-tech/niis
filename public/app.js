@@ -1220,7 +1220,7 @@
     var box = qs('[data-kt]'), src = qs('.kt-src');
     if (!box || !src) return;
     var stage = qs('.kt', box), cam = qs('.kt-cam', box);
-    var bar = qs('.kt-bar b', box), count = qs('.kt-count b', box), hint = qs('.kt-hint', box), nav = qs('.gov-nav');
+    var nav = qs('.gov-nav');
     // world units: each wall is W wide; lines are sized to fill it; FOLD is the angle of the left wall
     var FAMILY = 'Montserrat', FONT = '800 100px ' + FAMILY, W = 1600, G = 40, LH = .86, GAP = .07, FOLD = 46, CAP = .34 * W, CAP_TALL = .56 * W;
     var RHYTHM_WIDE = [9, 15, 11, 7, 16, 10, 13], RHYTHM_TALL = [5, 7, 4, 6, 8, 5];
@@ -1233,7 +1233,7 @@
     var bare = function (w) { return w.replace(/[^A-Za-z0-9'’-]/g, ''); };
     function rnd(j) { var a = Math.sin(j * 12.9898 + 78.233) * 43758.5453; return a - Math.floor(a); }
     var worlds = [], segs = [], total = 0, Ws = 0, Hs = 0, persp = 0, top = 0, raf = 0, last = 0, built = false, tall = null;
-    var target = 0, at = 0, shown = -1;
+    var target = 0, at = 0;
 
     // the text's words, those between asterisks marked to be set in blue
     function tokens(text) {
@@ -1304,9 +1304,9 @@
 
     // the path, in lengths of scroll: each text whole, drifting a little in 3D as the reader scrolls (it
     // stays readable all the way); between texts, the lines of one fly apart as the next one's assemble
-    // the scale that shows a text whole (on a phone, above the counter along its foot)
-    var SPAN = (W + G) * (1 + Math.cos(FOLD * Math.PI / 180)), FOOT = 40;
-    function fit(wd) { return tall ? Math.min(.94 * Ws / SPAN, .86 * (Hs - FOOT) / wd.H) : Math.min(.88 * Ws / SPAN, .78 * Hs / wd.H); }
+    // the scale that shows a text whole: on a phone the corner fills the width
+    var SPAN = (W + G) * (1 + Math.cos(FOLD * Math.PI / 180));
+    function fit(wd) { return tall ? .94 * Ws / SPAN : Math.min(.88 * Ws / SPAN, .82 * Hs / wd.H); }
     function whole(wd) {
       var cs = Math.cos(FOLD * Math.PI / 180);
       return { x: ((W + G) - (W + G) * cs) / 2, y: wd.H / 2, z: 0, s: fit(wd), yaw: 0, pitch: 4, roll: 0 };
@@ -1336,7 +1336,7 @@
     }
     function aim(wd, c, o) {
       var s = c.s.toFixed(4), el = wd.el;
-      el.style.transform = 'translate(' + (Ws / 2).toFixed(1) + 'px,' + ((tall ? Hs - FOOT : Hs) / 2).toFixed(1) + 'px) scale3d(' + s + ',' + s + ',' + s + ') rotateX(' + c.pitch.toFixed(2) + 'deg) rotateZ(' + c.roll.toFixed(2) + 'deg) rotateY(' + c.yaw.toFixed(2) + 'deg) translate3d(' + (-c.x).toFixed(1) + 'px,' + (-c.y).toFixed(1) + 'px,' + (-c.z).toFixed(1) + 'px)';
+      el.style.transform = 'translate(' + (Ws / 2).toFixed(1) + 'px,' + (Hs / 2).toFixed(1) + 'px) scale3d(' + s + ',' + s + ',' + s + ') rotateX(' + c.pitch.toFixed(2) + 'deg) rotateZ(' + c.roll.toFixed(2) + 'deg) rotateY(' + c.yaw.toFixed(2) + 'deg) translate3d(' + (-c.x).toFixed(1) + 'px,' + (-c.y).toFixed(1) + 'px,' + (-c.z).toFixed(1) + 'px)';
       el.style.opacity = o == null ? '' : o.toFixed(3);
       el.hidden = false;
     }
@@ -1359,7 +1359,7 @@
     function render(d) {
       var pos = d * total, sg = segs[segs.length - 1];
       for (var k = 0; k < segs.length; k++) if (pos < segs[k].at + segs[k].len) { sg = segs[k]; break; }
-      var u = clamp01((pos - sg.at) / sg.len), cur = sg.wd;
+      var u = clamp01((pos - sg.at) / sg.len);
       worlds.forEach(function (wd, i) { if (i !== sg.wd && i !== sg.to) { wd.el.hidden = true; scatter(wd, 0); } });
       if (!sg.turn) {
         scatter(worlds[sg.wd], 0);
@@ -1374,11 +1374,7 @@
           if (out < 1) { aim(A, mix(A.B, shift(A.B, { yaw: 24, roll: -9, pitch: 6, s: 1.1 }), ease(out))); scatter(A, out, false); } else { A.el.hidden = true; scatter(A, 0); }
           if (inn > 0) { aim(B, mix(shift(B.A, { yaw: -24, roll: 9, pitch: -6, s: 1.1 }), B.A, ease(inn))); scatter(B, 1 - inn, true); } else B.el.hidden = true;
         }
-        cur = u > .5 ? sg.to : sg.wd;
       }
-      if (cur !== shown) { shown = cur; count.textContent = '0' + (cur + 1); }
-      bar.style.transform = 'scaleX(' + d.toFixed(4) + ')';
-      hint.classList.toggle('is-gone', d > .01);
     }
     // where the scroll is, from 0 (the stage just pinned) to 1 (about to let go)
     function progress() {
@@ -1405,10 +1401,19 @@
         tall = t;
         worlds.forEach(function (wd) { wd.el.remove(); });
         worlds = texts.map(build);
-        shown = -1;
       }
-      // the stage fills the screen under the bar, on a phone as on a desktop
-      top = bar0;
+      // on a phone the stage is cut to the tallest text and held in the middle of the screen; the box
+      // around it is the same grey, so the screen is all this section until it is scrolled past, and the
+      // next section comes straight under the last line. A desktop's stage fills the screen.
+      if (tall) {
+        var hMax = worlds.reduce(function (a, wd) { return Math.max(a, wd.H * fit(wd)); }, 0);
+        Hs = Math.min(view, Math.round(hMax * 1.06 + 28));
+        stage.style.height = Hs + 'px';
+        top = bar0 + Math.max(0, Math.round((view - Hs) / 2));
+      } else {
+        stage.style.height = '';
+        top = bar0;
+      }
       box.style.setProperty('--kt-top', top + 'px');
       Hs = stage.clientHeight;
       persp = Math.round(Math.max(Ws, Hs) * 1.4);

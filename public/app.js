@@ -1211,18 +1211,19 @@
   // ---- About: the mission, the problem and the answer as kinetic type, after the reference film:
   // heavy near-black words, a few in neon green, on light grey. Each short text is dealt into lines
   // sized to one width, now and then a word on end beside the lines it spans, set on two walls that meet
-  // at a corner. The stage holds still while the reader scrolls, and the scroll drives the camera: each
-  // text stays whole and readable, drifting a little in 3D as the reader scrolls, then turns away like a
-  // wall as the next turns in. Scrolling back runs it backwards.
+  // at a corner (the same corner on a phone, its lines dealt shorter so the words stay large). The stage
+  // holds still while the reader scrolls, and the scroll drives it: each text stays whole and readable,
+  // drifting a little in 3D; then its lines break away one after another and fly past the camera,
+  // tumbling, while the next text's lines fly in from the depth and lock into their corner. Scrolling
+  // back runs it backwards.
   function initKinetic() {
     var box = qs('[data-kt]'), src = qs('.kt-src');
     if (!box || !src) return;
     var stage = qs('.kt', box), blurEl = qs('.kt-blur', box), cam = qs('.kt-cam', box);
     var bar = qs('.kt-bar b', box), count = qs('.kt-count b', box), hint = qs('.kt-hint', box), nav = qs('.gov-nav');
     // world units: each wall is W wide; lines are sized to fill it; FOLD is the angle of the left wall
-    // (on a tall phone screen the walls stack instead, the top one folded back along a level line, FOLDX)
-    var FAMILY = 'Montserrat', FONT = '800 100px ' + FAMILY, W = 1600, G = 40, LH = .86, GAP = .07, FOLD = 46, FOLDX = 38, CAP = .34 * W;
-    var RHYTHM = [9, 15, 11, 7, 16, 10, 13];
+    var FAMILY = 'Montserrat', FONT = '800 100px ' + FAMILY, W = 1600, G = 40, LH = .86, GAP = .07, FOLD = 46, CAP = .34 * W;
+    var RHYTHM_WIDE = [9, 15, 11, 7, 16, 10, 13], RHYTHM_TALL = [7, 10, 6, 9, 11, 8];
     var texts = qsa('.kt-row', src).map(function (row) {
       return { label: qs('dt', row).textContent.trim(), text: row.getAttribute('data-kt-text') || qs('dd', row).textContent.trim() };
     });
@@ -1230,8 +1231,9 @@
     var ctx = document.createElement('canvas').getContext('2d');
     function w1(str) { ctx.font = FONT; return ctx.measureText(str).width / 100; }   // width at 1px
     var bare = function (w) { return w.replace(/[^A-Za-z0-9'’-]/g, ''); };
-    var worlds = [], segs = [], total = 0, Ws = 0, Hs = 0, top = 0, raf = 0, last = 0, built = false, tall = null;
-    var target = 0, shown = -1, prev = null, blurOn = true, blurN = 0, blurDt = 0;
+    function rnd(j) { var a = Math.sin(j * 12.9898 + 78.233) * 43758.5453; return a - Math.floor(a); }
+    var worlds = [], segs = [], total = 0, Ws = 0, Hs = 0, persp = 0, top = 0, raf = 0, last = 0, built = false, tall = null;
+    var target = 0, at = 0, shown = -1, prev = null, blurOn = true, blurN = 0, blurDt = 0;
 
     // the text's words, those between asterisks marked green
     function tokens(text) {
@@ -1245,13 +1247,13 @@
       });
     }
     // deal a text into lines: the label first, then lines of varied length; one long word may stand on
-    // end, beside the two or three short lines it spans
+    // end, beside the two short lines it spans
     function deal(tx) {
       var words = tokens(tx.text), lines = [{ words: tx.label.split(' ').map(function (w) { return { w: w, green: true }; }), label: true }];
-      var i = 0, k = 0, short = 0, used = false;
+      var rhythm = tall ? RHYTHM_TALL : RHYTHM_WIDE, i = 0, k = 0, short = 0, used = false;
       while (i < words.length) {
         if (!used && k === 2 && bare(words[i].w).length >= 5 && words.length - i > 4) { lines.push({ words: [words[i++]], vert: true }); short = 2; used = true; k++; continue; }
-        var target = short ? 9 : RHYTHM[k % RHYTHM.length], ln = [words[i++]], len = ln[0].w.length;
+        var target = short ? (tall ? 7 : 9) : rhythm[k % rhythm.length], ln = [words[i++]], len = ln[0].w.length;
         while (i < words.length && len + 1 + words[i].w.length <= target) { len += 1 + words[i].w.length; ln.push(words[i++]); }
         lines.push({ words: ln, beside: !!short });
         if (short) short--;
@@ -1281,15 +1283,14 @@
       }
       return out;
     }
-    // one text's world: the blocks split across two walls that meet at a corner, the first wall turned
-    // back: side by side on a wide screen, one above the other on a tall one
-    function build(tx) {
+    // one text's world: the blocks split across two walls that meet at a corner, the left wall turned
+    // back. Each line keeps its place, its size and the way it will fly.
+    function build(tx, ti) {
       var bl = blocks(deal(tx)), all = bl.reduce(function (a, b) { return a + b.adv; }, 0), acc = 0, split = bl.length;
       for (var q = 0; q < bl.length; q++) { if (acc + bl[q].adv / 2 > all / 2) { split = Math.max(1, q); break; } acc += bl[q].adv; }
-      var H0 = bl.slice(0, split).reduce(function (a, b) { return a + b.adv; }, 0), H1 = all - H0;
       var world = document.createElement('div');
       world.className = 'kt-world'; world.hidden = true;
-      var heights = [0, 0];
+      var items = [], heights = [0, 0];
       function put(l, f, tf) {
         var e = document.createElement('span');
         e.className = 'kt-w';
@@ -1301,11 +1302,16 @@
         e.style.fontSize = f.toFixed(2) + 'px';
         e.style.transform = tf;
         world.appendChild(e);
+        var j = ti * 37 + items.length * 11, ax = rnd(j + 5) - .5, ay = rnd(j + 6) - .5, az = rnd(j + 7) - .5;
+        items.push({ el: e, tf: tf, w: l.w1 * f, h: LH * f,
+          // where it flies: across the stage (shares of its size), towards the camera or far away, tumbling
+          fx: (rnd(j) - .5) * 2.4, fy: (rnd(j + 1) - .5) * 1.9, fz: rnd(j + 2) < .38 ? -(1.4 + 2.2 * rnd(j + 3)) : .16 + .3 * rnd(j + 3),
+          axis: [ax, ay, az + (Math.abs(az) < .1 ? .3 : 0)], spin: (rnd(j + 8) < .5 ? -1 : 1) * (80 + 120 * rnd(j + 9)) });
       }
       bl.forEach(function (b, q) {
-        var side = q < split ? 0 : 1, h = heights[side];
-        var wallTf = side ? '' : tall ? 'rotateX(' + FOLDX + 'deg) ' : 'rotateY(' + (-FOLD) + 'deg) ';
-        var x = tall ? 0 : side ? G : -(W + G), y = tall ? (side ? G + h : h - (H0 + G)) : h;
+        var side = q < split ? 0 : 1, y = heights[side];
+        var wallTf = side ? '' : 'rotateY(' + (-FOLD) + 'deg) ';
+        var x = side ? G : -(W + G);
         if (b.vert) {
           put(b.vert, b.fv, wallTf + 'translate(' + x.toFixed(1) + 'px,' + (y + b.Lv).toFixed(1) + 'px) rotate(-90deg)');
           var yc = y;
@@ -1313,105 +1319,132 @@
         } else {
           put(b.lines[0], b.fs[0], wallTf + 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)');
         }
-        heights[side] = h + b.adv;
+        heights[side] = y + b.adv;
       });
       cam.appendChild(world);
-      return { el: world, H: Math.max(H0, H1), H0: H0, H1: H1 };
+      return { el: world, items: items, H: Math.max(heights[0], heights[1]), q: -1 };
     }
 
     // the path, in lengths of scroll: each text whole, drifting a little in 3D as the reader scrolls (it
-    // stays readable all the way); between texts, the block turns away as the next one turns in
+    // stays readable all the way); between texts, the lines of one fly apart as the next one's assemble
     function whole(wd) {
-      if (tall) {
-        var up = (wd.H0 + G) * Math.cos(FOLDX * Math.PI / 180), down = wd.H1 + G;
-        return { x: W / 2, y: (down - up) / 2, z: 0, s: Math.min(.9 * Ws / W, .8 * Hs / (up + down)), yaw: 0, pitch: 0, roll: 0 };
-      }
       var cs = Math.cos(FOLD * Math.PI / 180), span = (W + G) * (1 + cs);
       return { x: ((W + G) - (W + G) * cs) / 2, y: wd.H / 2, z: 0, s: Math.min(.88 * Ws / span, .78 * Hs / wd.H), yaw: 0, pitch: 4, roll: 0 };
     }
+    function shift(c, d) { var o = Object.assign({}, c); for (var k in d) o[k] = k === 's' ? c.s * d.s : c[k] + d[k]; return o; }
     function plan() {
       segs = []; total = 0;
       function add(sg) { sg.at = total; total += sg.len; segs.push(sg); }
       var drift = REDUCE ? 0 : 1;
       worlds.forEach(function (wd, i) {
         var V = whole(wd);
-        var A = Object.assign({}, V, { yaw: V.yaw - 7 * drift, pitch: V.pitch + 3 * drift, s: V.s * (1 - .04 * drift) });
-        var B = Object.assign({}, V, { yaw: V.yaw + 7 * drift, pitch: V.pitch - 2 * drift });
-        add({ wd: i, A: A, B: B, len: 1.2, move: true, flat: true });
-        if (i < worlds.length - 1) {
-          var N = whole(worlds[i + 1]), turn = REDUCE ? 0 : 62;
-          var N0 = Object.assign({}, N, { yaw: N.yaw - 7 * drift, pitch: N.pitch + 3 * drift, s: N.s * (1 - .04 * drift) });
-          add({ wd: i, to: i + 1, A: B, B: Object.assign({}, B, { yaw: turn, s: B.s * .86 }), A2: Object.assign({}, N0, { yaw: -turn, s: N0.s * .86 }), B2: N0, len: .7, move: true });
-        }
+        wd.V = V;
+        wd.A = shift(V, { yaw: -7 * drift, pitch: 3 * drift, s: 1 - .04 * drift });
+        wd.B = shift(V, { yaw: 7 * drift, pitch: -2 * drift, s: 1 });
+      });
+      worlds.forEach(function (wd, i) {
+        add({ wd: i, A: wd.A, B: wd.B, len: 1.25 });
+        if (i < worlds.length - 1) add({ wd: i, to: i + 1, len: 1.7, turn: true });
       });
     }
     function ease(p) { return p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; }
+    function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
     function mix(A, B, e) {
       return { x: A.x + (B.x - A.x) * e, y: A.y + (B.y - A.y) * e, z: A.z + (B.z - A.z) * e,
         s: Math.exp(Math.log(A.s) + (Math.log(B.s) - Math.log(A.s)) * e),
         yaw: A.yaw + (B.yaw - A.yaw) * e, pitch: A.pitch + (B.pitch - A.pitch) * e, roll: A.roll + (B.roll - A.roll) * e };
     }
-    function aim(el, c, o) {
-      var s = c.s.toFixed(4);
+    function aim(wd, c, o) {
+      var s = c.s.toFixed(4), el = wd.el;
       el.style.transform = 'translate(' + (Ws / 2).toFixed(1) + 'px,' + (Hs / 2).toFixed(1) + 'px) scale3d(' + s + ',' + s + ',' + s + ') rotateX(' + c.pitch.toFixed(2) + 'deg) rotateZ(' + c.roll.toFixed(2) + 'deg) rotateY(' + c.yaw.toFixed(2) + 'deg) translate3d(' + (-c.x).toFixed(1) + 'px,' + (-c.y).toFixed(1) + 'px,' + (-c.z).toFixed(1) + 'px)';
       el.style.opacity = o == null ? '' : o.toFixed(3);
       el.hidden = false;
     }
-    // draw the frame for a point along the path (0 to 1); returns how far the camera moved, in pixels
+    // the lines of one text, from in place (0) to flown (1), one after another in reading order: each
+    // gathers speed as it leaves and slows as it lands, turning end over end, fading at the far end
+    function scatter(wd, p, landing) {
+      var n = wd.items.length, k = 1 / wd.V.s;
+      if (wd.q === 0 && p === 0) return;
+      wd.q = p;
+      wd.items.forEach(function (it, i) {
+        var d = n > 1 ? .45 * (landing ? n - 1 - i : i) / (n - 1) : 0, u = clamp01((p - d) / .55), q = REDUCE ? 0 : u * u * u;
+        if (!q) { it.el.style.transform = it.tf; it.el.style.opacity = ''; return; }
+        var dx = it.fx * Ws * k * q, dy = it.fy * Hs * k * q, dz = it.fz * persp * k * q;
+        it.el.style.transform = 'translate3d(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px,' + dz.toFixed(1) + 'px) ' + it.tf +
+          ' translate(' + (it.w / 2).toFixed(1) + 'px,' + (it.h / 2).toFixed(1) + 'px) rotate3d(' + it.axis[0].toFixed(3) + ',' + it.axis[1].toFixed(3) + ',' + it.axis[2].toFixed(3) + ',' + (it.spin * q).toFixed(1) + 'deg) translate(' + (-it.w / 2).toFixed(1) + 'px,' + (-it.h / 2).toFixed(1) + 'px)';
+        it.el.style.opacity = q > .6 ? (1 - (q - .6) / .4).toFixed(3) : '';
+      });
+    }
+    // draw the frame for a point along the path (0 to 1); returns how hard to blur it
     function render(d) {
       var pos = d * total, sg = segs[segs.length - 1];
       for (var k = 0; k < segs.length; k++) if (pos < segs[k].at + segs[k].len) { sg = segs[k]; break; }
-      var u = Math.max(0, Math.min(1, (pos - sg.at) / sg.len)), e = !sg.move ? 0 : sg.flat ? u : ease(u), c = mix(sg.A, sg.B, e);
-      worlds.forEach(function (wd, i) { if (i !== sg.wd && i !== sg.to) wd.el.hidden = true; });
-      if (sg.to != null) {
-        var f = Math.min(1, Math.max(0, (e - .35) / .3));
-        aim(worlds[sg.wd].el, c, 1 - f);
-        aim(worlds[sg.to].el, mix(sg.A2, sg.B2, e), f);
-      } else aim(worlds[sg.wd].el, c);
-      var i = sg.to != null && e > .5 ? sg.to : sg.wd;
-      if (i !== shown) { shown = i; count.textContent = '0' + (i + 1); }
+      var u = clamp01((pos - sg.at) / sg.len), c, blur = 0, cur = sg.wd;
+      worlds.forEach(function (wd, i) { if (i !== sg.wd && i !== sg.to) { wd.el.hidden = true; scatter(wd, 0); } });
+      if (!sg.turn) {
+        c = mix(sg.A, sg.B, u);
+        scatter(worlds[sg.wd], 0);
+        aim(worlds[sg.wd], c);
+      } else {
+        // the first text's lines fly apart while the camera rolls and swings away; the next text's lines
+        // fly in from the depth while the camera swings back level
+        var A = worlds[sg.wd], B = worlds[sg.to], out = clamp01(u / .56), inn = clamp01((u - .44) / .56);
+        if (REDUCE) {
+          aim(A, A.B, 1 - clamp01((u - .35) / .3)); aim(B, B.A, clamp01((u - .35) / .3));
+        } else {
+          if (out < 1) { c = mix(A.B, shift(A.B, { yaw: 24, roll: -9, pitch: 6, s: 1.1 }), ease(out)); aim(A, c); scatter(A, out, false); } else { A.el.hidden = true; scatter(A, 0); }
+          if (inn > 0) { var cB = mix(shift(B.A, { yaw: -24, roll: 9, pitch: -6, s: 1.1 }), B.A, ease(inn)); aim(B, cB); scatter(B, 1 - inn, true); if (!c || inn > .5) c = cB; } else B.el.hidden = true;
+          blur = 3.2 * Math.sin(Math.PI * u);
+        }
+        cur = u > .5 ? sg.to : sg.wd;
+      }
+      if (cur !== shown) { shown = cur; count.textContent = '0' + (cur + 1); }
       bar.style.transform = 'scaleX(' + d.toFixed(4) + ')';
       hint.classList.toggle('is-gone', d > .01);
-      var moved = prev ? Math.hypot(c.x - prev.x, c.y - prev.y) * c.s + Math.abs(Math.log(c.s / prev.s)) * 260 + Math.abs(c.roll - prev.roll) * 4 + Math.abs(c.yaw - prev.yaw) * 3 : 0;
-      prev = c;
-      return moved;
+      if (c && prev) blur = Math.max(blur, Math.min(6, (Math.hypot(c.x - prev.x, c.y - prev.y) * c.s + Math.abs(Math.log(c.s / prev.s)) * 260 + Math.abs(c.roll - prev.roll) * 4 + Math.abs(c.yaw - prev.yaw) * 3) / 22));
+      prev = c || prev;
+      return blur;
     }
     // where the scroll is, from 0 (the stage just pinned) to 1 (about to let go)
     function progress() {
       var r = box.getBoundingClientRect(), run = box.offsetHeight - stage.offsetHeight;
-      return run > 0 ? Math.max(0, Math.min(1, (top - r.top) / run)) : 0;
+      return run > 0 ? clamp01((top - r.top) / run) : 0;
     }
-    var at = 0;
     function frame(now) {
       raf = 0;
       var dt = last ? Math.min(.05, (now - last) / 1000) : .016; last = now;
-      at += (target - at) * (1 - Math.exp(-dt * 10));          // the camera eases after the scroll
+      at += (target - at) * (1 - Math.exp(-dt * 8));          // the motion eases after the scroll
       if (Math.abs(target - at) < 1e-4) at = target;
-      var moved = render(at), blur = REDUCE ? 0 : Math.min(6, moved / 22);
+      var blur = render(at);
+      if (REDUCE) blur = 0;
       blurEl.style.filter = blurOn && blur > .4 ? 'blur(' + blur.toFixed(1) + 'px)' : '';
       if (blurOn && blur > .4) {                                 // drop the blur on a machine too slow for it
         blurDt += dt;
         if (++blurN === 45) { if (blurDt / blurN > .026) blurOn = false; blurN = 0; blurDt = 0; }
       }
-      if (at !== target || blur > .4) raf = requestAnimationFrame(frame);
-      else last = 0;
+      if (at !== target) raf = requestAnimationFrame(frame);
+      else { last = 0; if (blur > .4) { blurEl.style.filter = ''; } }
     }
     function onScroll() { if (!built) return; target = progress(); if (!raf) raf = requestAnimationFrame(frame); }
+    var lastW = 0, lastH = 0;
     function measure() {
       top = nav ? nav.offsetHeight : 0;
       box.style.setProperty('--kt-top', top + 'px');
       Ws = stage.clientWidth; Hs = stage.clientHeight;
-      cam.style.perspective = Math.round(Math.max(Ws, Hs) * 1.4) + 'px';
-      // the walls stand side by side on a wide screen, one above the other on a tall one
+      persp = Math.round(Math.max(Ws, Hs) * 1.4);
+      cam.style.perspective = persp + 'px';
+      // a tall screen deals the lines shorter, so the corner still fills it with large words
       var t = Hs > Ws * 1.15;
       if (t !== tall) {
         tall = t;
         worlds.forEach(function (wd) { wd.el.remove(); });
         worlds = texts.map(build);
+        shown = -1;
       }
       plan();
-      // the length of scroll the whole path takes
-      box.style.height = Math.round(Hs + total * innerHeight * .62) + 'px';
+      // the length of scroll the whole path takes (set only when the width changes, so a phone's bar
+      // sliding away does not move the page)
+      if (Ws !== lastW || Math.abs(innerHeight - lastH) > 160) { box.style.height = Math.round(Hs + total * innerHeight * .62) + 'px'; lastW = Ws; lastH = innerHeight; }
       target = at = progress(); prev = null;
       render(at);
     }

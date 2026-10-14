@@ -1971,9 +1971,9 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
   // the mission, the problem and the answer, cut short for the kinetic type (the owner asked for few
   // words); the words between asterisks are set in blue
   const story = [
-    ['the mission', 'Liberia’s *official* source of ICT data. All *15 counties.* One *trusted* place.'],
-    ['the problem', 'For two decades, Liberia’s digital story was told with numbers from *somewhere else.*'],
-    ['the answer', 'The law is in place. NIIS is the *missing layer* that makes it work.'],
+    ['“THE MISSION”', 'Liberia’s *official* source of ICT data. All *15 counties.* One *trusted* place.'],
+    ['“THE PROBLEM”', 'For two decades, Liberia’s digital story was told with numbers from *somewhere else.*'],
+    ['“THE ANSWER”', 'The law is in place. NIIS is the *missing layer* that makes it work.'],
   ];
 
   const alignment = [

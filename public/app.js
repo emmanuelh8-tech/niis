@@ -1327,9 +1327,12 @@
 
     // the path, in lengths of scroll: each text whole, drifting a little in 3D as the reader scrolls (it
     // stays readable all the way); between texts, the lines of one fly apart as the next one's assemble
+    // the scale that shows a text whole: on a phone the corner fills the width (the stage is cut to fit)
+    var SPAN = (W + G) * (1 + Math.cos(FOLD * Math.PI / 180)), FOOT = 40;
+    function fit(wd) { return tall ? .92 * Ws / SPAN : Math.min(.88 * Ws / SPAN, .78 * Hs / wd.H); }
     function whole(wd) {
-      var cs = Math.cos(FOLD * Math.PI / 180), span = (W + G) * (1 + cs);
-      return { x: ((W + G) - (W + G) * cs) / 2, y: wd.H / 2, z: 0, s: Math.min(.88 * Ws / span, .78 * Hs / wd.H), yaw: 0, pitch: 4, roll: 0 };
+      var cs = Math.cos(FOLD * Math.PI / 180);
+      return { x: ((W + G) - (W + G) * cs) / 2, y: wd.H / 2, z: 0, s: fit(wd), yaw: 0, pitch: 4, roll: 0 };
     }
     function shift(c, d) { var o = Object.assign({}, c); for (var k in d) o[k] = k === 's' ? c.s * d.s : c[k] + d[k]; return o; }
     function plan() {
@@ -1356,7 +1359,7 @@
     }
     function aim(wd, c, o) {
       var s = c.s.toFixed(4), el = wd.el;
-      el.style.transform = 'translate(' + (Ws / 2).toFixed(1) + 'px,' + (Hs / 2).toFixed(1) + 'px) scale3d(' + s + ',' + s + ',' + s + ') rotateX(' + c.pitch.toFixed(2) + 'deg) rotateZ(' + c.roll.toFixed(2) + 'deg) rotateY(' + c.yaw.toFixed(2) + 'deg) translate3d(' + (-c.x).toFixed(1) + 'px,' + (-c.y).toFixed(1) + 'px,' + (-c.z).toFixed(1) + 'px)';
+      el.style.transform = 'translate(' + (Ws / 2).toFixed(1) + 'px,' + ((tall ? Hs - FOOT : Hs) / 2).toFixed(1) + 'px) scale3d(' + s + ',' + s + ',' + s + ') rotateX(' + c.pitch.toFixed(2) + 'deg) rotateZ(' + c.roll.toFixed(2) + 'deg) rotateY(' + c.yaw.toFixed(2) + 'deg) translate3d(' + (-c.x).toFixed(1) + 'px,' + (-c.y).toFixed(1) + 'px,' + (-c.z).toFixed(1) + 'px)';
       el.style.opacity = o == null ? '' : o.toFixed(3);
       el.hidden = false;
     }
@@ -1417,23 +1420,35 @@
     function onScroll() { if (!built) return; target = progress(); if (!raf) raf = requestAnimationFrame(frame); }
     var lastW = 0, lastH = 0;
     function measure() {
-      top = nav ? nav.offsetHeight : 0;
-      box.style.setProperty('--kt-top', top + 'px');
-      Ws = stage.clientWidth; Hs = stage.clientHeight;
-      persp = Math.round(Math.max(Ws, Hs) * 1.4);
-      cam.style.perspective = persp + 'px';
+      var bar0 = nav ? nav.offsetHeight : 0, view = innerHeight - bar0;
+      Ws = stage.clientWidth;
       // a tall screen deals the lines shorter, so the corner still fills it with large words
-      var t = Hs > Ws * 1.15;
+      var t = view > Ws * 1.15;
       if (t !== tall) {
         tall = t;
         worlds.forEach(function (wd) { wd.el.remove(); });
         worlds = texts.map(build);
         shown = -1;
       }
+      if (tall) {
+        // on a phone the stage is cut to the tallest text (no empty grey above and below it) and holds
+        // still in the middle of the screen while the reader scrolls
+        var hMax = worlds.reduce(function (a, wd) { return Math.max(a, wd.H * fit(wd)); }, 0);
+        Hs = Math.min(view, Math.round(hMax * 1.1 + FOOT + 24));
+        stage.style.height = Hs + 'px';
+        top = bar0 + Math.max(0, Math.round((view - Hs) / 2));
+      } else {
+        stage.style.height = '';
+        top = bar0;
+      }
+      box.style.setProperty('--kt-top', top + 'px');
+      Hs = stage.clientHeight;
+      persp = Math.round(Math.max(Ws, Hs) * 1.4);
+      cam.style.perspective = persp + 'px';
       plan();
       // the length of scroll the whole path takes (set only when the width changes, so a phone's bar
       // sliding away does not move the page)
-      if (Ws !== lastW || Math.abs(innerHeight - lastH) > 160) { box.style.height = Math.round(Hs + total * innerHeight * .62) + 'px'; lastW = Ws; lastH = innerHeight; }
+      if (Ws !== lastW || Math.abs(innerHeight - lastH) > 160) { box.style.height = Math.round(Hs + total * innerHeight * (tall ? .45 : .62)) + 'px'; lastW = Ws; lastH = innerHeight; }
       target = at = progress();
       render(at);
     }

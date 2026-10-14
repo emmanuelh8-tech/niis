@@ -1958,9 +1958,7 @@ function policyEmblem(kind) {
 // (careers.js) stands beside the commitments, as a wireframe in the black capacity band, and alone
 // above the closing line. Every figure is live from the catalogue or the
 // programme; every photo is one of the site's own.
-exports.about = (ctx, { mission, indicatorCount = 0, domainCount = 0 } = {}) => {
-  const DEFAULT_MISSION = "The National ICT Intelligence System (NIIS) is a private-sector-led national initiative advancing Liberia's data sovereignty, and the country's official, continuously maintained source of ICT statistics, infrastructure, usage, affordability, market structure, digital trust and governance, and sustainability, disaggregated across all 15 counties. NIIS exists to give researchers, policymakers, donors and the public a single, trustworthy place to find and compare Liberia's digital-development data.";
-  const statement = String(mission || DEFAULT_MISSION).trim();
+exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
 
   // live from the catalogue where the database has it; programme figures from the programme
   const stats = [
@@ -1970,10 +1968,12 @@ exports.about = (ctx, { mission, indicatorCount = 0, domainCount = 0 } = {}) => 
     [174, 'Programme positions', 'Created for Liberian staff'],
   ].filter(([n]) => n > 0);
 
+  // the mission, the problem and the answer, cut short for the kinetic type (the owner asked for few
+  // words); the words between asterisks are set in green
   const story = [
-    ['The mission', statement],
-    ['The problem', 'For two decades Liberia’s digital-development story has been told with numbers produced somewhere else: estimated rather than observed, national rather than local, and always a reporting cycle behind the decisions they are meant to inform.'],
-    ['The answer', 'The law is already in place: a Data Protection Act in 2026, and data sovereignty among the eight priorities of the National Digital Strategy. What has not moved is the infrastructure. NIIS is that missing layer: the database, the collection pipeline and the platform that turn a commitment on paper into a working national asset.'],
+    ['the mission', 'Liberia’s *official* source of ICT data. All *15 counties.* One *trusted* place.'],
+    ['the problem', 'For two decades, Liberia’s digital story was told with numbers from *somewhere else.*'],
+    ['the answer', 'The law is in place. NIIS is the *missing layer* that makes it work.'],
   ];
 
   const alignment = [
@@ -2047,13 +2047,18 @@ exports.about = (ctx, { mission, indicatorCount = 0, domainCount = 0 } = {}) => 
             <p class="ab-stat-s">${esc(s)}</p>
           </div>`).join('')}
         </div>` : ''}
-        <!-- the mission, the problem and the answer as kinetic type (app.js sets it from the list below,
-             which stays in the page as the text screen readers and search engines read) -->
-        <div class="kt" data-kt aria-hidden="true"><div class="kt-blur"><div class="kt-cam"></div></div></div>
-        <dl class="cs-rows kt-src sr-only">${story.map(([tag, text]) => `
-          <div class="cs-row"><dt>${esc(tag)}</dt><dd>${esc(text)}</dd></div>`).join('')}
-        </dl>
       </div>
+      <!-- the mission, the problem and the answer as kinetic type, turned by the reader's scroll (app.js
+           sets it from the list below, which stays in the page as the text screen readers read) -->
+      <div class="kt-scroll" data-kt>
+        <div class="kt" aria-hidden="true">
+          <div class="kt-blur"><div class="kt-cam"></div></div>
+          <div class="kt-ui"><span class="kt-count"><b>01</b> / 0${story.length}</span><i class="kt-bar"><b></b></i><span class="kt-hint">Scroll</span></div>
+        </div>
+      </div>
+      <dl class="kt-src sr-only">${story.map(([tag, text]) => `
+        <div class="kt-row" data-kt-text="${esc(text)}"><dt>${esc(tag)}</dt><dd>${esc(text.replace(/\*/g, ''))}</dd></div>`).join('')}
+      </dl>
     </section>
 
     <section class="ab-quote" data-star="quiet" aria-label="The global target">

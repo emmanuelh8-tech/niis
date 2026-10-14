@@ -6108,13 +6108,23 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 .paper-cover-lg .pc { width: 100%; }
 
 /* ---- About: the mission, the problem and the answer as kinetic type (initKinetic in app.js), set as
-   the reference film sets its words: Montserrat ExtraBold, near-black with a neon green, on light grey */
-.kt { position: relative; overflow: hidden; aspect-ratio: 16 / 9; margin: .5rem 0 0; background: #EEEEEE; user-select: none; -webkit-user-select: none; }
+   the reference film sets its words: Montserrat ExtraBold, near-black with a neon green, on light grey.
+   The stage holds still under the bar while the reader scrolls the box around it; app.js sets the
+   box's height to the length of the path. */
+.kt-scroll { position: relative; margin-top: clamp(2.5rem, 6vh, 4rem); }
+.kt { position: sticky; top: var(--kt-top, 64px); overflow: hidden; height: calc(100vh - var(--kt-top, 64px)); height: calc(100svh - var(--kt-top, 64px));
+  background: #EEEEEE; user-select: none; -webkit-user-select: none; }
 .kt-blur, .kt-cam { position: absolute; inset: 0; }
 .kt-cam { perspective-origin: 50% 50%; }
 .kt-world { position: absolute; left: 0; top: 0; transform-origin: 0 0; transform-style: preserve-3d; }
 .kt-world[hidden] { display: none; }
 .kt-w { position: absolute; left: 0; top: 0; transform-origin: 0 0; white-space: pre; font-family: 'Montserrat', var(--sans); font-weight: 800; line-height: .86; letter-spacing: 0; color: #262626; }
 .kt-w b { font-weight: inherit; color: #0FF916; }
-.kt-w.is-label { color: #0FF916; }
-@media (max-width: 640px) { .kt { aspect-ratio: 4 / 5; } }
+/* the count, the progress line and the cue to scroll, small along the foot of the stage */
+.kt-ui { position: absolute; left: clamp(16px, 4vw, 48px); right: clamp(16px, 4vw, 48px); bottom: clamp(14px, 3vh, 28px); display: flex; align-items: center; gap: 1rem;
+  font: 800 .72rem/1 'Montserrat', var(--sans); letter-spacing: .14em; text-transform: uppercase; color: #262626; pointer-events: none; }
+.kt-count b { font-weight: inherit; color: #262626; }
+.kt-bar { position: relative; flex: 1; height: 2px; background: rgb(38 38 38 / .14); }
+.kt-bar b { position: absolute; inset: 0; background: #262626; transform: scaleX(0); transform-origin: 0 50%; }
+.kt-hint { transition: opacity .4s; }
+.kt-hint.is-gone { opacity: 0; }

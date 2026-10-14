@@ -1210,8 +1210,8 @@
 
   // ---- About: the mission, the problem and the answer as kinetic type, after the reference film:
   // heavy near-black words, a few in the page's blue, on light grey. Each short text is dealt into lines
-  // sized to one width, now and then a word on end beside the lines it spans, set on two walls that meet
-  // at a corner (the same corner on a phone, its lines dealt shorter so the words stay large). The stage
+  // sized to one width, set on two walls that meet at a corner (the same corner on a phone, its lines
+  // dealt shorter and set larger so the block fills the tall screen). The stage
   // holds still while the reader scrolls, and the scroll drives it: each text stays whole and readable,
   // drifting a little in 3D; then its lines break away one after another and fly past the camera,
   // tumbling, while the next text's lines fly in from the depth and lock into their corner. Nothing is
@@ -1222,8 +1222,8 @@
     var stage = qs('.kt', box), cam = qs('.kt-cam', box);
     var bar = qs('.kt-bar b', box), count = qs('.kt-count b', box), hint = qs('.kt-hint', box), nav = qs('.gov-nav');
     // world units: each wall is W wide; lines are sized to fill it; FOLD is the angle of the left wall
-    var FAMILY = 'Montserrat', FONT = '800 100px ' + FAMILY, W = 1600, G = 40, LH = .86, GAP = .07, FOLD = 46, CAP = .34 * W;
-    var RHYTHM_WIDE = [9, 15, 11, 7, 16, 10, 13], RHYTHM_TALL = [7, 10, 6, 9, 11, 8];
+    var FAMILY = 'Montserrat', FONT = '800 100px ' + FAMILY, W = 1600, G = 40, LH = .86, GAP = .07, FOLD = 46, CAP = .34 * W, CAP_TALL = .56 * W;
+    var RHYTHM_WIDE = [9, 15, 11, 7, 16, 10, 13], RHYTHM_TALL = [5, 7, 4, 6, 8, 5];
     var texts = qsa('.kt-row', src).map(function (row) {
       return { label: qs('dt', row).textContent.trim(), text: row.getAttribute('data-kt-text') || qs('dd', row).textContent.trim() };
     });
@@ -1246,42 +1246,25 @@
         return t;
       });
     }
-    // deal a text into lines: the label first, then lines of varied length; one long word may stand on
-    // end, beside the two short lines it spans
+    // deal a text into lines: the label first, then lines of varied length (shorter on a tall screen).
+    // Every word stands upright, and a word of one or two letters never stands alone ("it work.")
     function deal(tx) {
       var words = tokens(tx.text), lines = [{ words: tx.label.split(' ').map(function (w) { return { w: w, hi: true }; }), label: true }];
-      var rhythm = tall ? RHYTHM_TALL : RHYTHM_WIDE, i = 0, k = 0, short = 0, used = false;
+      var rhythm = tall ? RHYTHM_TALL : RHYTHM_WIDE, i = 0, k = 0;
       while (i < words.length) {
-        if (!used && k === 2 && bare(words[i].w).length >= 5 && words.length - i > 4) { lines.push({ words: [words[i++]], vert: true }); short = 2; used = true; k++; continue; }
-        var target = short ? (tall ? 7 : 9) : rhythm[k % rhythm.length], ln = [words[i++]], len = ln[0].w.length;
-        while (i < words.length && len + 1 + words[i].w.length <= target) { len += 1 + words[i].w.length; ln.push(words[i++]); }
-        lines.push({ words: ln, beside: !!short });
-        if (short) short--;
-        k++;
+        var target = rhythm[k++ % rhythm.length], ln = [words[i++]], len = ln[0].w.length;
+        while (i < words.length && (len + 1 + words[i].w.length <= target || (ln.length === 1 && bare(ln[0].w).length <= 2))) { len += 1 + words[i].w.length; ln.push(words[i++]); }
+        lines.push({ words: ln });
       }
+      // nor is a short word left on its own at the end
+      var tail = lines[lines.length - 1], prev = lines[lines.length - 2];
+      if (lines.length > 2 && !prev.label && tail.words.length === 1 && bare(tail.words[0].w).length <= 2) { prev.words = prev.words.concat(tail.words); lines.pop(); }
       lines.forEach(function (l) { l.str = l.words.map(function (t) { return t.w; }).join(' '); l.w1 = w1(l.str); });
       return lines;
     }
-    // size the lines into blocks: a plain line, or a word on end with the lines beside it
+    // size each line to fill the wall's width (short words capped, so they do not tower)
     function blocks(lines) {
-      var out = [];
-      for (var n = 0; n < lines.length; n++) {
-        var L = lines[n];
-        if (!L.vert) { var f = Math.min(W / L.w1, CAP); out.push({ lines: [L], fs: [f], adv: f * (LH + GAP) }); continue; }
-        var comp = [];
-        for (var m = n + 1; m < lines.length && comp.length < 3 && lines[m].beside; m++) comp.push(lines[m]);
-        if (!comp.length) { L.vert = false; n--; continue; }
-        var T = .15 * W, g = .02 * W, fs = [], H = 0;
-        for (var it = 0; it < 5; it++) {
-          fs = comp.map(function (c) { return Math.min((W - T - g) / c.w1, CAP); });
-          H = fs.reduce(function (a, f) { return a + f * (LH + GAP); }, 0) - fs[fs.length - 1] * GAP;
-          T = Math.min(LH * H / L.w1, .34 * W);
-        }
-        var fv = T / LH;
-        out.push({ vert: L, fv: fv, T: T, g: g, Lv: L.w1 * fv, lines: comp, fs: fs, adv: Math.max(H, L.w1 * fv) + fs[fs.length - 1] * GAP });
-        n += comp.length;
-      }
-      return out;
+      return lines.map(function (L) { var f = Math.min(W / L.w1, tall ? CAP_TALL : CAP); return { lines: [L], fs: [f], adv: f * (LH + GAP) }; });
     }
     // one text's world: the blocks split across two walls that meet at a corner, the left wall turned
     // back. Each line keeps its place, its size and the way it will fly.
@@ -1312,13 +1295,7 @@
         var side = q < split ? 0 : 1, y = heights[side];
         var wallTf = side ? '' : 'rotateY(' + (-FOLD) + 'deg) ';
         var x = side ? G : -(W + G);
-        if (b.vert) {
-          put(b.vert, b.fv, wallTf + 'translate(' + x.toFixed(1) + 'px,' + (y + b.Lv).toFixed(1) + 'px) rotate(-90deg)');
-          var yc = y;
-          b.lines.forEach(function (l, j) { put(l, b.fs[j], wallTf + 'translate(' + (x + b.T + b.g).toFixed(1) + 'px,' + yc.toFixed(1) + 'px)'); yc += b.fs[j] * (LH + GAP); });
-        } else {
-          put(b.lines[0], b.fs[0], wallTf + 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)');
-        }
+        put(b.lines[0], b.fs[0], wallTf + 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)');
         heights[side] = y + b.adv;
       });
       cam.appendChild(world);
@@ -1327,9 +1304,9 @@
 
     // the path, in lengths of scroll: each text whole, drifting a little in 3D as the reader scrolls (it
     // stays readable all the way); between texts, the lines of one fly apart as the next one's assemble
-    // the scale that shows a text whole: on a phone the corner fills the width (the stage is cut to fit)
+    // the scale that shows a text whole (on a phone, above the counter along its foot)
     var SPAN = (W + G) * (1 + Math.cos(FOLD * Math.PI / 180)), FOOT = 40;
-    function fit(wd) { return tall ? .92 * Ws / SPAN : Math.min(.88 * Ws / SPAN, .78 * Hs / wd.H); }
+    function fit(wd) { return tall ? Math.min(.94 * Ws / SPAN, .86 * (Hs - FOOT) / wd.H) : Math.min(.88 * Ws / SPAN, .78 * Hs / wd.H); }
     function whole(wd) {
       var cs = Math.cos(FOLD * Math.PI / 180);
       return { x: ((W + G) - (W + G) * cs) / 2, y: wd.H / 2, z: 0, s: fit(wd), yaw: 0, pitch: 4, roll: 0 };
@@ -1430,17 +1407,8 @@
         worlds = texts.map(build);
         shown = -1;
       }
-      if (tall) {
-        // on a phone the stage is cut to the tallest text (no empty grey above and below it) and holds
-        // still in the middle of the screen while the reader scrolls
-        var hMax = worlds.reduce(function (a, wd) { return Math.max(a, wd.H * fit(wd)); }, 0);
-        Hs = Math.min(view, Math.round(hMax * 1.1 + FOOT + 24));
-        stage.style.height = Hs + 'px';
-        top = bar0 + Math.max(0, Math.round((view - Hs) / 2));
-      } else {
-        stage.style.height = '';
-        top = bar0;
-      }
+      // the stage fills the screen under the bar, on a phone as on a desktop
+      top = bar0;
       box.style.setProperty('--kt-top', top + 'px');
       Hs = stage.clientHeight;
       persp = Math.round(Math.max(Ws, Hs) * 1.4);

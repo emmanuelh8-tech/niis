@@ -166,7 +166,7 @@ const LOCAL_FONTS = (() => {
 })();
 const FONT_HEAD = `<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,400..900;1,400..700&family=Public+Sans:ital,wght@0,300..900;1,400..700&family=Righteous&family=Source+Serif+4:opsz,wght@8..60,400..700&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">${LOCAL_FONTS}`;
+<link href="https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,400..900;1,400..700&family=Montserrat:wght@800&family=Public+Sans:ital,wght@0,300..900;1,400..700&family=Righteous&family=Source+Serif+4:opsz,wght@8..60,400..700&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">${LOCAL_FONTS}`;
 const FAVICON = `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(sealLogo(32))}">`;
 
 // ---------- shared shell pieces ----------
@@ -1976,15 +1976,6 @@ exports.about = (ctx, { mission, indicatorCount = 0, domainCount = 0 } = {}) => 
     ['The answer', 'The law is already in place: a Data Protection Act in 2026, and data sovereignty among the eight priorities of the National Digital Strategy. What has not moved is the infrastructure. NIIS is that missing layer: the database, the collection pipeline and the platform that turn a commitment on paper into a working national asset.'],
   ];
 
-  const agencies = [
-    ['mopt', 'Ministry of Posts & Telecommunications', 'Policy lead'],
-    ['lta', 'Liberia Telecommunications Authority', 'Sector regulator'],
-    ['lisgis', 'LISGIS', 'National statistics'],
-    ['moe', 'Ministry of Education', 'Education data'],
-    ['epa', 'Environmental Protection Agency', 'E-waste & sustainability'],
-    ['cbl', 'Central Bank of Liberia', 'Digital finance'],
-  ];
-
   const alignment = [
     ['ARREST Agenda for Inclusive Development', '2025-2029',
       'ICT modernization sits in the Infrastructure pillar. NIIS is the measurement layer it is judged against.', 'lr'],
@@ -2056,8 +2047,11 @@ exports.about = (ctx, { mission, indicatorCount = 0, domainCount = 0 } = {}) => 
             <p class="ab-stat-s">${esc(s)}</p>
           </div>`).join('')}
         </div>` : ''}
-        <dl class="cs-rows">${story.map(([tag, text]) => `
-          <div class="cs-row"><dt><span class="cs-tag">${esc(tag)}</span></dt><dd data-fill>${esc(text)}</dd></div>`).join('')}
+        <!-- the mission, the problem and the answer as kinetic type (app.js sets it from the list below,
+             which stays in the page as the text screen readers and search engines read) -->
+        <div class="kt" data-kt aria-hidden="true"><div class="kt-blur"><div class="kt-cam"></div></div></div>
+        <dl class="cs-rows kt-src sr-only">${story.map(([tag, text]) => `
+          <div class="cs-row"><dt>${esc(tag)}</dt><dd>${esc(text)}</dd></div>`).join('')}
         </dl>
       </div>
     </section>
@@ -2086,27 +2080,6 @@ exports.about = (ctx, { mission, indicatorCount = 0, domainCount = 0 } = {}) => 
         <h2 id="abCapTitle" class="cs-h2 cs-h2-lg" aria-label="A dataset is also a workforce. 174 positions across eight role types.">${csDecode('A dataset is also a workforce.')}${csDecode('174 positions across eight role types.', 'cs-dim')}</h2>
         <p class="ab-dark-p">Enumerators and supervisors in every county, research leads, data engineers, GIS and sampling specialists, quality analysts and developers, recruited from Liberian STEM graduates and researchers. Hosted in-country, methodology published, staff trained locally: the measure of this programme is whether Liberia can run it without us.</p>
         <div class="cs-ctas">${csBtn('/careers', 'See open roles')}</div>
-      </div>
-    </section>
-
-    <section class="ab-partners" data-star="quiet" aria-labelledby="abPartTitle">
-      <div class="cs-wrap ab-grid">
-        <header class="ab-grid-head">
-          <h2 id="abPartTitle">Partner institutions</h2>
-          <p class="cs-count">${agencies.length}</p>
-          <p class="ab-grid-note">These institutions contribute data, validation or domain review. Partnership is confirmed institution by institution.</p>
-          ${csBtn('/partners', 'All partners', 'cs-btn-sm cs-btn-dark ab-grid-btn')}
-        </header>
-        <ul class="ab-cards">${agencies.map(([slug, name, role], i) => {
-          const src = imgs.url('partnerLogos', slug);
-          return `
-          <li class="ab-card"${rise(i % 3)}>
-            <div class="ab-frame ab-frame--white">${src ? `<img src="${esc(src)}" alt="${esc(name)} logo" loading="lazy" decoding="async">` : ''}</div>
-            <h3>${esc(name)}</h3>
-            <p class="ab-card-l">${esc(role)}</p>
-          </li>`;
-        }).join('')}
-        </ul>
       </div>
     </section>
 

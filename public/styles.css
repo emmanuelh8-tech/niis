@@ -1891,32 +1891,17 @@ tr.unread td { background: var(--gold-soft); }
 .ab-frame--white img { position: relative; z-index: 1; width: auto; height: auto; max-width: 58%; max-height: 42%; object-fit: contain;
   mix-blend-mode: multiply; filter: grayscale(1) contrast(1.08); transition: filter .5s var(--cs-ease), transform 1.2s var(--cs-ease); }
 .ab-quote-frame img { max-width: 56%; max-height: 56%; filter: none; }
-.ab-card:hover .ab-frame--blue img, .ab-card:hover .ab-frame--white img { transform: scale(1.04); }
-.ab-card:hover .ab-frame--white img { filter: none; }
 
-/* ---- what we do, and the partner institutions: a label column and a card grid */
+/* ---- what we do */
 .ab-team { padding: clamp(3.5rem, 8vh, 5.5rem) 0 clamp(1.5rem, 4vh, 2.5rem); background: var(--cs-black); }
 .ab-lead { max-width: 23em; margin: 0; font-size: clamp(1.6rem, 2.35vw, 2.25rem); line-height: 1.17; }
-.ab-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); column-gap: 2rem; }
-.ab-grid-head { align-self: start; }
-.ab-grid-head :is(h2, h3) { margin: 0; font-size: 1rem; font-weight: 400; line-height: 1.3; letter-spacing: -.01em; }
-.ab-grid-head .cs-count { margin-top: .35rem; font-size: .8rem; }
-.ab-grid-note { max-width: 17rem; margin: 1.6rem 0 1.4rem !important; font-size: .88rem; line-height: 1.6; color: rgb(255 255 255 / .66); }
-.ab-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3.2rem 1rem; margin: 0; padding: 0; list-style: none; }
-.ab-card :is(h3, h4) { margin: 1.15rem 0 .4rem; color: #fff; font: 500 1rem/1.3 var(--sans); letter-spacing: -.01em; }
-.ab-card-l { font: 500 .64rem/1.4 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: rgb(255 255 255 / .56); }
-.ab-card-b { max-width: 32ch; margin-top: .95rem !important; font-size: .88rem; line-height: 1.6; color: rgb(255 255 255 / .74); }
 
 /* ---- the black band (careers' .cs-dark), with a working paragraph */
 .ab-dark-p { max-width: 34rem; font-size: 1rem; line-height: 1.65; color: rgb(255 255 255 / .74); }
 
-/* ---- partners: navy rising to blue, like the reference's board */
-.ab-partners { padding: clamp(3rem, 7vh, 4.5rem) 0 clamp(3.5rem, 8vh, 5rem);
-  background: linear-gradient(180deg, var(--cs-navy) 0%, #0A1A3E 34%, #143472 72%, #2A55A4 100%); }
-
 /* ---- commitments: the left half, the seal standing in the right */
 .ab-commit { padding: clamp(3.5rem, 8vh, 5rem) 0 clamp(2rem, 5vh, 3rem); color: var(--cs-ink);
-  background: linear-gradient(180deg, #2A55A4 0%, #8FADDC 6%, #D3DFEF 13%, #EDF2F7 40%, var(--cs-paper) 100%); }
+  background: linear-gradient(180deg, var(--cs-navy) 0%, #2A55A4 9%, #8FADDC 16%, #D3DFEF 22%, #EDF2F7 44%, var(--cs-paper) 100%); }
 .ab-commit-in { max-width: 44rem; }
 .ab-sub { max-width: 34rem; margin: -1rem 0 2.8rem !important; font-size: 1.02rem; line-height: 1.6; color: var(--cs-ink2); }
 .ab-pols { display: grid; gap: 2.4rem; margin: 0; padding: 0; list-style: none; }
@@ -1964,10 +1949,6 @@ tr.unread td { background: var(--gold-soft); }
   .ab-quote-in { grid-template-columns: minmax(0, 1fr); row-gap: 2rem; }
   .ab-qmark { width: 4.4rem; }
   .ab-quote-frame { justify-self: start; width: 8.5rem; }
-  .ab-grid { grid-template-columns: minmax(0, 1fr); row-gap: 1.8rem; }
-  .ab-grid-note { max-width: 30rem; }
-  .ab-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2.4rem .75rem; }
-  .ab-card-b { font-size: .84rem; }
   .ab-commit-in { max-width: none; }
   .ab-brow { grid-template-columns: minmax(0, 1fr) auto; gap: .45rem 1rem; }
   .ab-bw { grid-column: 1 / -1; grid-row: 2; }
@@ -4060,7 +4041,6 @@ html { -webkit-text-size-adjust: 100%; }
   .cs .ab-commit { padding-top: 2.5rem; }
   .cs .ab-quote { padding-top: 5rem; padding-bottom: 3rem; }
   .cs .ab-team { padding-top: 3rem; padding-bottom: 1.5rem; }
-  .cs .ab-partners { padding-top: 3rem; padding-bottom: 3.5rem; }
 }
 
 /* phones only: the Browse indicators button in the filter bar and the indicator sheet's header */
@@ -5057,14 +5037,14 @@ button.skip:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px;
    as transparency) is tinted pale grey on the light sections and faint white on the dark and blue
    ones, behind the content. The partner logo tiles carry it too. */
 html:has(.ab-hero) { background-image: linear-gradient(rgb(255 255 255 / .5), rgb(255 255 255 / .5)), url("/img/brand/mask-pattern-light.webp"); background-size: auto, 185px auto; }
-.cs .ab-story, .cs .ab-quote, .cs .ab-team, .cs .ab-dark, .cs .ab-partners, .cs .ab-commit, .cs .ab-bench, .cs .ab-faq, .cs .ab-close { position: relative; isolation: isolate; }
-.cs .ab-story::after, .cs .ab-quote::after, .cs .ab-team::after, .cs .ab-dark::after, .cs .ab-partners::after, .cs .ab-commit::after,
+.cs .ab-story, .cs .ab-quote, .cs .ab-team, .cs .ab-dark, .cs .ab-commit, .cs .ab-bench, .cs .ab-faq, .cs .ab-close { position: relative; isolation: isolate; }
+.cs .ab-story::after, .cs .ab-quote::after, .cs .ab-team::after, .cs .ab-dark::after, .cs .ab-commit::after,
 .cs .ab-bench::after, .cs .ab-faq::after, .cs .ab-close::after, .ab-frame--white::after {
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background: var(--mask-ink, #5B6470); opacity: var(--mask-op, .085);
   -webkit-mask: url("/img/brand/mask-lines.webp") 0 0 / 185px auto repeat; mask: url("/img/brand/mask-lines.webp") 0 0 / 185px auto repeat;
   filter: blur(1.6px); }
-.cs .ab-team, .cs .ab-dark, .cs .ab-partners, .cs .ab-close { --mask-ink: #fff; --mask-op: .05; }
+.cs .ab-team, .cs .ab-dark, .cs .ab-close { --mask-ink: #fff; --mask-op: .05; }
 /* the logo tiles: the masks take the place of the grid, under the logo */
 .ab-frame--white { background: #fff; }
 .ab-frame--white::after { z-index: 0; --mask-ink: #5B6470; --mask-op: .085; background-size: auto; }
@@ -5581,7 +5561,7 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
 .tag, .selector-field label, .xdd-item .grp, .xdd-group-label, .vq-head, .stat-label-dh, .map-size-row label, .compare-stat-card .lbl,
 .data-table th, .dash-hero-stats .lbl, .footer-dh h4, .kicker, .kpi-label, .sb-brand-text span, .sb-section-label, .role-chip,
 .fbar-facet-label, .hd-chip, .hv-cue, .cs-tag, .cs-role-m, .cs-faq-more, .cs-back, .cs-ap-meta dt, .cs-ap-role h2, .cs-label, .cs-drop-clear,
-.ab-stat-l, .ab-quote figcaption span, .ab-card-l, .ab-pol-y, .ab-bs, .imglib-state, .tree-title, .dx-fact i, .dx-stat-lbl, .dx-readout-lbl,
+.ab-stat-l, .ab-quote figcaption span, .ab-pol-y, .ab-bs, .imglib-state, .tree-title, .dx-fact i, .dx-stat-lbl, .dx-readout-lbl,
 .dx-size label, .dx-mock, .pt-stat-lbl, .pt-logo-note, .pt-cat, .pt-status, .pt-contrib span, .pt-focal-label, .vhero-kicker, .bk-kicker,
 .bk-hint, .m-eyebrow, .m-hero-fig figcaption, .m-quote figcaption, .m-zig-meta, .m-tag, .m-logo span, .m-contact h4, .m-flow-chip,
 .m-pol-meta, .m-polbox-meta, .lsc-nat i, .lsc-natnote i, .lsc-an-pair label, .ui-eyebrow, .ui-k, .ui-stats dt, .ic-rail-h, .ic-flag,
@@ -6126,3 +6106,15 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 :is(.pc--net, .pc--dark) .pc-foot { color: rgb(255 255 255 / .6); }
 :is(.pc--net, .pc--dark) .pc-foot b { color: #fff; }
 .paper-cover-lg .pc { width: 100%; }
+
+/* ---- About: the mission, the problem and the answer as kinetic type (initKinetic in app.js), set as
+   the reference film sets its words: Montserrat ExtraBold, near-black with a neon green, on light grey */
+.kt { position: relative; overflow: hidden; aspect-ratio: 16 / 9; margin: .5rem 0 0; background: #EEEEEE; user-select: none; -webkit-user-select: none; }
+.kt-blur, .kt-cam { position: absolute; inset: 0; }
+.kt-cam { perspective-origin: 50% 50%; }
+.kt-world { position: absolute; left: 0; top: 0; transform-origin: 0 0; transform-style: preserve-3d; }
+.kt-world[hidden] { display: none; }
+.kt-w { position: absolute; left: 0; top: 0; transform-origin: 0 0; white-space: pre; font-family: 'Montserrat', var(--sans); font-weight: 800; line-height: .86; letter-spacing: 0; color: #262626; }
+.kt-w b { font-weight: inherit; color: #0FF916; }
+.kt-w.is-label { color: #0FF916; }
+@media (max-width: 640px) { .kt { aspect-ratio: 4 / 5; } }

@@ -1208,6 +1208,201 @@
     initDropdown: initDropdown, initSortableTable: initSortableTable, exportSvgToPng: exportSvgToPng,
     toast: toast, copyText: copyText, COLORS: COLORS, SVG_NS: SVG_NS };
 
+  // ---- About: the mission, the problem and the answer as kinetic type, after the reference film:
+  // heavy near-black words, a few in neon green, on light grey. Each text is dealt into lines of
+  // varied length, every line sized to the same width, now and then one word on end beside the lines
+  // it spans; the lines are set on two walls that meet at a corner. The camera flies through them two
+  // or three words at a time, turning in 3D to read each one, then pulls back to show the whole
+  // paragraph locked into its corner, holds it to be read, and cuts to the next.
+  function initKinetic() {
+    var stage = qs('[data-kt]'), src = qs('.kt-src');
+    if (!stage || !src) return;
+    var blurEl = qs('.kt-blur', stage), cam = qs('.kt-cam', stage);
+    // world units: each wall is W wide; lines are sized to fill it; FOLD is the angle of the left wall
+    var FAMILY = 'Montserrat', FONT = '800 100px ' + FAMILY, W = 1600, G = 40, LH = .86, GAP = .07, FOLD = 46, CAP = .3 * W;
+    var GREEN = /^(official|counties|trustworthy|somewhere|else|observed|local|sovereignty|missing|layer|asset)$/i;
+    var RHYTHM = [14, 30, 40, 22, 46, 26, 16, 36, 44, 20, 32, 50, 18, 38];
+    var texts = qsa('.cs-row', src).map(function (row) {
+      return { label: qs('dt', row).textContent.trim().toLowerCase(), text: qs('dd', row).textContent.trim() };
+    });
+    if (!texts.length) return;
+    var ctx = document.createElement('canvas').getContext('2d');
+    function w1(str) { ctx.font = FONT; return ctx.measureText(str).width / 100; }   // width at 1px
+    var bare = function (w) { return w.replace(/[^A-Za-z0-9'’-]/g, ''); };
+    var scenes = [], cur = 0, seg = 0, segT = 0, Ws = 0, Hs = 0, raf = 0, last = 0, seen = false, built = false;
+    var blurOn = true, blurN = 0, blurDt = 0;   // the blur is dropped on a machine too slow to draw it smoothly
+
+    // deal a text into lines: the label first, then lines of varied length; every fifth line one long
+    // word stands on end, beside three short lines that it spans
+    function deal(tx) {
+      var words = tx.text.split(/\s+/).filter(Boolean), lines = [{ words: tx.label.split(' '), label: true }];
+      var i = 0, k = 0, short = 0;
+      while (i < words.length) {
+        if (k % 5 === 3 && !short && bare(words[i]).length >= 5 && words.length - i > 8) { lines.push({ words: [words[i++]], vert: true }); short = 3; k++; continue; }
+        var target = short ? [11, 14, 12][3 - short] : RHYTHM[k % RHYTHM.length], ln = [words[i++]], len = ln[0].length;
+        while (i < words.length && len + 1 + words[i].length <= target) { len += 1 + words[i].length; ln.push(words[i++]); }
+        lines.push({ words: ln, beside: !!short });
+        if (short) short--;
+        k++;
+      }
+      var tail = lines[lines.length - 1], prev = lines[lines.length - 2];
+      if (lines.length > 2 && tail.words.join(' ').length < 7 && !prev.vert && !prev.label && !tail.beside) { prev.words = prev.words.concat(tail.words); lines.pop(); }
+      lines.forEach(function (l) { l.str = l.words.join(' '); l.w1 = w1(l.str); });
+      return lines;
+    }
+    // size the lines into blocks: a plain line, or a word on end with the lines beside it
+    function blocks(lines) {
+      var out = [];
+      for (var n = 0; n < lines.length; n++) {
+        var L = lines[n];
+        if (!L.vert) { var f = Math.min(W / L.w1, CAP); out.push({ lines: [L], fs: [f], adv: f * (LH + GAP) }); continue; }
+        var comp = [];
+        for (var m = n + 1; m < lines.length && comp.length < 3 && lines[m].beside; m++) comp.push(lines[m]);
+        if (!comp.length) { L.vert = false; n--; continue; }
+        var T = .15 * W, g = .02 * W, fs = [], H = 0, fv = 0;
+        for (var it = 0; it < 5; it++) {
+          fs = comp.map(function (c) { return Math.min((W - T - g) / c.w1, CAP); });
+          H = fs.reduce(function (a, f) { return a + f * (LH + GAP); }, 0) - fs[fs.length - 1] * GAP;
+          T = Math.min(LH * H / L.w1, .34 * W);
+        }
+        fv = T / LH;
+        out.push({ vert: L, fv: fv, T: T, g: g, Lv: L.w1 * fv, lines: comp, fs: fs, adv: Math.max(H, L.w1 * fv) + fs[fs.length - 1] * GAP });
+        n += comp.length;
+      }
+      return out;
+    }
+    // build one text's world: the blocks split across two walls that meet at a corner, the left wall
+    // turned back; and the camera's stops, two or three words at a time, in reading order
+    function build(tx) {
+      var bl = blocks(deal(tx)), total = bl.reduce(function (a, b) { return a + b.adv; }, 0), acc = 0, split = bl.length;
+      for (var q = 0; q < bl.length; q++) { if (acc + bl[q].adv / 2 > total / 2) { split = Math.max(1, q); break; } acc += bl[q].adv; }
+      var world = document.createElement('div');
+      world.className = 'kt-world'; world.hidden = true;
+      var stops = [], heights = [0, 0];
+      function put(l, f, tf, vert, line) {
+        var e = document.createElement('span');
+        e.className = 'kt-w' + (l.label ? ' is-label' : '');
+        l.words.forEach(function (w, j) {
+          if (j) e.appendChild(document.createTextNode(' '));
+          if (!l.label && GREEN.test(bare(w))) { var b = document.createElement('b'); b.textContent = w; e.appendChild(b); }
+          else e.appendChild(document.createTextNode(w));
+        });
+        e.style.fontSize = f.toFixed(2) + 'px';
+        e.style.transform = tf;
+        world.appendChild(e);
+        var m = new DOMMatrix(tf), h = LH * f, at = function (x) { return m.transformPoint(new DOMPoint(x, h / 2, 0)); };
+        var wall = tf.indexOf('rotateY') === 0 ? FOLD : 0;
+        if (vert) { var c = at(l.w1 * f / 2); stops.push({ x: c.x, y: c.y, z: c.z, w: l.w1 * f, h: h, n: l.str.length, yaw: wall, roll: 90, line: line }); return; }
+        // the line's words, gathered into runs of about twelve letters
+        var j = 0;
+        while (j < l.words.length) {
+          var run = [l.words[j++]];
+          while (j < l.words.length && (run.join(' ') + ' ' + l.words[j]).length <= 12) run.push(l.words[j++]);
+          var before = l.words.slice(0, j - run.length).join(' '), x0 = before ? w1(before + ' ') * f : 0, x1 = w1(l.words.slice(0, j).join(' ')) * f;
+          var p = at((x0 + x1) / 2);
+          stops.push({ x: p.x, y: p.y, z: p.z, w: x1 - x0, h: h, n: run.join(' ').length, yaw: wall, roll: 0, line: line });
+        }
+      }
+      var line = 0;
+      bl.forEach(function (b, q) {
+        var side = q < split ? 0 : 1, y = heights[side];
+        var wallTf = side ? '' : 'rotateY(' + (-FOLD) + 'deg) ';
+        var x = side ? G : -(W + G);
+        if (b.vert) {
+          put(b.vert, b.fv, wallTf + 'translate(' + x.toFixed(1) + 'px,' + (y + b.Lv).toFixed(1) + 'px) rotate(-90deg)', true, line++);
+          var yc = y;
+          b.lines.forEach(function (l, j) { put(l, b.fs[j], wallTf + 'translate(' + (x + b.T + b.g).toFixed(1) + 'px,' + yc.toFixed(1) + 'px)', false, line++); yc += b.fs[j] * (LH + GAP); });
+        } else {
+          put(b.lines[0], b.fs[0], wallTf + 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)', false, line++);
+        }
+        heights[side] = y + b.adv;
+      });
+      cam.appendChild(world);
+      return { world: world, stops: stops, H: Math.max(heights[0], heights[1]) };
+    }
+
+    // the camera: where it looks, how close and how it is turned; and its path through one text
+    function rnd(j) { var a = Math.sin(j * 12.9898 + 78.233) * 43758.5453; return a - Math.floor(a); }
+    function track(sc) {
+      var t = [], prev = null;
+      sc.stops.forEach(function (st) {
+        var j = st.line;       // the same turn all along one line, a new one on the next
+        var c = { x: st.x, y: st.y, z: st.z, s: Math.min(.6 * Ws / st.w, .38 * Hs / st.h),
+          yaw: st.yaw + (rnd(j) - .5) * 28, pitch: (rnd(j + 7) - .5) * 18, roll: st.roll + (rnd(j + 3) - .5) * 9, b: 0 };
+        if (!prev) t.push({ c: Object.assign({}, c, { s: c.s * 2.4, b: 12 }), move: 0, hold: 0 });   // the cut in
+        t.push({ c: c, move: prev ? .27 : .5, hold: .06 + .019 * st.n });
+        prev = c;
+      });
+      // the pull back: the corner seen from the front, a little to the left
+      var cs = Math.cos(FOLD * Math.PI / 180), span = (W + G) * (1 + cs);
+      var fit = Math.min(.9 * Ws / span, .86 * Hs / sc.H);
+      t.push({ c: { x: ((W + G) - (W + G) * cs) / 2, y: sc.H / 2, z: 0, s: fit, yaw: 0, pitch: 5, roll: 0, b: 0 }, move: 1.2, hold: 6 });
+      return t;
+    }
+    function measure() {
+      Ws = stage.clientWidth; Hs = stage.clientHeight;
+      cam.style.perspective = Math.round(Ws * 1.4) + 'px';
+      scenes.forEach(function (sc) { sc.t = track(sc); });
+    }
+    function ease(p) { return p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; }
+    function show(c, blur) {
+      var s = c.s.toFixed(4);
+      scenes[cur].world.style.transform = 'translate(' + (Ws / 2).toFixed(1) + 'px,' + (Hs / 2).toFixed(1) + 'px) scale3d(' + s + ',' + s + ',' + s + ') rotateX(' + c.pitch.toFixed(2) + 'deg) rotateZ(' + c.roll.toFixed(2) + 'deg) rotateY(' + c.yaw.toFixed(2) + 'deg) translate3d(' + (-c.x).toFixed(1) + 'px,' + (-c.y).toFixed(1) + 'px,' + (-c.z).toFixed(1) + 'px)';
+      blurEl.style.filter = blurOn && blur > .4 ? 'blur(' + blur.toFixed(1) + 'px)' : '';
+      return blurOn && blur > .4;
+    }
+    function cut(k) {
+      scenes[cur].world.hidden = true;
+      cur = k; seg = 0; segT = 0;
+      scenes[cur].world.hidden = false;
+    }
+    function frame(now) {
+      raf = 0;
+      var dt = last ? Math.min(.05, (now - last) / 1000) : 0; last = now;
+      var t = scenes[cur].t;
+      segT += dt;
+      if (REDUCE) {                                   // no flight: each block still, one after another
+        if (segT > 9) cut((cur + 1) % scenes.length);
+        show(scenes[cur].t[scenes[cur].t.length - 1].c, 0);
+      } else {
+        while (segT > t[seg].move + t[seg].hold) {
+          segT -= t[seg].move + t[seg].hold;
+          if (++seg >= t.length) { cut((cur + 1) % scenes.length); t = scenes[cur].t; }
+        }
+        var A = t[Math.max(0, seg - 1)].c, B = t[seg].c, p = t[seg].move ? Math.min(1, segT / t[seg].move) : 1, e = ease(p);
+        var c = {
+          x: A.x + (B.x - A.x) * e, y: A.y + (B.y - A.y) * e, z: A.z + (B.z - A.z) * e,
+          s: Math.exp(Math.log(A.s) + (Math.log(B.s) - Math.log(A.s)) * e),
+          yaw: A.yaw + (B.yaw - A.yaw) * e, pitch: A.pitch + (B.pitch - A.pitch) * e, roll: A.roll + (B.roll - A.roll) * e,
+        };
+        // a blur while the camera moves, as a fast move blurs on film
+        var travel = Math.hypot(B.x - A.x, B.y - A.y) * Math.max(A.s, B.s) + Math.abs(Math.log(B.s / A.s)) * 260 + Math.abs(B.roll - A.roll) * 4 + Math.abs(B.yaw - A.yaw) * 3;
+        if (show(c, (A.b + (B.b - A.b) * e) + (p < 1 ? Math.min(6, travel / 90) * Math.sin(Math.PI * p) : 0)) && dt) {
+          blurDt += dt;
+          if (++blurN === 45) { if (blurDt / blurN > .026) blurOn = false; blurN = 0; blurDt = 0; }
+        }
+      }
+      if (seen && !document.hidden) raf = requestAnimationFrame(frame);
+      else last = 0;
+    }
+    function run() { if (built && !raf && seen && !document.hidden) { last = 0; raf = requestAnimationFrame(frame); } }
+    function start() {
+      if (built) return;
+      built = true;
+      scenes = texts.map(build);
+      measure();
+      cut(0);
+      run();
+    }
+    var fonts = document.fonts;
+    if (fonts && fonts.load) Promise.race([fonts.load(FONT), new Promise(function (r) { setTimeout(r, 2500); })]).then(start, start);
+    else start();
+    window.addEventListener('resize', function () { if (built) measure(); });
+    document.addEventListener('visibilitychange', run);
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { seen = es[es.length - 1].isIntersecting; run(); }).observe(stage);
+    else { seen = true; run(); }
+  }
+
   // ---------- boot ----------
   var page = window.__NICTD_PAGE__;
   document.addEventListener('DOMContentLoaded', function () {
@@ -1217,6 +1412,7 @@
     if (page === 'reports') initReports();
     if (page === 'team') initTeam();
     if (qs('#rsLib')) initResearchLib();
+    if (qs('[data-kt]')) initKinetic();
     if (page === 'programs') initPrograms();
     if (page === 'login') initLogin();
     if (page === 'dashboard-topic') initDashboardTopic();

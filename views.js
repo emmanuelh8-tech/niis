@@ -333,7 +333,7 @@ ${extraHead}
 </head><body>
 ${mainNav(active, q)}
 <main>${body}</main>
-${/cs-outro|lg-brand|data-no-outro/.test(body) ? '' : SITE_OUTRO}
+${/cs-outro|lg-brand/.test(body) ? '' : SITE_OUTRO}
 ${footerDh()}
 <script src="/assets/app.js?v=${ASSET_V}" defer></script></body></html>`;
 }
@@ -1986,7 +1986,7 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
 
   return shell(ctx, {
     title: 'About', active: '/about', workspaceActive: 'about', extraHead: CAREERS_HEAD + `<script src="/assets/glass-folder.js?v=${ASSET_V}" defer></script>`, body: `
-  <div class="cs ab" id="abPage" data-no-outro>
+  <div class="cs ab" id="abPage">
     <canvas class="cs-star" id="csStar" aria-hidden="true" data-seal="${esc(sealArt())}"></canvas>
     <section class="cs-hero cs-hero--film ab-hero" data-star="film" aria-labelledby="abTitle">
       <video class="cs-film" autoplay muted loop playsinline preload="auto" poster="/media/about-hero-poster.jpg" aria-hidden="true">
@@ -2053,7 +2053,6 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
           return { name: c, meta: st, thumb: `/img/about/region/thumb-${n}.webp${v}`, slide: `/img/about/region/slide-${n}.webp${v}`,
             flyer: `/img/about/region/flyer-${n}.webp${v}`, alt: `African Regional Report, ${i + 1} of ${bench.length}: ${c}. ${st}. ${w}` };
         })).replace(/</g, '\\u003c')}</script>
-        <p class="ab-note">Based on publicly documented data-governance infrastructure. Sources in the policy annex, on request.</p>
       </div>
     </section>
 

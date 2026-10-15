@@ -1869,7 +1869,6 @@ tr.unread td { background: var(--gold-soft); }
 
 /* ---- the region: the African Regional Report, one glass folder of country slides (styles below) */
 .ab-bench { padding: clamp(1.5rem, 4vh, 2.5rem) 0 clamp(4rem, 10vh, 6rem); color: var(--cs-ink); background: var(--cs-paper); }
-.ab-note { margin-top: 1.2rem !important; font-size: .8rem; line-height: 1.5; color: var(--cs-ink2); }
 .ab-faq { padding-top: clamp(3rem, 8vh, 5rem); padding-bottom: clamp(2rem, 4vh, 3rem); }   /* the footer follows straight on */
 
 /* ---- the emblem: the seal alone over the light (as the reference closes), then the closing line */

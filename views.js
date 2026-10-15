@@ -216,7 +216,8 @@ function liberiaFlag(size = 46) {
 // current page is a filled icon. On phones the dock sits at the foot of the screen with short names,
 // the way a tab bar does.
 function mainNav(active, q) {
-  // [href, label, icon, submenu?, short label for the phone dock]
+  // [href, label, icon, submenu?, short label for the phone dock]; a submenu entry is [href, label, icon,
+  // and the page it marks as current when its href leads to a section of that page]
   const links = [
     ['/', 'Home', 'home', null, 'Home'],
     ['/data', 'Data Explorer', 'bars', [['/landscape', 'Data Landscape', 'layers']], 'Data'],
@@ -224,9 +225,10 @@ function mainNav(active, q) {
     ['/research', 'Research', 'doc', [['/research/submit', 'Submit Paper', 'plus']], 'Research'],
     ['/partners', 'Our Partners', 'globe', null, 'Partners'],
     ['/careers', 'Careers', 'briefcase', [['/careers/programs', 'Programs', 'calendar']], 'Careers'],
-    ['/about', 'About', 'info', [['/about/team', 'Our Team', 'users'], ['/about/team#patrons', 'ICT Patrons', 'sparkle'], ['/about/team#talent', 'ICT Talent Pool', 'code']], 'About'],
+    ['/about', 'About', 'info', [['/about/team#team', 'Our Team', 'users', '/about/team'], ['/about/team#patrons', 'ICT Patrons', 'sparkle'], ['/about/team#talent', 'ICT Talent Pool', 'code']], 'About'],
   ];
-  const isActive = (href, sub) => active === href || (sub || []).some(([h]) => active === h);
+  const subOn = ([h, , , page]) => active === h || (!!page && active === page);
+  const isActive = (href, sub) => active === href || (sub || []).some(subOn);
   const navItem = ([href, label, ic, sub, short]) => {
     const on = isActive(href, sub);
     const link = `<a href="${href}" class="nav-link${on ? ' active' : ''}"${on ? ' aria-current="page"' : ''}><span class="dock-ic"><i class="dock-water" aria-hidden="true"></i>${icon(ic)}</span><span class="nav-label"><span class="nav-full">${esc(label)}</span><span class="nav-short">${esc(short)}</span>${sub ? `<i class="nav-caret" aria-hidden="true">${icon('chevron')}</i>` : ''}</span></a>`;
@@ -235,7 +237,7 @@ function mainNav(active, q) {
     return `<div class="dock-item nav-has-sub">${link}
       <div class="nav-submenu">
         <a href="${href}" class="nav-subitem nav-subhead ${active === href ? 'active' : ''}"><span>${esc(label)}</span></a>
-        ${sub.map(([h, l]) => `<a href="${h}" class="nav-subitem ${active === h ? 'active' : ''}"><span>${l}</span></a>`).join('')}
+        ${sub.map((e) => `<a href="${e[0]}" class="nav-subitem ${subOn(e) ? 'active' : ''}"><span>${e[1]}</span></a>`).join('')}
       </div>
     </div>`;
   };
@@ -247,7 +249,7 @@ function mainNav(active, q) {
     return `<li${sub ? ' class="has-sub"' : ''}>
           <div class="sheet-row"><a href="${href}" class="sheet-link${isActive(href, sub) ? ' active' : ''}"${active === href ? ' aria-current="page"' : ''}>${esc(label)}</a>${sub
             ? `<button type="button" class="sheet-plus" aria-expanded="${open ? 'true' : 'false'}" aria-controls="${subId}" aria-label="${esc(label)} pages"><i aria-hidden="true"></i></button>` : ''}</div>
-          ${sub ? `<ul class="sheet-sub" id="${subId}"${open ? '' : ' hidden'}>${sub.map(([h, l]) => `<li><a href="${h}" class="${active === h ? 'active' : ''}"${active === h ? ' aria-current="page"' : ''}>${esc(l)}</a></li>`).join('')}</ul>` : ''}
+          ${sub ? `<ul class="sheet-sub" id="${subId}"${open ? '' : ' hidden'}>${sub.map((e) => `<li><a href="${e[0]}" class="${subOn(e) ? 'active' : ''}"${subOn(e) ? ' aria-current="page"' : ''}>${esc(e[1])}</a></li>`).join('')}</ul>` : ''}
         </li>`;
   };
   return `<nav class="gov-nav" aria-label="Main"><div class="nav-shell">

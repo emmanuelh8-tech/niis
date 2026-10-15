@@ -1222,8 +1222,11 @@
     var stage = qs('.kt', box), cam = qs('.kt-cam', box);
     var nav = qs('.gov-nav');
     // world units: each wall is W wide; lines are sized to fill it; FOLD is the angle of the left wall
-    var FAMILY = 'Montserrat', FONT = '800 100px ' + FAMILY, W = 1600, G = 40, LH = .86, GAP = .07, FOLD = 46, CAP = .34 * W, CAP_TALL = .56 * W;
-    var RHYTHM_WIDE = [9, 15, 11, 7, 16, 10, 13], RHYTHM_TALL = [5, 7, 4, 6, 8, 5];
+    // (on a tall phone screen each text takes whichever of a few layouts fills the screen best: the two
+    // walls side by side, or one above the other with the upper one folded back along a level line, FOLDX)
+    var FAMILY = 'Montserrat', FONT = '800 100px ' + FAMILY, W = 1600, G = 40, LH = .86, GAP = .07, FOLD = 46, FOLDX = 34, CAP = .34 * W, CAP_TALL = .56 * W;
+    var RHYTHM_WIDE = [9, 15, 11, 7, 16, 10, 13];
+    var RHYTHMS_TALL = [[5, 7, 4, 6, 8, 5], [7, 10, 6, 9, 11, 8], [9, 13, 8, 12, 14, 10], [12, 17, 11, 15, 18, 13]];
     var texts = qsa('.kt-row', src).map(function (row) {
       return { label: qs('dt', row).textContent.trim(), text: row.getAttribute('data-kt-text') || qs('dd', row).textContent.trim() };
     });
@@ -1248,9 +1251,9 @@
     }
     // deal a text into lines: the label first, then lines of varied length (shorter on a tall screen).
     // Every word stands upright, and a word of one or two letters never stands alone ("it work.")
-    function deal(tx) {
+    function deal(tx, rhythm) {
       var words = tokens(tx.text), lines = [{ words: tx.label.split(' ').map(function (w) { return { w: w, hi: true }; }), label: true }];
-      var rhythm = tall ? RHYTHM_TALL : RHYTHM_WIDE, i = 0, k = 0;
+      var i = 0, k = 0;
       while (i < words.length) {
         var target = rhythm[k++ % rhythm.length], ln = [words[i++]], len = ln[0].w.length;
         while (i < words.length && (len + 1 + words[i].w.length <= target || (ln.length === 1 && bare(ln[0].w).length <= 2))) { len += 1 + words[i].w.length; ln.push(words[i++]); }
@@ -1266,11 +1269,36 @@
     function blocks(lines) {
       return lines.map(function (L) { var f = Math.min(W / L.w1, tall ? CAP_TALL : CAP); return { lines: [L], fs: [f], adv: f * (LH + GAP) }; });
     }
+    var CX = Math.cos(FOLDX * Math.PI / 180), SPAN = (W + G) * (1 + Math.cos(FOLD * Math.PI / 180));
+    // a layout's shape: where the lines split between the walls, the walls' heights, and the whole
+    // block's width and height as the camera sees it
+    function shape(bl, stack) {
+      var all = bl.reduce(function (a, b) { return a + b.adv; }, 0), acc = 0, split = bl.length;
+      for (var q = 0; q < bl.length; q++) { if (acc + bl[q].adv / 2 > all / 2) { split = Math.max(1, q); break; } acc += bl[q].adv; }
+      var H0 = bl.slice(0, split).reduce(function (a, b) { return a + b.adv; }, 0), H1 = all - H0;
+      return { bl: bl, split: split, H0: H0, H1: H1, stack: stack,
+        w: stack ? W : SPAN, h: stack ? H0 * CX + 2 * G + H1 : Math.max(H0, H1) };
+    }
+    // the scale a layout is shown at, whole: as large as the stage allows, a margin all round
+    function scaleOf(sh) { return tall ? Math.min(.94 * Ws / sh.w, .9 * Hs / sh.h) : Math.min(.88 * Ws / sh.w, .82 * Hs / sh.h); }
+    // a desktop always sets the walls side by side; a tall screen tries each line length both ways and
+    // keeps the layout that covers most of the stage
+    function layout(tx) {
+      if (!tall) return shape(blocks(deal(tx, RHYTHM_WIDE)), false);
+      var best = null, bestFill = -1;
+      RHYTHMS_TALL.forEach(function (r) {
+        var bl = blocks(deal(tx, r));
+        [false, true].forEach(function (stack) {
+          var sh = shape(bl, stack), k = scaleOf(sh), fill = (sh.w * k) * (sh.h * k) / (Ws * Hs);
+          if (fill > bestFill) { bestFill = fill; best = sh; }
+        });
+      });
+      return best;
+    }
     // one text's world: the blocks split across two walls that meet at a corner, the left wall turned
     // back. Each line keeps its place, its size and the way it will fly.
     function build(tx, ti) {
-      var bl = blocks(deal(tx)), all = bl.reduce(function (a, b) { return a + b.adv; }, 0), acc = 0, split = bl.length;
-      for (var q = 0; q < bl.length; q++) { if (acc + bl[q].adv / 2 > all / 2) { split = Math.max(1, q); break; } acc += bl[q].adv; }
+      var sh = layout(tx), bl = sh.bl, split = sh.split;
       var world = document.createElement('div');
       world.className = 'kt-world'; world.hidden = true;
       var items = [], heights = [0, 0];
@@ -1292,24 +1320,29 @@
           axis: [ax, ay, az + (Math.abs(az) < .1 ? .3 : 0)], spin: (rnd(j + 8) < .5 ? -1 : 1) * (80 + 120 * rnd(j + 9)) });
       }
       bl.forEach(function (b, q) {
-        var side = q < split ? 0 : 1, y = heights[side];
-        var wallTf = side ? '' : 'rotateY(' + (-FOLD) + 'deg) ';
-        var x = side ? G : -(W + G);
+        var side = q < split ? 0 : 1, h = heights[side], x, y, wallTf;
+        if (sh.stack) {     // the upper wall above the fold line (y 0), leaning back; the lower one facing
+          wallTf = side ? '' : 'rotateX(' + FOLDX + 'deg) ';
+          x = 0; y = side ? G + h : h - (sh.H0 + G);
+        } else {            // the left wall turned back from the corner (x 0); the right one facing
+          wallTf = side ? '' : 'rotateY(' + (-FOLD) + 'deg) ';
+          x = side ? G : -(W + G); y = h;
+        }
         put(b.lines[0], b.fs[0], wallTf + 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)');
-        heights[side] = y + b.adv;
+        heights[side] = h + b.adv;
       });
       cam.appendChild(world);
-      return { el: world, items: items, H: Math.max(heights[0], heights[1]), q: -1 };
+      return { el: world, items: items, sh: sh, H: sh.h, q: -1 };
     }
 
     // the path, in lengths of scroll: each text whole, drifting a little in 3D as the reader scrolls (it
     // stays readable all the way); between texts, the lines of one fly apart as the next one's assemble
-    // the scale that shows a text whole: on a phone the corner fills the width
-    var SPAN = (W + G) * (1 + Math.cos(FOLD * Math.PI / 180));
-    function fit(wd) { return tall ? .94 * Ws / SPAN : Math.min(.88 * Ws / SPAN, .82 * Hs / wd.H); }
+    // where the camera looks to show a text whole, and how close
     function whole(wd) {
+      var sh = wd.sh, s0 = scaleOf(sh);
+      if (sh.stack) return { x: W / 2, y: ((G + sh.H1) - (sh.H0 + G) * CX) / 2, z: 0, s: s0, yaw: 0, pitch: 0, roll: 0 };
       var cs = Math.cos(FOLD * Math.PI / 180);
-      return { x: ((W + G) - (W + G) * cs) / 2, y: wd.H / 2, z: 0, s: fit(wd), yaw: 0, pitch: 4, roll: 0 };
+      return { x: ((W + G) - (W + G) * cs) / 2, y: sh.h / 2, z: 0, s: s0, yaw: 0, pitch: 4, roll: 0 };
     }
     function shift(c, d) { var o = Object.assign({}, c); for (var k in d) o[k] = k === 's' ? c.s * d.s : c[k] + d[k]; return o; }
     function plan() {
@@ -1391,31 +1424,21 @@
       else last = 0;
     }
     function onScroll() { if (!built) return; target = progress(); if (!raf) raf = requestAnimationFrame(frame); }
-    var lastW = 0, lastH = 0;
+    var lastW = 0, lastH = 0, laidFor = '';
     function measure() {
-      var bar0 = nav ? nav.offsetHeight : 0, view = innerHeight - bar0;
-      Ws = stage.clientWidth;
-      // a tall screen deals the lines shorter, so the corner still fills it with large words
-      var t = view > Ws * 1.15;
-      if (t !== tall) {
-        tall = t;
+      // the stage fills the screen under the bar, on a phone as on a desktop, and each text is laid out
+      // to fill the stage (again whenever its shape changes much)
+      top = nav ? nav.offsetHeight : 0;
+      box.style.setProperty('--kt-top', top + 'px');
+      stage.style.height = '';
+      Ws = stage.clientWidth; Hs = stage.clientHeight;
+      tall = Hs > Ws * 1.15;
+      var key = tall + ':' + Math.round(Ws / 40) + ':' + Math.round(Hs / 80);
+      if (key !== laidFor) {
+        laidFor = key;
         worlds.forEach(function (wd) { wd.el.remove(); });
         worlds = texts.map(build);
       }
-      // on a phone the stage is cut to the tallest text and held in the middle of the screen; the box
-      // around it is the same grey, so the screen is all this section until it is scrolled past, and the
-      // next section comes straight under the last line. A desktop's stage fills the screen.
-      if (tall) {
-        var hMax = worlds.reduce(function (a, wd) { return Math.max(a, wd.H * fit(wd)); }, 0);
-        Hs = Math.min(view, Math.round(hMax * 1.06 + 28));
-        stage.style.height = Hs + 'px';
-        top = bar0 + Math.max(0, Math.round((view - Hs) / 2));
-      } else {
-        stage.style.height = '';
-        top = bar0;
-      }
-      box.style.setProperty('--kt-top', top + 'px');
-      Hs = stage.clientHeight;
       persp = Math.round(Math.max(Ws, Hs) * 1.4);
       cam.style.perspective = persp + 'px';
       plan();

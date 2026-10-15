@@ -4946,7 +4946,7 @@ button.skip:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px;
 @media (max-width: 760px) { .sec-head-dh .more, #featuredPapers .more, #natReports .more, #latestUpdates .more { height: 36px; padding: 0 .8rem; font-size: .8rem; } }
 
 /* the About menu's ICT Patrons and ICT Talent Pool land on their sections below the sticky bar */
-#patrons, #talent { scroll-margin-top: calc(var(--nav-h) + 30px); }
+#team, #patrons, #talent { scroll-margin-top: calc(var(--nav-h) + 30px); }
 
 /* home: a thin black edge on each featured paper, each news card and the "Up next" box */
 #fpTrack .fp-card { border: 1px solid #111; }
@@ -6061,7 +6061,8 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
   .ab-slides { --sl-ar: 1.25; --sl-w: min(100vw - 32px, (100vh - var(--sl-nav) - 32px) / var(--sl-ar)); }
   @supports (height: 100dvh) { .ab-slides { --sl-w: min(100vw - 32px, (100dvh - var(--sl-nav) - 32px) / var(--sl-ar)); } }
   .sl { gap: 10vh; }
-  .sl-card { border-radius: 10px; }
+  /* a flyer is shorter than a phone's screen: it holds just under the bar, not in the middle */
+  .sl-card { top: calc(var(--sl-nav) + 14px); border-radius: 10px; }
 }
 @media (prefers-reduced-motion: reduce) { .sl-card { transform: none; } .sl-card::after { opacity: 0; } }
 

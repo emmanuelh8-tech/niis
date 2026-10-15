@@ -25,4 +25,7 @@ niip-3d/brag-output*/
 brag-output*/
 
 # full-size PNGs of the About page slides and flyers (the site uses the WebP copies in public/img/about/slides)
-about-slides/
+/about-slides/
+
+# half-size previews of the About slides
+design/about-slides/prev/

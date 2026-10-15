@@ -29,6 +29,12 @@
         ],
         "createdAt": "2026-10-01T16:50:19.860Z",
         "reason": "Claude: only tracked text is the short uppercase lockup descriptor and eyebrow labels, specified to match brand/niip-lockup.svg"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(.34, 1.36, .5, 1)",
+        "createdAt": "2026-10-15T13:06:33.245Z",
+        "reason": "Owner-supplied glass-folder-cards.tsx defines --gf-spring as this curve for the lid hinge and the files' rise; public/glass-folder.js is a faithful port of it"
       }
     ]
   }

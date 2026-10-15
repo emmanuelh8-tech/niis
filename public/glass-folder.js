@@ -365,7 +365,7 @@
     '.gf-root[data-tone="dark"] .gf-tint{background:linear-gradient(180deg,rgba(18,18,20,.18) 0%,rgba(14,14,16,.62) 46%,rgba(8,8,10,.94) 100%)}',
     '.gf-spec{position:absolute;inset:0;background:radial-gradient(260px 200px at calc(50% + var(--gf-px) * 46%) calc(30% + var(--gf-py) * 40%),rgba(255,255,255,.5),rgba(255,255,255,0) 70%);mix-blend-mode:soft-light;opacity:.9;pointer-events:none}',
     '.gf-root[data-tone="dark"] .gf-spec{mix-blend-mode:screen;opacity:.16}',
-    '.gf-front-rim{width:340px;height:198px}.gf-front-rim path{stroke-width:2.4;transition:stroke-width .3s var(--gf-ease)}.gf-root[data-tone="dark"] .gf-front-rim{opacity:.55}',
+    '.gf-front-rim{width:340px;height:198px}.gf-front-rim path{stroke-width:2.4}.gf-root[data-tone="dark"] .gf-front-rim{opacity:.55}',
     '.gf-hit{all:unset;position:absolute;inset:0;z-index:1;cursor:pointer}',
     '.gf-hit:focus-visible~.gf-label .gf-title{text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}',
     '.gf-front:has(.gf-hit:focus-visible) .gf-front-rim path{stroke-width:5}',

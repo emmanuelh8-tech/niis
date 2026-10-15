@@ -1870,14 +1870,9 @@ tr.unread td { background: var(--gold-soft); }
 /* ---- the region: the African Regional Report, one glass folder of country slides (styles below) */
 .ab-bench { padding: clamp(1.5rem, 4vh, 2.5rem) 0 clamp(4rem, 10vh, 6rem); color: var(--cs-ink); background: var(--cs-paper); }
 .ab-note { margin-top: 1.2rem !important; font-size: .8rem; line-height: 1.5; color: var(--cs-ink2); }
-.ab-faq { padding-top: clamp(3rem, 8vh, 5rem); }
+.ab-faq { padding-top: clamp(3rem, 8vh, 5rem); padding-bottom: clamp(2rem, 4vh, 3rem); }   /* the footer follows straight on */
 
 /* ---- the emblem: the seal alone over the light (as the reference closes), then the closing line */
-.ab-emblem { height: 100vh; background: linear-gradient(180deg, var(--cs-paper) 0%, #DCE6F3 30%, #9DB6DE 62%, #4A77C4 100%); }
-.ab-close { padding: clamp(2rem, 6vh, 4rem) 0 clamp(3rem, 8vh, 5rem); color: #fff; background: linear-gradient(180deg, #4A77C4 0%, #2A55A4 100%); }
-.ab-close-in { display: flex; flex-direction: column; gap: 2rem; }
-.ab-close .cs-dim { color: rgb(255 255 255 / .76); }
-.ab-outro { background: linear-gradient(180deg, #2A55A4 0%, #1B3F86 45%, var(--navy-800) 100%); }
 
 /* blocks rise as they arrive (careers.js adds .can-rise and .is-in) */
 .cs.can-rise [data-rise] { transition: opacity .9s ease-out calc(var(--i, 0) * 90ms), transform 1s var(--cs-ease) calc(var(--i, 0) * 90ms); }
@@ -1885,7 +1880,6 @@ tr.unread td { background: var(--gold-soft); }
 
 @media (max-width: 860px) {
   .ab-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem 1.2rem; }
-  .ab-emblem { height: 72vh; }
 }
 @media (prefers-reduced-motion: reduce) {
   .cs [data-rise] { opacity: 1 !important; transform: none !important; transition: none !important; }
@@ -4966,13 +4960,12 @@ button.skip:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px;
    as transparency) is tinted pale grey on the light sections and faint white on the dark and blue
    ones, behind the content. The partner logo tiles carry it too. */
 html:has(.ab-hero) { background-image: linear-gradient(rgb(255 255 255 / .5), rgb(255 255 255 / .5)), url("/img/brand/mask-pattern-light.webp"); background-size: auto, 185px auto; }
-.cs .ab-story, .cs .ab-bench, .cs .ab-faq, .cs .ab-close { position: relative; isolation: isolate; }
-.cs .ab-story::after, .cs .ab-bench::after, .cs .ab-faq::after, .cs .ab-close::after {
+.cs .ab-story, .cs .ab-bench, .cs .ab-faq { position: relative; isolation: isolate; }
+.cs .ab-story::after, .cs .ab-bench::after, .cs .ab-faq::after {
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background: var(--mask-ink, #5B6470); opacity: var(--mask-op, .085);
   -webkit-mask: url("/img/brand/mask-lines.webp") 0 0 / 185px auto repeat; mask: url("/img/brand/mask-lines.webp") 0 0 / 185px auto repeat;
   filter: blur(1.6px); }
-.cs .ab-close { --mask-ink: #fff; --mask-op: .05; }
 
 /* ============ TYPE: LABELS AND BYLINES ============
    Category labels ("Report", "Sector report", "Assessment"...) are set in Marvin Visions as plain

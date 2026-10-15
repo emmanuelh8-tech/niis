@@ -333,7 +333,7 @@ ${extraHead}
 </head><body>
 ${mainNav(active, q)}
 <main>${body}</main>
-${/cs-outro|lg-brand/.test(body) ? '' : SITE_OUTRO}
+${/cs-outro|lg-brand|data-no-outro/.test(body) ? '' : SITE_OUTRO}
 ${footerDh()}
 <script src="/assets/app.js?v=${ASSET_V}" defer></script></body></html>`;
 }
@@ -1986,7 +1986,7 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
 
   return shell(ctx, {
     title: 'About', active: '/about', workspaceActive: 'about', extraHead: CAREERS_HEAD + `<script src="/assets/glass-folder.js?v=${ASSET_V}" defer></script>`, body: `
-  <div class="cs ab" id="abPage">
+  <div class="cs ab" id="abPage" data-no-outro>
     <canvas class="cs-star" id="csStar" aria-hidden="true" data-seal="${esc(sealArt())}"></canvas>
     <section class="cs-hero cs-hero--film ab-hero" data-star="film" aria-labelledby="abTitle">
       <video class="cs-film" autoplay muted loop playsinline preload="auto" poster="/media/about-hero-poster.jpg" aria-hidden="true">
@@ -2067,20 +2067,6 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
         <div class="cs-faq-list">${faqs.map(([q, a], i) => `<details class="cs-q"><summary><span class="cs-q-n" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span><span class="cs-q-t">${esc(q)}</span><span class="cs-q-x" aria-hidden="true"></span></summary><div class="cs-q-a"><p>${esc(a)}</p></div></details>`).join('')}</div>
       </div>
     </section>
-
-    <div class="ab-emblem" data-star="emblem" aria-hidden="true"></div>
-
-    <section class="ab-close" data-star="outro" aria-labelledby="abCloseTitle">
-      <div class="cs-wrap ab-close-in">
-        <h2 id="abCloseTitle" class="cs-h2 cs-h2-lg" aria-label="Liberia’s ICT statistics, research and reports, all in one place.">${csDecode('Liberia’s ICT statistics, research and reports,')}${csDecode('all in one place.', 'cs-dim')}</h2>
-        <div class="cs-ctas">
-          ${csBtn('/data', 'Explore the data')}
-          <a class="cs-btn cs-btn-dark" href="/research"><span>Read the research</span></a>
-        </div>
-      </div>
-    </section>
-
-    <section class="cs-outro ab-outro" data-star="outro" aria-hidden="true"><div class="cs-word">NIIS</div></section>
   </div>`,
   });
 };

@@ -1867,19 +1867,8 @@ tr.unread td { background: var(--gold-soft); }
 
 .ab-sub { max-width: 34rem; margin: -1rem 0 2.8rem !important; font-size: 1.02rem; line-height: 1.6; color: var(--cs-ink2); }
 
-/* ---- the region: rows in the FAQ's grammar; Liberia's row inverts, with the one red mark */
+/* ---- the region: the African Regional Report, one glass folder of country slides (styles below) */
 .ab-bench { padding: clamp(1.5rem, 4vh, 2.5rem) 0 clamp(4rem, 10vh, 6rem); color: var(--cs-ink); background: var(--cs-paper); }
-.ab-brows { display: grid; gap: 3px; }
-.ab-brow { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 8fr) 6.5rem; align-items: center; gap: 1.5rem; min-height: 3.7rem;
-  padding: .8rem .95rem; background: rgb(11 30 69 / .05); }
-.ab-bc { display: flex; align-items: center; gap: .75rem; font-weight: 500; }
-.ab-flag { display: block; flex: 0 0 auto; width: 1.7rem; line-height: 0; }
-.ab-flag svg { display: block; width: 100%; height: auto; }
-.ab-bw { font-size: .95rem; line-height: 1.5; color: var(--cs-ink2); }
-.ab-bs { justify-self: end; padding: .32rem .5rem; background: rgb(11 30 69 / .08); font: 500 .66rem/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--cs-ink2); white-space: nowrap; }
-.ab-brow.is-gap { background: var(--cs-ink); color: #fff; }
-.ab-brow.is-gap .ab-bw { color: rgb(255 255 255 / .82); }
-.ab-brow.is-gap .ab-bs { background: var(--ab-red); color: #fff; }
 .ab-note { margin-top: 1.2rem !important; font-size: .8rem; line-height: 1.5; color: var(--cs-ink2); }
 .ab-faq { padding-top: clamp(3rem, 8vh, 5rem); }
 
@@ -1896,8 +1885,6 @@ tr.unread td { background: var(--gold-soft); }
 
 @media (max-width: 860px) {
   .ab-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem 1.2rem; }
-  .ab-brow { grid-template-columns: minmax(0, 1fr) auto; gap: .45rem 1rem; }
-  .ab-bw { grid-column: 1 / -1; grid-row: 2; }
   .ab-emblem { height: 72vh; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -5499,7 +5486,7 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
 .tag, .selector-field label, .xdd-item .grp, .xdd-group-label, .vq-head, .stat-label-dh, .map-size-row label, .compare-stat-card .lbl,
 .data-table th, .dash-hero-stats .lbl, .footer-dh h4, .kicker, .kpi-label, .sb-brand-text span, .sb-section-label, .role-chip,
 .fbar-facet-label, .hd-chip, .hv-cue, .cs-tag, .cs-role-m, .cs-faq-more, .cs-back, .cs-ap-meta dt, .cs-ap-role h2, .cs-label, .cs-drop-clear,
-.ab-stat-l, .ab-bs, .imglib-state, .tree-title, .dx-fact i, .dx-stat-lbl, .dx-readout-lbl,
+.ab-stat-l, .imglib-state, .tree-title, .dx-fact i, .dx-stat-lbl, .dx-readout-lbl,
 .dx-size label, .dx-mock, .pt-stat-lbl, .pt-logo-note, .pt-cat, .pt-status, .pt-contrib span, .pt-focal-label, .vhero-kicker, .bk-kicker,
 .bk-hint, .m-eyebrow, .m-hero-fig figcaption, .m-quote figcaption, .m-zig-meta, .m-tag, .m-logo span, .m-contact h4, .m-flow-chip,
 .m-pol-meta, .m-polbox-meta, .lsc-nat i, .lsc-natnote i, .lsc-an-pair label, .ui-eyebrow, .ui-k, .ui-stats dt, .ic-rail-h, .ic-flag,
@@ -6085,3 +6072,33 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
   .sl-card { border-radius: 10px; }
 }
 @media (prefers-reduced-motion: reduce) { .sl-card { transform: none; } .sl-card::after { opacity: 0; } }
+
+/* ---- About: the African Regional Report (initRegionReport in app.js; the folder is public/glass-folder.js).
+   Room above the folder for its slides to rise into when it opens. */
+.rr { display: grid; justify-items: center; margin-top: 1rem; }
+.rr-stage { display: flex; justify-content: center; width: 100%; min-height: 360px; padding-top: clamp(56px, 9vh, 96px); }
+.rr-hint { margin: 1.6rem 0 0 !important; font: 500 .66rem/1.3 var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--cs-ink2); text-align: center; }
+/* the viewer: a slide full size over a dark shade, with its count, its name and the skip buttons under it */
+.rv { position: fixed; inset: 0; z-index: 400; display: grid; place-items: center; padding: 16px; }
+.rv[hidden] { display: none; }
+.rv-shade { position: absolute; inset: 0; background: rgb(3 12 32 / .88); opacity: 0; transition: opacity .3s ease; }
+.rv.is-open .rv-shade { opacity: 1; }
+.rv-dlg { position: relative; width: min(1180px, 100%, (100vh - 120px) * 16 / 9); outline: none; opacity: 0; transform: translateY(18px) scale(.97);
+  transition: opacity .35s ease, transform .5s cubic-bezier(.2, .8, .2, 1); }
+.rv.is-open .rv-dlg { opacity: 1; transform: none; }
+.rv-dlg picture, .rv-dlg img { display: block; width: 100%; height: auto; }
+.rv-dlg img { border-radius: 12px; box-shadow: 0 40px 80px -30px rgb(0 0 0 / .7); background: #04235C; aspect-ratio: 16 / 9; }
+.rv-bar { display: flex; align-items: center; gap: .6rem; margin-top: 14px; color: #fff; }
+.rv-count { font: 600 .74rem/1 var(--sans); letter-spacing: .16em; color: #A6D930; font-variant-numeric: tabular-nums; }
+.rv-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 .95rem/1.2 var(--sans); }
+.rv-btn { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid rgb(255 255 255 / .28); border-radius: 50%;
+  background: rgb(255 255 255 / .08); color: #fff; cursor: pointer; transition: background .2s, border-color .2s; }
+.rv-btn:hover { background: rgb(255 255 255 / .18); border-color: rgb(255 255 255 / .5); }
+.rv-btn:focus-visible { outline: 2px solid #A6D930; outline-offset: 2px; }
+.rv-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media (max-width: 760px) {
+  .rv-dlg { width: min(100%, (100vh - 130px) * .8); }
+  .rv-dlg img { aspect-ratio: 4 / 5; }
+  .rr-stage { min-height: 300px; }
+}
+@media (prefers-reduced-motion: reduce) { .rv-shade, .rv-dlg { transition: none; } }

@@ -1462,6 +1462,80 @@
     measure();
   }
 
+  // ---- About: the African Regional Report. One glass folder (public/glass-folder.js) holds a slide for
+  // each country; a click opens the folder and fans them out, and a slide chosen there opens full size in
+  // a viewer (the flyer on a phone) with skip buttons, the arrow keys and Escape.
+  function initRegionReport() {
+    var box = qs('[data-region-report]'), at = qs('[data-rr-mount]', box || document), src = qs('#rrData');
+    if (!box || !at || !src || !window.GlassFolder) return;
+    var data = JSON.parse(src.textContent), cur = 0, from = null, vw = null;
+    // the back panel's artwork in the flag's red and blue, as a long exposure
+    var ART = { style: 'streak', colors: ['#f6f3ef', '#e7c9c4', '#BF0A30', '#2a1e2a', '#0B2C63', '#5B95F0', '#e8eef8'], scale: 0.7, warp: 1.4, angle: -0.62, gloss: 0.18, veins: 0 };
+    // narrower than the column on a phone, so the slides fanning out of it stay on the screen
+    function width() { var cw = box.clientWidth; return Math.max(260, Math.min(540, cw - (cw < 520 ? 52 : 8))); }
+    var folder = window.GlassFolder.mount(at, {
+      label: 'African Regional Report', meta: data.length + ' countries', tone: 'light', art: ART, seed: 7,
+      files: data.map(function (d) { return { name: d.name, meta: d.meta, image: d.thumb, label: 'Open the slide: ' + d.name + ', ' + d.meta }; }),
+      maxVisible: data.length, sheetHeight: 153, width: width(),
+      onFileSelect: function (f, i, el) { show(i, el); },
+      keepOpenWhile: function () { return !!vw && !vw.hidden; },
+    });
+    var lastW = box.clientWidth;
+    window.addEventListener('resize', function () { if (box.clientWidth !== lastW) { lastW = box.clientWidth; folder.setWidth(width()); } });
+
+    function build() {
+      vw = document.createElement('div');
+      vw.className = 'rv'; vw.hidden = true;
+      var arrow = function (d) { return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + (d < 0 ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7') + '"/></svg>'; };
+      vw.innerHTML = '<div class="rv-shade" data-rv-close></div>' +
+        '<div class="rv-dlg" role="dialog" aria-modal="true" aria-label="African Regional Report" tabindex="-1">' +
+          '<picture><source media="(max-width: 760px)"><img alt="" decoding="async"></picture>' +
+          '<div class="rv-bar"><span class="rv-count"></span><span class="rv-name"></span>' +
+            '<button type="button" class="rv-btn" data-rv-step="-1" aria-label="Previous country">' + arrow(-1) + '</button>' +
+            '<button type="button" class="rv-btn" data-rv-step="1" aria-label="Next country">' + arrow(1) + '</button>' +
+            '<button type="button" class="rv-btn rv-x" data-rv-close aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(vw);
+      vw.addEventListener('click', function (e) {
+        if (e.target.closest('[data-rv-close]')) { close(); return; }
+        var b = e.target.closest('[data-rv-step]');
+        if (b) fill(cur + Number(b.dataset.rvStep));
+      });
+      document.addEventListener('keydown', function (e) {
+        if (vw.hidden) return;
+        if (e.key === 'Escape') { e.preventDefault(); close(); }
+        else if (e.key === 'ArrowRight') { e.preventDefault(); fill(cur + 1); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); fill(cur - 1); }
+        else trapTab(e, qs('.rv-dlg', vw));
+      });
+    }
+    function fill(i) {
+      cur = (i + data.length) % data.length;
+      var d = data[cur], img = qs('img', vw);
+      qs('source', vw).srcset = d.flyer;
+      img.src = d.slide; img.alt = d.alt;
+      qs('.rv-count', vw).textContent = String(cur + 1).padStart(2, '0') + ' / ' + String(data.length).padStart(2, '0');
+      qs('.rv-name', vw).textContent = d.name;
+    }
+    function show(i, el) {
+      if (!vw) build();
+      from = el || null;
+      fill(i);
+      vw.hidden = false;
+      void vw.offsetWidth;
+      vw.classList.add('is-open');
+      document.documentElement.classList.add('ui-locked');
+      try { qs('.rv-dlg', vw).focus({ preventScroll: true }); } catch (e) { qs('.rv-dlg', vw).focus(); }
+    }
+    function close() {
+      vw.classList.remove('is-open');
+      document.documentElement.classList.remove('ui-locked');
+      setTimeout(function () { vw.hidden = true; }, REDUCE ? 0 : 260);
+      if (from) try { from.focus({ preventScroll: true }); } catch (e) {}
+    }
+  }
+
   // ---------- boot ----------
   var page = window.__NICTD_PAGE__;
   document.addEventListener('DOMContentLoaded', function () {
@@ -1473,6 +1547,7 @@
     if (qs('#rsLib')) initResearchLib();
     if (qs('[data-kt]')) initKinetic();
     if (qs('[data-slides]')) initSlides();
+    if (qs('[data-region-report]')) initRegionReport();
     if (page === 'programs') initPrograms();
     if (page === 'login') initLogin();
     if (page === 'dashboard-topic') initDashboardTopic();

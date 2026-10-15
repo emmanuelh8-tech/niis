@@ -1922,26 +1922,6 @@ exports.dashboardTopic = (ctx, { slug, label, description, counties, narrative }
 // markers, a white ground with one red accent, and scroll-driven reveals. All styling is
 // scoped under .m in styles.css.
 
-// The mark shown against each policy commitment. Liberia's own flag for the national
-// instruments and the UN's published SDG mark for the goal; the African Union and ECOWAS
-// emblems are not in the asset library, so those carry a typographic abbreviation rather
-// than an approximation of an official emblem.
-// Flags for the peer table. Drawn as plain geometry rather than pulled from an icon set,
-// so they carry no dependency; each is the flag's actual construction and colours.
-const FLAGS = {
-  rw: '<rect width="30" height="20" fill="#00A1DE"/><rect y="10" width="30" height="4" fill="#FAD201"/><rect y="14" width="30" height="6" fill="#20603D"/><circle cx="22" cy="5" r="2.6" fill="#E5BE01"/>',
-  ke: '<rect width="30" height="20" fill="#fff"/><rect width="30" height="6" fill="#000"/><rect y="7" width="30" height="6" fill="#BB0000"/><rect y="14" width="30" height="6" fill="#006600"/><ellipse cx="15" cy="10" rx="3" ry="6" fill="#BB0000" stroke="#fff" stroke-width="1"/>',
-  ng: '<rect width="30" height="20" fill="#fff"/><rect width="10" height="20" fill="#008751"/><rect x="20" width="10" height="20" fill="#008751"/>',
-  gh: '<rect width="30" height="20" fill="#FCD116"/><rect width="30" height="6.67" fill="#CE1126"/><rect y="13.33" width="30" height="6.67" fill="#006B3F"/><polygon points="15,7 16.2,10.4 19.8,10.4 16.9,12.5 18,16 15,13.8 12,16 13.1,12.5 10.2,10.4 13.8,10.4" fill="#000"/>',
-  sn: '<rect width="30" height="20" fill="#FDEF42"/><rect width="10" height="20" fill="#00853F"/><rect x="20" width="10" height="20" fill="#E31B23"/><polygon points="15,7 16.2,10.4 19.8,10.4 16.9,12.5 18,16 15,13.8 12,16 13.1,12.5 10.2,10.4 13.8,10.4" fill="#00853F"/>',
-};
-function peerFlag(code) {
-  if (code === 'lr') return liberiaFlag(30);
-  const g = FLAGS[code];
-  if (!g) return '';
-  return `<svg class="m-peer-flag" viewBox="0 0 30 20" role="img" aria-hidden="true">${g}</svg>`;
-}
-
 // The About page's slides (public/img/about/slides: slide-NN.webp, and flyer-NN.webp for phones), made
 // from the page's own copy in the style of the owner's SDG slide; each card covers the last as the reader
 // scrolls. [alt text, link]
@@ -2005,7 +1985,7 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
   // the reference's quote marks, drawn as dashed outlines
 
   return shell(ctx, {
-    title: 'About', active: '/about', workspaceActive: 'about', extraHead: CAREERS_HEAD, body: `
+    title: 'About', active: '/about', workspaceActive: 'about', extraHead: CAREERS_HEAD + `<script src="/assets/glass-folder.js?v=${ASSET_V}" defer></script>`, body: `
   <div class="cs ab" id="abPage">
     <canvas class="cs-star" id="csStar" aria-hidden="true" data-seal="${esc(sealArt())}"></canvas>
     <section class="cs-hero cs-hero--film ab-hero" data-star="film" aria-labelledby="abTitle">
@@ -2063,13 +2043,16 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
         <span class="cs-mark" aria-hidden="true"></span>
         <h2 id="abBenchTitle" class="cs-h2" aria-label="Where Liberia stands in the region.">${csDecode('Where Liberia stands in the region.')}</h2>
         <p class="ab-sub">Peers have moved their data infrastructure home. Liberia has the law and the strategy, and not yet the platform.</p>
-        <div class="ab-brows" role="table" aria-label="Regional data-governance benchmark">${bench.map(([c, w, st, code], i) => `
-          <div class="ab-brow${st === 'The gap' ? ' is-gap' : ''}" role="row"${rise(i)}>
-            <span class="ab-bc" role="cell"><i class="ab-flag">${peerFlag(code)}</i>${esc(c)}</span>
-            <span class="ab-bw" role="cell">${esc(w)}</span>
-            <span class="ab-bs" role="cell">${esc(st)}</span>
-          </div>`).join('')}
+        <div class="rr" data-region-report>
+          <div class="rr-stage" data-rr-mount></div>
+          <p class="rr-hint" aria-hidden="true">Open the folder · choose a slide to read it</p>
+          <ol class="sr-only">${bench.map(([c, w, st]) => `<li>${esc(c)}: ${esc(st)}. ${esc(w)}</li>`).join('')}</ol>
         </div>
+        <script type="application/json" id="rrData">${JSON.stringify(bench.map(([c, w, st], i) => {
+          const n = String(i + 1).padStart(2, '0'), v = `?v=${ASSET_V}`;
+          return { name: c, meta: st, thumb: `/img/about/region/thumb-${n}.webp${v}`, slide: `/img/about/region/slide-${n}.webp${v}`,
+            flyer: `/img/about/region/flyer-${n}.webp${v}`, alt: `African Regional Report, ${i + 1} of ${bench.length}: ${c}. ${st}. ${w}` };
+        })).replace(/</g, '\\u003c')}</script>
         <p class="ab-note">Based on publicly documented data-governance infrastructure. Sources in the policy annex, on request.</p>
       </div>
     </section>

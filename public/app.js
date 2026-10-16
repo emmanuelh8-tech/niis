@@ -1562,6 +1562,11 @@
   // ---------- boot ----------
   var page = window.__NICTD_PAGE__;
   document.addEventListener('DOMContentLoaded', function () {
+    // the bar's real height, for the anchors that land just under it (--nav-real)
+    var bar = qs('.gov-nav');
+    function barH() { if (bar) document.documentElement.style.setProperty('--nav-real', bar.offsetHeight + 'px'); }
+    barH();
+    window.addEventListener('resize', barH);
     initAccordions('.faq-item', '.faq-q');
     if (page === 'home') { initHome(); if (window.__DASHBOARD_STATE__) initDashboardTopic(); }
     // the Data Explorer runs on its own engine, public/explorer.js

@@ -6095,3 +6095,13 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
   .rr-stage { min-height: 300px; }
 }
 @media (prefers-reduced-motion: reduce) { .rv-shade, .rv-dlg { transition: none; } }
+
+/* ---- About: the About NIIS section (the hero's first button leads here) and its words over the numbers.
+   The anchors land just under the bar; the page glides to them. */
+html:has(#about-niis) { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html:has(#about-niis) { scroll-behavior: auto; } }
+#about-niis, #what-we-do { scroll-margin-top: var(--nav-real, var(--nav-h)); }   /* the bar's own height (app.js) */
+.ab-about-h { margin: 0 0 clamp(2rem, 5vh, 3rem); text-align: center; font: 600 clamp(2.1rem, 1.4rem + 2.6vw, 3.4rem)/1.05 var(--sans); letter-spacing: -.02em; color: var(--cs-ink); }
+.ab-about { display: grid; gap: 1.05rem; max-width: 46rem; margin: 0 0 clamp(2.5rem, 6vh, 3.5rem); }
+.ab-about p { margin: 0; font-size: clamp(1rem, .95rem + .25vw, 1.12rem); line-height: 1.68; color: var(--cs-ink2); text-align: left; hyphens: manual; }
+.ab-about b { font-weight: 600; color: var(--cs-ink); }

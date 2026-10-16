@@ -1960,7 +1960,7 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
   const story = [
     ['“THE MISSION”', 'Liberia’s *official* source of ICT data. All *fifteen counties.* One *trusted* system.'],
     ['“THE PROBLEM”', 'For two decades, Liberia’s digital story was told with numbers from *somewhere else.*'],
-    ['“THE ANSWER”', 'The law is in place. NIIS is the *missing layer* that makes it work.'],
+    ['“THE ANSWER”', 'President Boakai wants to *modernize* ICT in Liberia. NIIS gives him the data he needs in *real time.*'],
   ];
 
   const bench = [
@@ -1999,17 +1999,24 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
       <div class="cs-wrap cs-hero-in">
         <h1 id="abTitle" class="cs-h1" aria-label="Liberia’s ICT data, collected and managed by Liberians.">${csDecode('Liberia’s ICT data,')}${csDecode('collected and managed by Liberians.', 'cs-dim')}</h1>
         <div class="cs-ctas">
-          ${csBtn('/data', 'Explore the data')}
-          <a class="cs-btn cs-btn-dark" href="/research"><span>Read the research</span></a>
+          ${csBtn('#about-niis', 'About NIIS')}
+          <a class="cs-btn cs-btn-dark" href="#what-we-do"><span>What we do</span></a>
         </div>
-        <p class="cs-hero-sub">The official, continuously maintained source of Liberia’s ICT statistics, disaggregated across all 15 counties.</p>
       </div>
     </section>
 
-    <section class="cs-mission ab-story" data-star="mission" aria-labelledby="abStoryTitle">
+    <section class="cs-mission ab-story" id="about-niis" data-star="mission" aria-labelledby="abAboutTitle">
       <div class="cs-wrap">
+        <h2 id="abAboutTitle" class="ab-about-h">About NIIS</h2>
         <span class="cs-mark" aria-hidden="true"></span>
         <h2 id="abStoryTitle" class="cs-h2" aria-label="Data sovereignty, made operational.">${csDecode('Data sovereignty, made operational.')}</h2>
+        <div class="ab-about">
+          <p><b>NIIS</b> is the acronym for the National ICT Intelligence System: a private-sector project, funded by the Government of Liberia, international agencies, private-sector stakeholders and institutions, to collect and continuously maintain Liberia’s ICT data, disaggregated across all 15 counties.</p>
+          <p>The project runs on three tiers of software. Secured databases store the ICT data we collect; a data-analytics algorithm draws on them; and the platform it feeds gives the public, anywhere in the world, access to ICT data across ${indicatorCount || 168} indicators.</p>
+          <p>NIIS is also an accelerator of ICT research. We have built a repository of all publicly available Liberian ICT research papers, we collect and host papers by Liberian ICT researchers, and we help researchers get published. We are also bringing together in one place, for the public, the ICT reports of government institutions, regulators and service providers.</p>
+          <p>We provide training and boot camps in partnership with international and local universities. And anyone who wants more data, a particular dataset or a new indicator can open a secure account on the platform, to search and save papers and reports, submit their research, and search for a job.</p>
+          <p><b>Why are we doing this?</b> For Liberia’s national commitments, and to create jobs for young Liberians in tech.</p>
+        </div>
         ${stats.length ? `<div class="ab-stats" role="list" aria-label="NIIS in numbers">${stats.map(([n, l, s], i) => `
           <div class="ab-stat" role="listitem"${rise(i)}>
             <p class="ab-stat-n" data-count="${n}">${n}</p>
@@ -2030,7 +2037,7 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
       </dl>
     </section>
 
-    <section class="ab-slides" data-star="quiet" aria-label="What NIIS does, and the commitments it serves" data-slides>
+    <section class="ab-slides" id="what-we-do" data-star="quiet" aria-label="What NIIS does, and the commitments it serves" data-slides>
       <ol class="sl" role="list">${SLIDES.map(([alt, href], i) => {
         const n = String(i + 1).padStart(2, '0'), v = `?v=${ASSET_V}`;
         const pic = `<picture><source media="(max-width: 760px)" srcset="/img/about/slides/flyer-${n}.webp${v}" width="1440" height="1800"><img src="/img/about/slides/slide-${n}.webp${v}" alt="${esc(alt)}" width="2400" height="1350" ${i ? 'loading="lazy" ' : ''}decoding="async"></picture>`;

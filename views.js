@@ -3482,27 +3482,10 @@ exports.team = (ctx) => {
         </div>
       </div>
     </section>`;
-  // the talent pool as a league table: three white columns of rows (number, photo, name, and the field's
-  // mark beside the profession); a row opens the profile window
+  // the talent pool on a turning sphere (app.js): a round photograph for each talent, and the field's mark and
+  // colour on its filter button
   const FIELD_MARK = { Software: ['code', '#1C5BB8'], 'Data & AI': ['chart', '#12A57E'], Cybersecurity: ['shield', '#C8102E'], Hardware: ['gauge', '#D9730D'],
     Networks: ['wifi', '#0B2C63'], Design: ['image', '#8E44AD'], Fintech: ['coin', '#1A5C38'], 'Digital media': ['camera', '#D6336C'] };
-  const tRow = (t, i) => {
-    const [ic, col] = FIELD_MARK[t.field] || ['sparkle', '#4A5160'];
-    return `<li class="tl-item" data-i="${i}" data-field="${esc(t.field)}">
-              <button type="button" class="tl-row" data-person="talent" data-i="${i}" style="--c:${col}" aria-label="${esc(t.name)}, ${esc(t.role)}, ${esc(t.county)}. Open profile">
-                <span class="tl-n">${i + 1}</span>
-                <span class="tl-ph"><img src="/img/talent/${t.img}.jpg?v=${ASSET_V}" alt="" width="600" height="800" loading="lazy" decoding="async"></span>
-                <span class="tl-who"><span class="tl-name">${esc(t.name)}</span><span class="tl-role">${icon(ic)}<span>${esc(t.role)}</span></span></span>
-                <span class="tl-go" aria-hidden="true">${icon('arrow')}</span>
-              </button>
-            </li>`;
-  };
-  const TL_COLS = 3;
-  const tlCols = Array.from({ length: TL_COLS }, (_, c) => {
-    const base = Math.floor(TALENTS.length / TL_COLS), extra = TALENTS.length % TL_COLS;
-    const start = c * base + Math.min(c, extra), take = base + (c < extra ? 1 : 0);
-    return TALENTS.slice(start, start + take).map((t, j) => tRow(t, start + j)).join('');
-  });
   // the team on a turning wheel: five cards ride the top of a bicycle tyre, the next one popping up on
   // the right as it turns to the left. The slot each card starts in is set here, so the page arrives
   // already laid out; app.js then turns it, and a drag or a swipe spins it either way.
@@ -3555,11 +3538,16 @@ exports.team = (ctx) => {
           ${[['', 'All', 'layers', TALENTS.length], ...[...new Set(TALENTS.map((t) => t.field))].map((f) => [f, f, (FIELD_MARK[f] || ['sparkle'])[0], TALENTS.filter((t) => t.field === f).length])]
             .map(([f, label, ic, n], k) => `<button type="button" class="tp-orb${k ? '' : ' is-on'}" data-tp-field="${esc(f)}" aria-pressed="${k ? 'false' : 'true'}"><span class="dock-ic"><i class="dock-water" aria-hidden="true"></i>${icon(ic)}</span><span class="tp-orb-l">${esc(label)} <b>${n}</b></span></button>`).join('')}
         </div>
-        <div class="tl-cols" id="tlCols" role="region" aria-label="ICT talents">
-          ${tlCols.map((rows) => `<ol class="tl-col">${rows}</ol>`).join('')}
+        <div class="ts" data-sphere-box>
+          <div class="ts-stage" data-sphere aria-hidden="true">${TALENTS.map((t, i) => `
+            <button type="button" class="ts-node" data-person="talent" data-i="${i}" data-field="${esc(t.field)}" tabindex="-1" style="--c:${(FIELD_MARK[t.field] || ['', '#0B2C63'])[1]}"><img src="/img/talent/${t.img}.jpg?v=${ASSET_V}" alt="" width="600" height="800" loading="lazy" decoding="async" draggable="false"></button>`).join('')}
+          </div>
+          <p class="ts-cap" aria-hidden="true"><b></b><span>Drag to turn · choose a face</span></p>
+          <ul class="ts-list" aria-label="ICT talents">${TALENTS.map((t, i) => `
+            <li data-field="${esc(t.field)}"><button type="button" data-person="talent" data-i="${i}">${esc(t.name)}, ${esc(t.role)}, ${esc(t.county)}</button></li>`).join('')}
+          </ul>
         </div>
-        <p class="tl-swipe" aria-hidden="true">Swipe for more ${icon('chevrons')}</p>
-        <p class="tp-note-s tl-note">Sample profiles with AI-generated placeholder photos.</p>
+        <p class="tp-note-s ts-note">Sample profiles with AI-generated placeholder photos.</p>
       </div>
     </section>
   </div>

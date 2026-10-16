@@ -924,6 +924,191 @@
     else { seen = true; run(); }
   }
 
+  // ---- the talent pool on a sphere (after the owner's img-sphere component, in plain JavaScript): each face is
+  // set on a sphere by a Fibonacci spiral; the sphere turns slowly on its own, a drag turns it and it coasts on,
+  // the faces round the back fade away, those near the rim and behind are drawn smaller, and any that would
+  // overlap shrink. A face opens the talent's profile. A field button keeps every face on the sphere but fades
+  // the others back, rings that field's people and turns the first to the front. The list beside it (for
+  // keyboards and screen readers) turns each talent to the front on focus.
+  function talentSphere(stage, onPick) {
+    var nodes = qsa('.ts-node', stage), box = stage.parentNode, list = qsa('.ts-list li', box);
+    var cap = qs('.ts-cap', box), capName = cap && qs('b', cap), capLine = cap && qs('span', cap), hint = capLine ? capLine.textContent : '';
+    var P = (window.__PEOPLE__ && window.__PEOPLE__.talent) || [];
+    var D2R = Math.PI / 180, AUTO = REDUCE ? 0 : 0.2, DECAY = 0.96, MAXV = 6, SENS = 0.5;
+    var rot = { x: 15, y: 15 }, vel = { x: 0, y: 0 }, aim = null, drag = null, hover = -1, raf = 0, last = 0, seen = false;
+    var size = 0, R = 0, base = 0, live = [], pos = [], dim = [];
+    function norm(a) { while (a > 180) a -= 360; while (a < -180) a += 360; return a; }
+    function clamp(v) { return Math.max(-MAXV, Math.min(MAXV, v)); }
+    function rnd(seed) { var a = Math.sin(seed * 12.9898 + 4.1414) * 43758.5453; return a - Math.floor(a); }
+    // the faces' places: a Fibonacci spiral, pulled towards the poles, with a little jitter so it is not a pattern
+    function layout(idx, born) {
+      live = idx; pos = [];
+      var inc = 2 * Math.PI / ((1 + Math.sqrt(5)) / 2), n = idx.length;
+      idx.forEach(function (ni, k) {
+        var phi = Math.acos(1 - 2 * (k + .5) / n) / D2R, theta = (inc * k / D2R) % 360;
+        var bonus = Math.pow(Math.abs(phi - 90) / 90, .6) * 35;
+        phi = phi < 90 ? Math.max(5, phi - bonus) : Math.min(175, phi + bonus);
+        phi = 15 + phi / 180 * 150;
+        theta = (theta + (rnd(ni + 1) - .5) * 20 + 360) % 360;
+        phi = Math.max(0, Math.min(180, phi + (rnd(ni + 51) - .5) * 10));
+        pos.push({ th: theta, ph: phi, born: born || 0 });
+      });
+      nodes.forEach(function (nd, i) { nd.hidden = idx.indexOf(i) < 0; });
+    }
+    function measure() {
+      size = Math.round(Math.min(box.clientWidth, 640));
+      R = size * .36; base = Math.round(size * .27);
+      stage.style.width = stage.style.height = size + 'px';
+      stage.style.setProperty('--ts-node', base + 'px');
+    }
+    function place(now) {
+      var cx = Math.cos(rot.x * D2R), sx = Math.sin(rot.x * D2R), cy = Math.cos(rot.y * D2R), sy = Math.sin(rot.y * D2R);
+      var fs = -.05 * R, fe = -.15 * R, pad = base * .16, moving = false;
+      var W = pos.map(function (p) {
+        var th = p.th * D2R, ph = p.ph * D2R, x = R * Math.sin(ph) * Math.cos(th), y = R * Math.cos(ph), z = R * Math.sin(ph) * Math.sin(th);
+        var x1 = x * cy + z * sy, z1 = -x * sy + z * cy;
+        var y2 = y * cx - z1 * sx, z2 = y * sx + z1 * cx;
+        var dr = Math.min(Math.sqrt(x1 * x1 + y2 * y2) / R, 1), pole = p.ph < 30 || p.ph > 150;
+        var s = Math.max(.3, 1 - dr * (pole ? .4 : .7)) * Math.max(.5, .8 + (z2 + R) / (2 * R) * .3);
+        return { x: x1, y: y2, z: z2, s: s, vis: z2 > fe, o: z2 <= fs ? Math.max(0, (z2 - fe) / (fs - fe)) : 1 };
+      });
+      W.forEach(function (w, i) {         // the faces that would overlap shrink
+        if (!w.vis) return;
+        var adj = w.s;
+        W.forEach(function (o, k) {
+          if (k === i || !o.vis) return;
+          var d = Math.hypot(w.x - o.x, w.y - o.y), min = base * (w.s + o.s) / 2 + pad;
+          if (d < min && d > 0) adj *= Math.max(.4, 1 - (min - d) / min * .6);
+        });
+        w.t = Math.max(.25, adj);
+      });
+      W.forEach(function (w, k) {
+        var nd = nodes[live[k]], p = pos[k], a = 1;
+        if (p.born) { a = Math.min(1, (now - p.born) / 520); a = 1 - Math.pow(1 - a, 3); if (a < 1) moving = true; else p.born = 0; }
+        if (!w.vis || a <= 0) { nd.style.visibility = 'hidden'; return; }
+        var faded = dim[live[k]], sc = w.t * (live[k] === hover ? Math.min(1.2, 1.2 / w.t) : 1) * (.4 + .6 * a) * (faded ? .78 : 1);
+        nd.style.visibility = '';
+        nd.style.opacity = (w.o * a * (faded ? .22 : 1)).toFixed(3);
+        nd.style.zIndex = Math.round(1000 + w.z);
+        nd.style.transform = 'translate3d(' + w.x.toFixed(1) + 'px,' + w.y.toFixed(1) + 'px,0) scale(' + sc.toFixed(3) + ')';
+      });
+      return moving;
+    }
+    function locked() { return document.documentElement.classList.contains('ui-locked'); }
+    function frame(now) {
+      raf = 0;
+      var dt = last ? Math.min(.05, (now - last) / 1000) : 1 / 60, f = dt * 60; last = now;
+      var busy = false;
+      if (!drag) {
+        if (aim) {                       // turning a talent to the front
+          var ax = norm(aim.x - rot.x), ay = norm(aim.y - rot.y), k = Math.min(1, dt * 6);
+          rot.x = norm(rot.x + ax * k); rot.y = norm(rot.y + ay * k);
+          if (Math.abs(ax) < .2 && Math.abs(ay) < .2) aim = null;
+          vel.x = vel.y = 0; busy = true;
+        } else {
+          var d = Math.pow(DECAY, f);
+          vel.x *= d; vel.y *= d;
+          if (Math.abs(vel.x) < .01) vel.x = 0;
+          if (Math.abs(vel.y) < .01) vel.y = 0;
+          var spin = hover < 0 && !locked() ? AUTO : 0;
+          rot.x = norm(rot.x + clamp(vel.x) * f);
+          rot.y = norm(rot.y + (clamp(vel.y) + spin) * f);
+          busy = spin > 0 || vel.x !== 0 || vel.y !== 0;
+        }
+      }
+      if (place(now)) busy = true;
+      if (seen && !document.hidden && (busy || drag)) raf = requestAnimationFrame(frame);
+      else last = 0;
+    }
+    function run() { if (!raf && seen && !document.hidden) { last = 0; raf = requestAnimationFrame(frame); } }
+    function tell(i) {
+      if (!cap) return;
+      if (i < 0 || !P[i]) { capName.textContent = ''; capLine.textContent = hint; cap.classList.remove('is-on'); return; }
+      capName.textContent = P[i].name; capLine.textContent = P[i].role + ' · ' + P[i].county; cap.classList.add('is-on');
+    }
+    function btnFor(i) { return qs('.ts-list button[data-i="' + i + '"]', box); }
+
+    // a drag turns the sphere (with a finger, only sideways: up and down still scroll the page)
+    stage.addEventListener('pointerdown', function (e) {
+      if (e.button) return;
+      drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, t: e.timeStamp, moved: false, node: e.target.closest('.ts-node') };
+      aim = null; vel.x = vel.y = 0; run();
+    });
+    stage.addEventListener('pointermove', function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      if (!drag.moved) {
+        if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) < 6) return;
+        drag.moved = true;
+        try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+        stage.classList.add('is-drag');
+      }
+      var vx = e.pointerType === 'mouse' ? clamp(-(e.clientY - drag.y) * SENS) : 0, vy = clamp((e.clientX - drag.x) * SENS);
+      rot.x = norm(rot.x + vx); rot.y = norm(rot.y + vy); vel.x = vx; vel.y = vy;
+      drag.x = e.clientX; drag.y = e.clientY; drag.t = e.timeStamp;
+      run();
+    });
+    function release(e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var d = drag; drag = null;
+      stage.classList.remove('is-drag');
+      if (d.moved && e.timeStamp - d.t > 90) vel.x = vel.y = 0;      // held still before letting go: no fling
+      if (!d.moved && d.node && e.type === 'pointerup') onPick(btnFor(d.node.dataset.i) || d.node);
+      run();
+    }
+    stage.addEventListener('pointerup', release);
+    stage.addEventListener('pointercancel', release);
+    // a face under the mouse grows a little, the turning pauses, and its name shows beneath
+    stage.addEventListener('pointerover', function (e) {
+      var nd = e.target.closest('.ts-node');
+      if (!nd || e.pointerType !== 'mouse') return;
+      hover = Number(nd.dataset.i); tell(hover); run();
+    });
+    stage.addEventListener('pointerout', function (e) {
+      var nd = e.target.closest('.ts-node');
+      if (!nd || (e.relatedTarget && nd.contains(e.relatedTarget)) || hover !== Number(nd.dataset.i)) return;
+      // back to the talent focused in the list, if one is
+      var f = document.activeElement && document.activeElement.closest && document.activeElement.closest('.ts-list button');
+      hover = f ? Number(f.dataset.i) : -1; tell(hover); run();
+    });
+    // the list: a talent taking focus turns to the front; choosing it opens the profile
+    box.addEventListener('focusin', function (e) {
+      var b = e.target.closest('.ts-list button');
+      if (!b) return;
+      var i = Number(b.dataset.i), k = live.indexOf(i);
+      if (k < 0) return;
+      aim = { x: 90 - pos[k].ph, y: pos[k].th - 90 }; hover = i; tell(i); run();
+    });
+    box.addEventListener('focusout', function (e) { if (e.target.closest('.ts-list')) { hover = -1; tell(-1); run(); } });
+    qsa('.ts-list button', box).forEach(function (b) { b.addEventListener('click', function () { onPick(b); }); });
+
+    // a field button fades the other faces back and rings this field's people, turning the first to the front
+    var chips = qsa('[data-tp-field]');
+    chips.forEach(function (b) {
+      b.addEventListener('click', function () {
+        var f = b.dataset.tpField, first = -1;
+        pressOnly(chips, 'data-tp-field', f);
+        nodes.forEach(function (nd, i) {
+          dim[i] = !!f && nd.dataset.field !== f;
+          nd.classList.toggle('is-dim', dim[i]);
+          nd.classList.toggle('is-match', !!f && !dim[i]);
+          if (f && !dim[i] && first < 0) first = i;
+        });
+        list.forEach(function (li) { li.hidden = !!f && li.dataset.field !== f; });
+        if (first >= 0) { var k = live.indexOf(first); aim = { x: 90 - pos[k].ph, y: pos[k].th - 90 }; }
+        hover = -1; tell(-1); run();
+      });
+    });
+
+    measure();
+    layout(nodes.map(function (_, i) { return i; }));
+    var lastW = box.clientWidth;
+    window.addEventListener('resize', function () { if (box.clientWidth !== lastW) { lastW = box.clientWidth; measure(); place(performance.now()); } });
+    document.addEventListener('visibilitychange', run);
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { seen = es[es.length - 1].isIntersecting; if (seen) run(); }).observe(stage);
+    else { seen = true; run(); }
+    place(performance.now());
+  }
+
   function initTeam() {
     var root = qs('.tm');
     if (!root) return;
@@ -943,36 +1128,9 @@
     var wheel = qs('[data-wheel]');
     if (wheel) teamWheel(wheel, openCard);
 
-    // ---- the talent pool: a league table in white columns, filtered by field. The rows still shown
-    // are shared out evenly across the columns, in order, and numbered from one.
-    var tlBox = qs('#tlCols');
-    if (tlBox) {
-      var cols = qsa('.tl-col', tlBox), items = qsa('.tl-item', tlBox), chips = qsa('[data-tp-field]');
-      var lay = function () {
-        var shown = items.filter(function (it) { return !it.hidden; }).sort(function (a, b) { return a.dataset.i - b.dataset.i; });
-        // a short list fills fewer columns (about four rows each) rather than one row per column
-        var c = Math.max(1, Math.min(cols.length, Math.ceil(shown.length / 4))), base = Math.floor(shown.length / c), extra = shown.length % c, k = 0;
-        cols.forEach(function (col, ci) {
-          var take = ci < c ? base + (ci < extra ? 1 : 0) : 0;
-          shown.slice(k, k + take).forEach(function (it, j) { col.appendChild(it); qs('.tl-n', it).textContent = k + j + 1; });
-          col.hidden = !take;
-          k += take;
-        });
-        items.filter(function (it) { return it.hidden; }).forEach(function (it) { cols[cols.length - 1].appendChild(it); });
-      };
-      qsa('.tl-row', tlBox).forEach(function (b) { b.addEventListener('click', function () { openCard(b); }); });
-      chips.forEach(function (b) {
-        b.addEventListener('click', function () {
-          var f = b.dataset.tpField, k = 0;
-          pressOnly(chips, 'data-tp-field', f);
-          items.forEach(function (it) { it.hidden = !!f && it.dataset.field !== f; });
-          lay();
-          if (!REDUCE) items.forEach(function (it) {
-            if (!it.hidden) it.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 360, delay: Math.min(k++, 10) * 30, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' });
-          });
-        });
-      });
-    }
+    // ---- the talent pool: the people on a turning sphere; the field buttons gather it to one field
+    var sphere = qs('[data-sphere]');
+    if (sphere) talentSphere(sphere, function (btn) { openCard(btn); });
   }
 
   // ============================================================

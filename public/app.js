@@ -1379,12 +1379,12 @@
     if (!box || !src) return;
     var stage = qs('.kt', box), cam = qs('.kt-cam', box);
     var nav = qs('.gov-nav');
-    // world units: each wall is W wide; lines are sized to fill it; FOLD is the angle of the left wall
-    // (on a tall phone screen each text takes whichever of a few layouts fills the screen best: the two
-    // walls side by side, or one above the other with the upper one folded back along a level line, FOLDX)
-    var FAMILY = 'Montserrat', FONT = '800 100px ' + FAMILY, W = 1600, G = 40, LH = .86, GAP = .07, FOLD = 46, FOLDX = 34, CAP = .34 * W, CAP_TALL = .56 * W;
+    // world units: each wall is W wide; lines are sized to fill it; FOLD is the angle of the left wall. On a
+    // tall phone screen the corner is the same, two walls side by side, but each text takes whichever line
+    // length and fold (FOLDS_TALL: a deeper fold makes the corner narrower, so larger) fill the screen best
+    var FAMILY = 'Montserrat', FONT = '800 100px ' + FAMILY, W = 1600, G = 40, LH = .86, GAP = .07, FOLD = 46, CAP = .34 * W, CAP_TALL = .56 * W;
     var RHYTHM_WIDE = [9, 15, 11, 7, 16, 10, 13];
-    var RHYTHMS_TALL = [[5, 7, 4, 6, 8, 5], [7, 10, 6, 9, 11, 8], [9, 13, 8, 12, 14, 10], [12, 17, 11, 15, 18, 13]];
+    var RHYTHMS_TALL = [[5, 7, 4, 6, 8, 5], [7, 10, 6, 9, 11, 8], [9, 13, 8, 12, 14, 10]], FOLDS_TALL = [46, 52];
     var texts = qsa('.kt-row', src).map(function (row) {
       return { label: qs('dt', row).textContent.trim(), text: row.getAttribute('data-kt-text') || qs('dd', row).textContent.trim() };
     });
@@ -1427,27 +1427,25 @@
     function blocks(lines) {
       return lines.map(function (L) { var f = Math.min(W / L.w1, tall ? CAP_TALL : CAP); return { lines: [L], fs: [f], adv: f * (LH + GAP) }; });
     }
-    var CX = Math.cos(FOLDX * Math.PI / 180), SPAN = (W + G) * (1 + Math.cos(FOLD * Math.PI / 180));
     // a layout's shape: where the lines split between the walls, the walls' heights, and the whole
     // block's width and height as the camera sees it
-    function shape(bl, stack) {
+    function shape(bl, fold) {
       var all = bl.reduce(function (a, b) { return a + b.adv; }, 0), acc = 0, split = bl.length;
       for (var q = 0; q < bl.length; q++) { if (acc + bl[q].adv / 2 > all / 2) { split = Math.max(1, q); break; } acc += bl[q].adv; }
       var H0 = bl.slice(0, split).reduce(function (a, b) { return a + b.adv; }, 0), H1 = all - H0;
-      return { bl: bl, split: split, H0: H0, H1: H1, stack: stack,
-        w: stack ? W : SPAN, h: stack ? H0 * CX + 2 * G + H1 : Math.max(H0, H1) };
+      return { bl: bl, split: split, H0: H0, H1: H1, fold: fold, w: (W + G) * (1 + Math.cos(fold * Math.PI / 180)), h: Math.max(H0, H1) };
     }
     // the scale a layout is shown at, whole: as large as the stage allows, a margin all round
     function scaleOf(sh) { return tall ? Math.min(.94 * Ws / sh.w, .9 * Hs / sh.h) : Math.min(.88 * Ws / sh.w, .82 * Hs / sh.h); }
-    // a desktop always sets the walls side by side; a tall screen tries each line length both ways and
-    // keeps the layout that covers most of the stage
+    // a desktop always sets its lines and fold one way; a tall screen tries each line length with each fold
+    // and keeps the layout that covers most of the stage
     function layout(tx) {
-      if (!tall) return shape(blocks(deal(tx, RHYTHM_WIDE)), false);
+      if (!tall) return shape(blocks(deal(tx, RHYTHM_WIDE)), FOLD);
       var best = null, bestFill = -1;
       RHYTHMS_TALL.forEach(function (r) {
         var bl = blocks(deal(tx, r));
-        [false, true].forEach(function (stack) {
-          var sh = shape(bl, stack), k = scaleOf(sh), fill = (sh.w * k) * (sh.h * k) / (Ws * Hs);
+        FOLDS_TALL.forEach(function (fold) {
+          var sh = shape(bl, fold), k = scaleOf(sh), fill = (sh.w * k) * (sh.h * k) / (Ws * Hs);
           if (fill > bestFill) { bestFill = fill; best = sh; }
         });
       });
@@ -1478,14 +1476,8 @@
           axis: [ax, ay, az + (Math.abs(az) < .1 ? .3 : 0)], spin: (rnd(j + 8) < .5 ? -1 : 1) * (80 + 120 * rnd(j + 9)) });
       }
       bl.forEach(function (b, q) {
-        var side = q < split ? 0 : 1, h = heights[side], x, y, wallTf;
-        if (sh.stack) {     // the upper wall above the fold line (y 0), leaning back; the lower one facing
-          wallTf = side ? '' : 'rotateX(' + FOLDX + 'deg) ';
-          x = 0; y = side ? G + h : h - (sh.H0 + G);
-        } else {            // the left wall turned back from the corner (x 0); the right one facing
-          wallTf = side ? '' : 'rotateY(' + (-FOLD) + 'deg) ';
-          x = side ? G : -(W + G); y = h;
-        }
+        // the left wall turned back from the corner (x 0); the right one facing
+        var side = q < split ? 0 : 1, h = heights[side], wallTf = side ? '' : 'rotateY(' + (-sh.fold) + 'deg) ', x = side ? G : -(W + G), y = h;
         put(b.lines[0], b.fs[0], wallTf + 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)');
         heights[side] = h + b.adv;
       });
@@ -1498,8 +1490,7 @@
     // where the camera looks to show a text whole, and how close
     function whole(wd) {
       var sh = wd.sh, s0 = scaleOf(sh);
-      if (sh.stack) return { x: W / 2, y: ((G + sh.H1) - (sh.H0 + G) * CX) / 2, z: 0, s: s0, yaw: 0, pitch: 0, roll: 0 };
-      var cs = Math.cos(FOLD * Math.PI / 180);
+      var cs = Math.cos(sh.fold * Math.PI / 180);
       return { x: ((W + G) - (W + G) * cs) / 2, y: sh.h / 2, z: 0, s: s0, yaw: 0, pitch: 4, roll: 0 };
     }
     function shift(c, d) { var o = Object.assign({}, c); for (var k in d) o[k] = k === 's' ? c.s * d.s : c[k] + d[k]; return o; }

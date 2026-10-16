@@ -524,7 +524,7 @@ function heroSlider() {
       <div class="hs-content wrap">
         <div class="hs-texts">${texts}</div>
       </div>
-      <div class="hv-cue" aria-hidden="true"><span>Scroll to explore</span><i></i></div>
+      <div class="hv-cue" aria-hidden="true"><i></i></div>
     </div>
   </section>`;
 }

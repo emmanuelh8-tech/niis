@@ -41,6 +41,7 @@ for (const set of ['', 'c']) {
       await page.evaluate((i, fmt, s) => window.render(i, fmt, s), i, fmt, set);
       await page.evaluate(() => Promise.all([...document.images].map((im) => (im.complete ? 0 : new Promise((r) => { im.onload = im.onerror = r; })))));
       await page.evaluate(() => document.fonts.ready);
+      await new Promise((r) => setTimeout(r, 250));   // the emblems drawn in the SVG (an <image>, not awaited above)
       await (await page.$('.s')).screenshot({ path: join(OUT, `${set ? 'country-' : ''}${fmt}-${String(i + 1).padStart(2, '0')}.png`) });
       n++;
     }

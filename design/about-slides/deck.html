@@ -3,6 +3,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&family=Oswald:wght@500;600&family=Fondamento&family=Marcellus&display=swap" rel="stylesheet">
 <script src="../../public/liberia-counties.js"></script>
+<script src="maps.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #222; }
@@ -24,7 +25,7 @@
   .slide .tile { left: 78px; top: 205px; width: 420px; height: 424px; padding: 30px 34px; }
   .flyer .tile { left: 360px; top: 64px; width: 360px; height: 364px; padding: 26px 28px; }
   .tile-top { display: flex; align-items: flex-start; gap: 20px; }
-  .tile-num { font: 600 118px/0.86 'Oswald', sans-serif; letter-spacing: -.01em; }
+  .tile-num { font: 600 118px/0.86 'Oswald', sans-serif; letter-spacing: -.01em; color: inherit; }
   .flyer .tile-num { font-size: 100px; }
   .tile-lab { padding-top: 6px; font: 500 44px/1.06 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: .005em; }
   .tile-ico { flex: 1; display: grid; place-items: center; }
@@ -107,49 +108,119 @@
   .t-trio .pager i { background: #00853F; }
   .t-trio .dot { fill: rgba(255,215,215,.5); }
   .s .pager i:first-child { background: var(--lime); }
+  /* no rules between the words: the heading leads, the foot sits a little apart */
+  .R h1 { margin-top: 0; }
+  .foot { margin-top: 34px; }
+  .cta svg { color: var(--lime); }
+  /* the colours the marks and signs take; the NIIS blue is the default */
+  .s { --tint: rgba(150,190,255,.85); --ink: #fff; --inkf: rgba(255,255,255,.1);
+    --mkf: rgba(255,255,255,.15); --mks: rgba(255,255,255,.55); --mklf: rgba(255,255,255,.035); --mkls: rgba(255,255,255,.15); }
+  .st-mid { stop-color: #9CC3FF; }
+  .mk-hi { fill: var(--mkf); stroke: var(--mks); stroke-width: 1.6; stroke-linejoin: round; }
+  .mk-lo { fill: var(--mklf); stroke: var(--mkls); stroke-width: 1.2; stroke-linejoin: round; }
+  .mk-img { opacity: .2; }
+  .mk-seal { filter: grayscale(1) brightness(1.5); mix-blend-mode: screen; opacity: .26; }
+  .mk-un { filter: brightness(0) invert(1); opacity: .2; }
+  .mk-mopt { mix-blend-mode: multiply; opacity: .2; }
+  .t-gh { --mkf: rgba(90,60,0,.1); --mks: rgba(90,60,0,.36); }
+  /* Why we do it: Liberia's red */
+  .s.t-red { --lime: #FFFFFF; --tint: rgba(255,215,222,.7); background: #6F0619; }
+  .t-red .L { background: radial-gradient(120% 85% at 8% 0%, #F0475F 0%, #D21A3A 36%, #B30C2C 68%, #8C0822 100%); }
+  .slide.t-red .L { box-shadow: 12px 0 40px rgba(60,0,10,.45); } .flyer.t-red .L { box-shadow: 0 12px 40px rgba(60,0,10,.45); }
+  .t-red .R { background: radial-gradient(90% 70% at 100% 0%, rgba(255,120,140,.2), transparent 60%), linear-gradient(180deg, #A30B28 0%, #8A0820 45%, #6F0619 100%); }
+  .t-red .tile { background: linear-gradient(160deg, rgba(150,8,36,.7), rgba(110,4,24,.86)); border-color: rgba(255,200,208,.55); }
+  .t-red .pager i { background: rgba(255,255,255,.35); } .t-red .dot { fill: rgba(255,215,222,.5); } .t-red .st-mid { stop-color: #FFC2CC; }
+  .t-red .sub { color: #FBE3E7; } .t-red .foot { color: #FBE3E7; }
+  /* the ARREST Agenda: the Republic's arms, gold and bronze */
+  .s.t-arrest { --lime: #FFD66B; --tint: rgba(255,226,160,.8); background: #4A3208; }
+  .t-arrest .L { background: radial-gradient(120% 85% at 8% 0%, #D9A743 0%, #B9832A 36%, #93651A 68%, #6C4810 100%); }
+  .slide.t-arrest .L { box-shadow: 12px 0 40px rgba(40,25,0,.45); } .flyer.t-arrest .L { box-shadow: 0 12px 40px rgba(40,25,0,.45); }
+  .t-arrest .R { background: radial-gradient(90% 70% at 100% 0%, rgba(255,214,107,.18), transparent 60%), linear-gradient(180deg, #76510F 0%, #5E400B 45%, #4A3208 100%); }
+  .t-arrest .tile { background: linear-gradient(160deg, rgba(120,80,15,.66), rgba(80,52,8,.86)); border-color: rgba(255,230,170,.5); }
+  .t-arrest .pager i { background: rgba(255,230,170,.35); } .t-arrest .dot { fill: rgba(255,235,190,.5); } .t-arrest .st-mid { stop-color: #FFE3A3; }
+  .t-arrest .sub, .t-arrest .foot { color: #F6E7C5; }
+  /* the National Digital Strategy: the Ministry of Posts & Telecommunications, blue on white */
+  .s.t-mopt { --lime: #1F4BA5; --tint: rgba(31,75,165,.42); --ink: #1C3F8A; --inkf: rgba(31,75,165,.08);
+    --mkf: rgba(31,75,165,.08); --mks: rgba(31,75,165,.3); color: #0B2C63; background: #E9EEF6; }
+  .t-mopt .L { background: radial-gradient(120% 85% at 8% 0%, #FFFFFF 0%, #F3F6FB 40%, #E4EBF5 75%, #D6E0EF 100%); }
+  .slide.t-mopt .L { box-shadow: 12px 0 40px rgba(11,44,99,.14); } .flyer.t-mopt .L { box-shadow: 0 12px 40px rgba(11,44,99,.14); }
+  .t-mopt .R { background: radial-gradient(90% 70% at 100% 0%, rgba(31,75,165,.07), transparent 60%), linear-gradient(180deg, #FBFCFE 0%, #F2F5FA 45%, #E9EEF6 100%); }
+  .t-mopt .tile { background: linear-gradient(160deg, rgba(255,255,255,.82), rgba(236,241,249,.9)); border-color: rgba(31,75,165,.3); box-shadow: inset 0 0 0 1px rgba(255,255,255,.4), 0 18px 40px rgba(11,44,99,.12); }
+  .t-mopt .sub { color: #3A4D70; } .t-mopt .sub b, .t-mopt .sub i { color: #0B2C63; }
+  .t-mopt .body { color: rgba(11,30,70,.9); } .t-mopt .foot { color: #3A4D70; }
+  .t-mopt .logo { filter: none; opacity: 1; }
+  .t-mopt .pager i { background: rgba(31,75,165,.25); } .t-mopt .dot { fill: rgba(31,75,165,.3); }
+  /* the Data Protection Act: graphite, with the flag's red */
+  .s.t-dpa { --lime: #E8344F; --tint: rgba(220,225,235,.55); background: #16181C; }
+  .t-dpa .L { background: radial-gradient(120% 85% at 8% 0%, #5D6471 0%, #454B57 36%, #31363F 68%, #1F2329 100%); }
+  .slide.t-dpa .L { box-shadow: 12px 0 40px rgba(0,0,0,.45); } .flyer.t-dpa .L { box-shadow: 0 12px 40px rgba(0,0,0,.45); }
+  .t-dpa .R { background: radial-gradient(90% 70% at 100% 0%, rgba(232,52,79,.12), transparent 60%), linear-gradient(180deg, #2B2F36 0%, #202328 45%, #16181C 100%); }
+  .t-dpa .tile { background: linear-gradient(160deg, rgba(64,70,82,.72), rgba(30,34,40,.88)); border-color: rgba(255,255,255,.28); }
+  .t-dpa .pager i { background: rgba(255,255,255,.3); } .t-dpa .dot { fill: rgba(255,255,255,.28); } .t-dpa .st-mid { stop-color: #D8DCE4; }
+  .t-dpa .sub, .t-dpa .foot { color: #DADDE3; }
+  /* the African Union: the claret of its wordmark, with gold */
+  .s.t-au { --lime: #E2BE55; --tint: rgba(255,220,200,.6); background: #3D0716; }
+  .t-au .L { background: radial-gradient(120% 85% at 8% 0%, #B42C52 0%, #921B3E 36%, #74122F 68%, #560C22 100%); }
+  .slide.t-au .L { box-shadow: 12px 0 40px rgba(40,0,10,.45); } .flyer.t-au .L { box-shadow: 0 12px 40px rgba(40,0,10,.45); }
+  .t-au .R { background: radial-gradient(90% 70% at 100% 0%, rgba(226,190,85,.14), transparent 60%), linear-gradient(180deg, #5E0D24 0%, #4B0A1D 45%, #3D0716 100%); }
+  .t-au .tile { background: linear-gradient(160deg, rgba(122,20,52,.68), rgba(80,10,32,.86)); border-color: rgba(255,215,160,.45); }
+  .t-au .pager i { background: rgba(226,190,85,.4); } .t-au .dot { fill: rgba(255,220,200,.45); } .t-au .st-mid { stop-color: #FFD3C4; }
+  .t-au .sub, .t-au .foot { color: #F5DDE3; }
+  /* the Sustainable Development Goals: the United Nations' blue */
+  .s.t-un { --lime: #FFFFFF; --tint: rgba(210,240,255,.7); background: #004A70; }
+  .t-un .L { background: radial-gradient(120% 85% at 8% 0%, #4CC6F2 0%, #19ACE4 36%, #0093CF 68%, #0077AB 100%); }
+  .slide.t-un .L { box-shadow: 12px 0 40px rgba(0,40,70,.4); } .flyer.t-un .L { box-shadow: 0 12px 40px rgba(0,40,70,.4); }
+  .t-un .R { background: radial-gradient(90% 70% at 100% 0%, rgba(120,220,255,.2), transparent 60%), linear-gradient(180deg, #006B9C 0%, #005B87 45%, #004A70 100%); }
+  .t-un .tile { background: linear-gradient(160deg, rgba(0,104,150,.68), rgba(0,74,110,.86)); border-color: rgba(200,240,255,.55); }
+  .t-un .pager i { background: rgba(255,255,255,.35); } .t-un .dot { fill: rgba(210,240,255,.55); } .t-un .st-mid { stop-color: #CFF0FF; }
+  .t-un .sub, .t-un .foot { color: #DDF2FC; }
+  /* regional integration: ECOWAS green, with gold */
+  .s.t-ecowas { --lime: #F2C230; --tint: rgba(200,240,210,.7); background: #0A3D1F; }
+  .t-ecowas .L { background: radial-gradient(120% 85% at 8% 0%, #33A85E 0%, #1E8C49 36%, #14713A 68%, #0D562C 100%); }
+  .slide.t-ecowas .L { box-shadow: 12px 0 40px rgba(0,30,10,.45); } .flyer.t-ecowas .L { box-shadow: 0 12px 40px rgba(0,30,10,.45); }
+  .t-ecowas .R { background: radial-gradient(90% 70% at 100% 0%, rgba(242,194,48,.14), transparent 60%), linear-gradient(180deg, #0F5A2E 0%, #0C4B26 45%, #0A3D1F 100%); }
+  .t-ecowas .tile { background: linear-gradient(160deg, rgba(15,100,50,.68), rgba(8,70,35,.86)); border-color: rgba(210,255,225,.5); }
+  .t-ecowas .pager i { background: rgba(255,255,255,.35); } .t-ecowas .dot { fill: rgba(210,255,225,.45); } .t-ecowas .st-mid { stop-color: #CFF5DA; }
+  .t-ecowas .sub, .t-ecowas .foot { color: #DDF3E3; }
 </style></head>
 <body>
 <div id="out"></div>
 <script>
 // ---- the slides' words, all from the About page's own copy
 var D = [
-  { num: '15', lab: 'Counties measured', ico: 'map', sign: 'signal', h: 'Providing Liberia ICT data in real time', sub: ['15 counties', 'Collected, validated, published'],
+  { num: '15', lab: 'Counties measured', ico: 'map', sign: 'signal', mark: 'lr', h: 'What we do', sub: ['15 counties', 'Collected, validated, published'],
     body: 'We collect, validate and publish Liberia’s ICT statistics for all 15 counties, and we build the infrastructure that keeps them at home.',
     foot: 'Liberia’s ICT data, collected and managed by Liberians.' },
-  { num: '174', lab: 'Programme positions', ico: 'people', sign: 'dots', h: 'A dataset is also a workforce', sub: ['174 positions', 'Eight role types'],
-    body: 'Enumerators and supervisors in every county, research leads, data engineers, GIS and sampling specialists, quality analysts and developers, recruited from Liberian STEM graduates and researchers. Hosted in-country, methodology published, staff trained locally: the measure of this programme is whether Liberia can run it without us.',
+  { num: '174', lab: 'Programme positions', ico: 'people', sign: 'dots', mark: 'lr', theme: 'red', h: 'Why we do it', sub: ['National commitments', 'Jobs for young Liberians'],
+    body: 'For Liberia’s national commitments, and to create jobs for young Liberians in tech: 174 positions across eight role types, from enumerators and supervisors in every county to research leads, data engineers, GIS and sampling specialists, quality analysts and developers, recruited from Liberian STEM graduates and trained locally.',
     cta: 'See open roles' },
-  { num: '6', lab: 'Commitments already made', ico: 'check', sign: 'bars', h: 'Commitments already made', sub: ['Not a new agenda'],
-    body: 'This is the measurement capability six existing commitments already assume Liberia has.',
-    list: [['01', 'ARREST Agenda', '2025–2029'], ['02', 'National Digital Strategy', '2025–2029'], ['03', 'Data Protection Act', 'Enacted 2026'],
-      ['04', 'AU Data Policy Framework', 'Adopted 2022'], ['05', 'SDG Target 17.18', 'Global goal'], ['06', 'Regional Digital Integration', 'ECOWAS · WARDIP']] },
-  { num: '01', lab: 'ARREST Agenda', ico: 'flag', sign: 'pillars', h: 'ARREST Agenda for Inclusive Development', sub: ['2025–2029', 'Infrastructure pillar'],
+  { num: '01', lab: 'ARREST Agenda', ico: 'flag', sign: 'pillars', mark: 'img:seal', theme: 'arrest', h: 'ARREST Agenda for Inclusive Development', sub: ['2025–2029', 'Infrastructure pillar'],
     body: 'ICT modernization sits in the Infrastructure pillar. NIIS is the measurement layer it is judged against.', foot: 'Commitment 01 of 06' },
-  { num: '02', lab: 'Digital Strategy', ico: 'flag', sign: 'star8', h: 'National Digital Strategy', sub: ['2025–2029', 'Eight national priorities'],
-    body: 'Cybersecurity and data sovereignty is one of its eight priorities. This is that pillar, made operational.', foot: 'Commitment 02 of 06' },
-  { num: '03', lab: 'Data Protection Act', ico: 'flag', sign: 'shield', h: 'Data Protection Act', sub: ['Enacted 2026', 'Liberia’s first personal-data law'],
+  { num: '02', lab: 'Digital Strategy', ico: 'flag', sign: 'star8', mark: 'img:mopt', theme: 'mopt', h: 'National Digital Strategy', sub: ['2025–2029', 'Eight national priorities'],
+    body: 'Cybersecurity and data sovereignty is one of its eight priorities. This is that pillar, made operational.', foot: 'Commitment 02 of 06 · Ministry of Posts & Telecommunications' },
+  { num: '03', lab: 'Data Protection Act', ico: 'flag', sign: 'shield', mark: 'lr', theme: 'dpa', h: 'Data Protection Act', sub: ['Enacted 2026', 'Liberia’s first personal-data law'],
     body: 'Built to Liberia’s first personal-data law: aggregate, anonymized statistics only.', foot: 'Commitment 03 of 06' },
-  { num: '04', lab: 'African Union', ico: 'au', sign: 'au', h: 'AU Data Policy Framework', sub: ['Adopted 2022', 'Continental policy'],
+  { num: '04', lab: 'African Union', ico: 'au', sign: 'au', mark: 'map:africa', theme: 'au', h: 'AU Data Policy Framework', sub: ['Adopted 2022', 'Continental policy'],
     body: 'Continental policy since 2022: member states are expected to hold and govern their own data.', foot: 'Commitment 04 of 06' },
-  { num: '17', lab: 'Partnerships for the goals', ico: 'rings', sign: 'sdg', h: 'United Nations Sustainable Development Goals', sub: ['Target 17.18', 'Data for sustainable development'],
+  { num: '17', lab: 'Partnerships for the goals', ico: 'rings', sign: 'sdg', mark: 'img:un', theme: 'un', h: 'United Nations Sustainable Development Goals', sub: ['Target 17.18', 'Data for sustainable development'],
     body: 'Increase significantly the availability of high-quality, timely and reliable data disaggregated by income, gender, age, race, ethnicity, migratory status, disability, geographic location and other characteristics relevant in national contexts.',
-    foot: 'County-level is the target, verbatim.' },
-  { num: '06', lab: 'ECOWAS · WARDIP', ico: 'network', sign: 'network', h: 'Regional Digital Integration', sub: ['ECOWAS', 'WARDIP'],
+    foot: 'Commitment 05 of 06 · County-level is the target, verbatim.' },
+  { num: '06', lab: 'ECOWAS · WARDIP', ico: 'network', sign: 'network', mark: 'map:ecowas', theme: 'ecowas', h: 'Regional Digital Integration', sub: ['ECOWAS', 'WARDIP'],
     body: 'You cannot negotiate on indicators you cannot produce, or benchmark against neighbours without them.', foot: 'Commitment 06 of 06' },
 ];
 // ---- the African Regional Report: one slide for each row of the About page's regional benchmark
 var DC = [
-  { num: '01', lab: 'Rwanda', theme: 'rw', ico: 'cflag:rw', sign: 'arcs:rw', h: 'Rwanda', sub: ['Ahead', 'Data sovereignty'],
+  { num: '01', lab: 'Rwanda', theme: 'rw', mark: 'map:rw', ico: 'cflag:rw', sign: 'arcs:rw', h: 'Rwanda', sub: ['Ahead', 'Data sovereignty'],
     body: 'Data-residency rules enforced; hosts the UN Big Data hub in Kigali; national AI agency.', foot: 'African Regional Report · 01 of 06' },
-  { num: '02', lab: 'Kenya', theme: 'ke', ico: 'cflag:ke', sign: 'arcs:ke', h: 'Kenya', sub: ['Ahead', 'Data sovereignty'],
+  { num: '02', lab: 'Kenya', theme: 'ke', mark: 'map:ke', ico: 'cflag:ke', sign: 'arcs:ke', h: 'Kenya', sub: ['Ahead', 'Data sovereignty'],
     body: 'Government data held in-territory by policy; sovereign-hosted cloud launched 2026.', foot: 'African Regional Report · 02 of 06' },
-  { num: '03', lab: 'Nigeria', theme: 'ng', ico: 'cflag:ng', sign: 'arcs:ng', h: 'Nigeria', sub: ['Ahead', 'Data sovereignty'],
+  { num: '03', lab: 'Nigeria', theme: 'ng', mark: 'map:ng', ico: 'cflag:ng', sign: 'arcs:ng', h: 'Nigeria', sub: ['Ahead', 'Data sovereignty'],
     body: 'Domestic storage of all payment data mandated from January 2027.', foot: 'African Regional Report · 03 of 06' },
-  { num: '04', lab: 'Ghana', theme: 'gh', ico: 'cflag:gh', sign: 'arcs:gh', h: 'Ghana', sub: ['Ahead', 'Data sovereignty'],
+  { num: '04', lab: 'Ghana', theme: 'gh', mark: 'map:gh', ico: 'cflag:gh', sign: 'arcs:gh', h: 'Ghana', sub: ['Ahead', 'Data sovereignty'],
     body: 'Malabo Convention ratified; national data portal published and maintained.', foot: 'African Regional Report · 04 of 06' },
-  { num: '05', lab: 'Senegal · Côte d’Ivoire · Togo', theme: 'trio', ico: 'cflag:trio', sign: 'arcs:trio', h: 'Senegal, Côte d’Ivoire, Togo', sub: ['Ahead', 'Data sovereignty'],
+  { num: '05', lab: 'Senegal · Côte d’Ivoire · Togo', theme: 'trio', mark: 'map:trio', ico: 'cflag:trio', sign: 'arcs:trio', h: 'Senegal, Côte d’Ivoire, Togo', sub: ['Ahead', 'Data sovereignty'],
     body: 'Malabo ratified; national data-centre programmes in delivery.', foot: 'African Regional Report · 05 of 06' },
-  { num: '06', lab: 'Liberia', ico: 'flag', sign: 'flag', gap: true, h: 'Liberia', sub: ['The gap', 'Data sovereignty'],
+  { num: '06', lab: 'Liberia', ico: 'flag', sign: 'flag', mark: 'lr', gap: true, h: 'Liberia', sub: ['The gap', 'Data sovereignty'],
     body: 'Law and strategy in place. No national ICT statistics platform in operation.', foot: 'African Regional Report · 06 of 06' },
 ];
 // the flags, as the site draws them (views.js FLAGS), with Côte d'Ivoire and Togo added
@@ -169,18 +240,35 @@ function flagSvg(code, w) { return '<svg width="' + w + '" height="' + (w * 2 / 
 var SDG = ['#E5243B','#DDA63A','#4C9F38','#C5192D','#FF3A21','#26BDE2','#FCC30B','#A21942','#FD6925','#DD1367','#FD9D24','#BF8B2E','#3F7E44','#0A97D9','#56C02B','#00689D','#19486A'];
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
 
-// ---- the bright panel's art: light streaks, a faint globe, a grid of dots, a wheel of segments
-function art(w, h, fmt, wheel) {
-  var g = '';
-  // the globe, faint, top left
-  var gx = fmt === 'slide' ? 118 : 120, gy = fmt === 'slide' ? 108 : 96, gr = 190;
-  g += '<g fill="none" stroke="rgba(255,255,255,.09)" stroke-width="3">';
-  g += '<circle cx="' + gx + '" cy="' + gy + '" r="' + gr + '"/><circle cx="' + gx + '" cy="' + gy + '" r="' + (gr * .66) + '"/>';
-  [0.35, 0.7].forEach(function (k) { g += '<ellipse cx="' + gx + '" cy="' + gy + '" rx="' + (gr * k) + '" ry="' + gr + '"/>'; });
-  [-0.5, 0, 0.5].forEach(function (k) { var yy = gy + gr * k, hw = Math.sqrt(gr * gr - (gr * k) * (gr * k)); g += '<line x1="' + (gx - hw) + '" y1="' + yy + '" x2="' + (gx + hw) + '" y2="' + yy + '"/>'; });
-  g += '<line x1="' + gx + '" y1="' + (gy - gr) + '" x2="' + gx + '" y2="' + (gy + gr) + '"/></g>';
+// ---- the bright panel's art: the subject's map or emblem (upper left), light streaks, a grid of dots,
+// and the slide's sign (lower left)
+var MARK_IMG = { seal: '../../public/img/brand/seal-large.webp', mopt: 'mopt-emblem.png', un: 'un-emblem.svg' };
+Object.keys(MARK_IMG).forEach(function (k) { var im = new Image(); im.src = MARK_IMG[k]; });
+function mark(m, fmt) {
+  if (!m) return '';
+  // a slide's tile starts 205px down, so its mark sits in the band above; a flyer's has the left of the panel
+  var bx = fmt === 'slide' ? -6 : -16, by = fmt === 'slide' ? -10 : -18, bw = fmt === 'slide' ? 400 : 380, bh = fmt === 'slide' ? 222 : 330;
+  if (m.indexOf('img:') === 0) {
+    var k = m.slice(4);
+    return '<image class="mk-img mk-' + k + '" href="' + MARK_IMG[k] + '" x="' + (bx + 20) + '" y="' + (by + 12) + '" width="' + (bw - 40) + '" height="' + (bh - 24) + '" preserveAspectRatio="xMidYMid meet"/>';
+  }
+  var vx = 0, vy = 0, vw, vh, hi = '', lo = '';
+  if (m === 'lr') {                            // Liberia, county by county
+    vx = 14; vy = 75; vw = 732; vh = 750;
+    hi = window.LIBERIA_COUNTIES.map(function (c) { return c.d; }).join('');
+  } else {
+    var mp = window.MAPS[m.slice(4)];
+    vw = mp.w; vh = mp.h; hi = mp.hi; lo = mp.lo;
+  }
+  var k2 = Math.min(bw / vw, bh / vh), ox = bx + (bw - vw * k2) / 2 - vx * k2, oy = by + (bh - vh * k2) / 2 - vy * k2;
+  return '<g class="mk" transform="translate(' + ox.toFixed(1) + ' ' + oy.toFixed(1) + ') scale(' + k2.toFixed(4) + ')">' +
+    (lo ? '<path class="mk-lo" d="' + lo + '" vector-effect="non-scaling-stroke"/>' : '') +
+    '<path class="mk-hi" d="' + hi + '" vector-effect="non-scaling-stroke"/></g>';
+}
+function art(w, h, fmt, sg, mk) {
+  var g = mark(mk, fmt);
   // light streaks sweeping up across the panel
-  g += '<defs><linearGradient id="st" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".45" stop-color="#9CC3FF" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
+  g += '<defs><linearGradient id="st" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".45" class="st-mid" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
     '<filter id="gl" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6"/></filter></defs>';
   var s1 = fmt === 'slide' ? 'M-40 700 C 140 610, 330 600, 600 520' : 'M-40 430 C 280 340, 620 330, 1120 230';
   var s2 = fmt === 'slide' ? 'M-40 760 C 180 660, 380 650, 620 600' : 'M-40 480 C 300 400, 700 380, 1120 300';
@@ -190,7 +278,7 @@ function art(w, h, fmt, wheel) {
   // the dots
   var dx = fmt === 'slide' ? 368 : 820, dy = fmt === 'slide' ? 702 : 330;
   for (var r = 0; r < 4; r++) for (var c = 0; c < 7; c++) g += '<circle cx="' + (dx + c * 23) + '" cy="' + (dy + r * 23) + '" r="2.6" class="dot"/>';
-  g += sign(wheel, w, h, fmt);
+  g += '<g class="sg">' + sign(sg, w, h, fmt) + '</g>';
   return '<svg class="art" viewBox="0 0 ' + w + ' ' + h + '">' + g + '</svg>';
 }
 
@@ -212,8 +300,8 @@ function sign(kind, w, h, fmt) {
     for (k = 0; k < n; k++) g += '<path d="' + arc(0, oy, R * 1.05 - band * (k + .5)) + '" fill="none" stroke="' + cols[k] + '" stroke-width="' + (band - 5).toFixed(1) + '"/>';
     g += '<path d="' + arc(0, oy, R * 1.05 + 12) + '" fill="none" class="acc" stroke-width="5"/>';
   } else if (kind === 'signal') {             // real time: a signal radiating from the corner
-    for (k = 1; k <= 6; k++) g += '<path d="' + arc(0, oy, R * (.2 + .16 * k)) + '" fill="none" stroke="' + (k % 2 ? LIME : '#6FA2F4') + '" stroke-width="9" stroke-linecap="round" stroke-opacity="' + (1.05 - .13 * k).toFixed(2) + '"/>';
-    g += '<circle cx="0" cy="' + oy + '" r="' + (R * .16) + '" fill="' + LIME + '"/>';
+    for (k = 1; k <= 6; k++) g += '<path d="' + arc(0, oy, R * (.2 + .16 * k)) + '" fill="none" style="stroke:var(' + (k % 2 ? '--lime' : '--tint') + ')" stroke-width="9" stroke-linecap="round" stroke-opacity="' + (1.05 - .13 * k).toFixed(2) + '"/>';
+    g += '<circle cx="0" cy="' + oy + '" r="' + (R * .16) + '" style="fill:var(--lime)"/>';
   } else if (kind === 'dots') {               // the workforce: a crowd of dots fanning out from the corner
     var n = 0;
     for (k = 1; k <= 9; k++) {
@@ -221,7 +309,7 @@ function sign(kind, w, h, fmt) {
       var m = Math.max(2, Math.round(r * Math.PI / 2 / 25));
       for (var j = 0; j <= m; j++) {
         a = -Math.PI / 2 + (j / m) * Math.PI / 2;
-        g += '<circle cx="' + (r * Math.cos(a)).toFixed(1) + '" cy="' + (oy + r * Math.sin(a)).toFixed(1) + '" r="6.2" fill="' + (n++ % 9 === 4 ? LIME : 'rgba(170,200,255,.85)') + '"/>';
+        g += '<circle cx="' + (r * Math.cos(a)).toFixed(1) + '" cy="' + (oy + r * Math.sin(a)).toFixed(1) + '" r="6.2" style="fill:var(' + (n++ % 9 === 4 ? '--lime' : '--tint') + ')"/>';
       }
     }
   } else if (kind === 'bars') {               // six commitments: six bars, rising
@@ -237,31 +325,31 @@ function sign(kind, w, h, fmt) {
     for (k = 0; k < 10; k++) { var rad = k % 2 ? sr * .382 : sr; a = Math.PI / 5 * k - Math.PI / 2; star.push((c / 2 + rad * Math.cos(a)).toFixed(1) + ',' + (oy - R + c / 2 + rad * Math.sin(a)).toFixed(1)); }
     g += '<defs><clipPath id="fq"><path d="M0 ' + oy + 'L' + pt(0, oy, R, -Math.PI / 2) + 'A' + R + ' ' + R + ' 0 0 1 ' + pt(0, oy, R, 0) + 'Z"/></clipPath></defs>' +
       '<g clip-path="url(#fq)">' + stripes + '<rect x="0" y="' + (oy - R) + '" width="' + c.toFixed(1) + '" height="' + c.toFixed(1) + '" fill="#002868"/><polygon points="' + star.join(' ') + '" fill="#fff"/></g>' +
-      '<path d="' + arc(0, oy, R + 12) + '" fill="none" stroke="' + LIME + '" stroke-width="5"/>';
+      '<path d="' + arc(0, oy, R + 12) + '" fill="none" style="stroke:var(--lime)" stroke-width="5"/>';
   } else if (kind === 'pillars') {            // the Agenda's pillars, the infrastructure one lit
     var px = fmt === 'slide' ? 30 : 26, cw = 34, cg = 30, base = oy - 22, ctop = oy - R * .92;
     var span2 = 3 * cw + 2 * cg + 36;
-    g += '<path d="M' + (px) + ' ' + (ctop - 4) + 'L' + (px + span2 / 2) + ' ' + (ctop - R * .32) + 'L' + (px + span2) + ' ' + (ctop - 4) + 'Z" fill="rgba(255,255,255,.1)" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>';
-    g += '<rect x="' + px + '" y="' + (ctop - 4) + '" width="' + span2 + '" height="14" fill="#fff"/>';
+    g += '<path d="M' + (px) + ' ' + (ctop - 4) + 'L' + (px + span2 / 2) + ' ' + (ctop - R * .32) + 'L' + (px + span2) + ' ' + (ctop - 4) + 'Z" style="fill:var(--inkf);stroke:var(--ink)" stroke-width="5" stroke-linejoin="round"/>';
+    g += '<rect x="' + px + '" y="' + (ctop - 4) + '" width="' + span2 + '" height="14" style="fill:var(--ink)"/>';
     for (k = 0; k < 3; k++) {
       var x = px + 18 + k * (cw + cg), lit = k === 1;
-      g += '<rect x="' + x + '" y="' + (ctop + 18) + '" width="' + cw + '" height="' + (base - ctop - 26) + '" fill="' + (lit ? LIME : 'rgba(255,255,255,.12)') + '" stroke="' + (lit ? LIME : '#fff') + '" stroke-width="4"/>';
-      if (!lit) for (var f = 1; f < 3; f++) g += '<line x1="' + (x + f * cw / 3) + '" y1="' + (ctop + 24) + '" x2="' + (x + f * cw / 3) + '" y2="' + (base - 14) + '" stroke="rgba(255,255,255,.5)" stroke-width="2"/>';
+      g += '<rect x="' + x + '" y="' + (ctop + 18) + '" width="' + cw + '" height="' + (base - ctop - 26) + '" style="' + (lit ? 'fill:var(--lime);stroke:var(--lime)' : 'fill:var(--inkf);stroke:var(--ink)') + '" stroke-width="4"/>';
+      if (!lit) for (var f = 1; f < 3; f++) g += '<line x1="' + (x + f * cw / 3) + '" y1="' + (ctop + 24) + '" x2="' + (x + f * cw / 3) + '" y2="' + (base - 14) + '" style="stroke:var(--ink)" stroke-opacity=".5" stroke-width="2"/>';
     }
-    g += '<rect x="' + (px - 8) + '" y="' + (base - 8) + '" width="' + (span2 + 16) + '" height="12" fill="#fff"/><rect x="' + (px - 20) + '" y="' + (base + 6) + '" width="' + (span2 + 40) + '" height="30" fill="rgba(255,255,255,.85)"/>';
+    g += '<rect x="' + (px - 8) + '" y="' + (base - 8) + '" width="' + (span2 + 16) + '" height="12" style="fill:var(--ink)"/><rect x="' + (px - 20) + '" y="' + (base + 6) + '" width="' + (span2 + 40) + '" height="30" style="fill:var(--ink)" fill-opacity=".85"/>';
   } else if (kind === 'star8') {              // eight priorities: an eight-pointed star
     var sx = R * .52, sy = oy - R * .46, pts = [], pts2 = []; R = R * .78;
     for (k = 0; k < 16; k++) { a = k * Math.PI / 8 - Math.PI / 2; pts.push(pt(sx, sy, k % 2 ? R * .4 : R, a).replace(' ', ',')); pts2.push(pt(sx, sy, k % 2 ? R * .2 : R * .5, a).replace(' ', ',')); }
-    g += '<circle cx="' + sx + '" cy="' + sy + '" r="' + (R * .72) + '" fill="none" stroke="rgba(160,195,255,.55)" stroke-width="3" stroke-dasharray="3 12" stroke-linecap="round"/>' +
-      '<polygon points="' + pts.join(' ') + '" fill="rgba(255,255,255,.1)" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>' +
-      '<polygon points="' + pts2.join(' ') + '" fill="' + LIME + '"/>';
+    g += '<circle cx="' + sx + '" cy="' + sy + '" r="' + (R * .72) + '" fill="none" style="stroke:var(--tint)" stroke-width="3" stroke-dasharray="3 12" stroke-linecap="round"/>' +
+      '<polygon points="' + pts.join(' ') + '" style="fill:var(--inkf);stroke:var(--ink)" stroke-width="5" stroke-linejoin="round"/>' +
+      '<polygon points="' + pts2.join(' ') + '" style="fill:var(--lime)"/>';
   } else if (kind === 'shield') {             // data protection: a shield and a keyhole
     var hx = fmt === 'slide' ? 122 : 112, top = oy - R * 1.04, hw = R * .6, hh = R * 1.36;
     var sh = function (dx) { return 'M' + (hx - hw + dx) + ' ' + (top + dx) + 'L' + (hx + hw - dx) + ' ' + (top + dx) + 'L' + (hx + hw - dx) + ' ' + (top + hh * .42) + 'Q' + (hx + hw - dx) + ' ' + (top + hh * .86 - dx) + ' ' + hx + ' ' + (top + hh - dx) + 'Q' + (hx - hw + dx) + ' ' + (top + hh * .86 - dx) + ' ' + (hx - hw + dx) + ' ' + (top + hh * .42) + 'Z'; };
-    g += '<path d="' + sh(0) + '" fill="rgba(255,255,255,.1)" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>' +
-      '<path d="' + sh(16) + '" fill="none" stroke="' + LIME + '" stroke-width="3.5" stroke-linejoin="round"/>' +
-      '<circle cx="' + hx + '" cy="' + (top + R * .42) + '" r="' + (R * .12) + '" fill="#fff"/>' +
-      '<path d="M' + (hx - R * .07) + ' ' + (top + R * .46) + 'L' + (hx - R * .12) + ' ' + (top + R * .78) + 'L' + (hx + R * .12) + ' ' + (top + R * .78) + 'L' + (hx + R * .07) + ' ' + (top + R * .46) + 'Z" fill="#fff"/>';
+    g += '<path d="' + sh(0) + '" style="fill:var(--inkf);stroke:var(--ink)" stroke-width="6" stroke-linejoin="round"/>' +
+      '<path d="' + sh(16) + '" fill="none" style="stroke:var(--lime)" stroke-width="3.5" stroke-linejoin="round"/>' +
+      '<circle cx="' + hx + '" cy="' + (top + R * .42) + '" r="' + (R * .12) + '" style="fill:var(--ink)"/>' +
+      '<path d="M' + (hx - R * .07) + ' ' + (top + R * .46) + 'L' + (hx - R * .12) + ' ' + (top + R * .78) + 'L' + (hx + R * .12) + ' ' + (top + R * .78) + 'L' + (hx + R * .07) + ' ' + (top + R * .46) + 'Z" style="fill:var(--ink)"/>';
   } else if (kind === 'au') {                 // the African Union: gold and green rings, a laurel round them
     var GOLD = '#D4AF37', GREEN = '#3E9B4F';
     g += '<path d="' + arc(0, oy, R) + '" fill="none" stroke="' + GOLD + '" stroke-width="16"/>' +
@@ -277,8 +365,8 @@ function sign(kind, w, h, fmt) {
     var P2 = N.map(function (q) { return [q[0] * R * 1.3, oy - (1 - q[1]) * R * 1.05 - 8]; });
     var L = '';
     P2.forEach(function (p, i) { P2.slice(i + 1).forEach(function (q) { var d = Math.hypot(p[0] - q[0], p[1] - q[1]); if (d < R * .48) L += '<line x1="' + p[0].toFixed(1) + '" y1="' + p[1].toFixed(1) + '" x2="' + q[0].toFixed(1) + '" y2="' + q[1].toFixed(1) + '"/>'; }); });
-    g += '<g stroke="rgba(170,200,255,.75)" stroke-width="3">' + L + '</g>' +
-      P2.map(function (p, i) { return '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + (i === 3 ? 15 : 9) + '" fill="' + (i === 3 ? LIME : '#fff') + '"/>'; }).join('');
+    g += '<g style="stroke:var(--tint)" stroke-width="3">' + L + '</g>' +
+      P2.map(function (p, i) { return '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + (i === 3 ? 15 : 9) + '" style="fill:var(' + (i === 3 ? '--lime' : '--ink') + ')"/>'; }).join('');
   }
   return g;
 }
@@ -327,15 +415,15 @@ function render(i, fmt, set) {
   var d = (set === 'c' ? DC : D)[i], w = fmt === 'slide' ? 1600 : 1080, h = fmt === 'slide' ? 900 : 1350, isz = fmt === 'slide' ? 220 : 180;
   var sub = '<b' + (d.gap ? ' class="gap"' : '') + '>' + esc(d.sub[0]) + '</b>' + (d.sub[1] ? '<i>|</i>' + esc(d.sub[1]) : '');
   var list = d.list ? '<ul class="list">' + d.list.map(function (x) { return '<li><b>' + x[0] + '</b><span>' + esc(x[1]) + '</span><small>' + esc(x[2]) + '</small></li>'; }).join('') + '</ul>' : '';
-  var tail = d.cta ? '<span class="cta">' + esc(d.cta) + '<svg viewBox="0 0 24 24" fill="none" stroke="#A6D930" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>'
-    : d.foot ? '<i class="rule r3"></i><p class="foot">' + esc(d.foot) + '</p>' : '';
+  var tail = d.cta ? '<span class="cta">' + esc(d.cta) + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>'
+    : d.foot ? '<p class="foot">' + esc(d.foot) + '</p>' : '';
   document.getElementById('out').innerHTML =
     '<div class="s ' + fmt + (d.theme ? ' t-' + d.theme : '') + '">' +
-      '<div class="L">' + art(fmt === 'slide' ? 548 : 1080, fmt === 'slide' ? 900 : 520, fmt, d.sign) +
+      '<div class="L">' + art(fmt === 'slide' ? 548 : 1080, fmt === 'slide' ? 900 : 520, fmt, d.sign, d.mark) +
         '<div class="tile"><div class="tile-top"><span class="tile-num">' + esc(d.num) + '</span><span class="tile-lab">' + esc(d.lab) + '</span></div><div class="tile-ico">' + icon(d.ico, isz) + '</div></div>' +
       '</div>' +
       '<div class="pager"><i></i><i></i><i></i></div>' +
-      '<div class="R"><i class="rule r1"></i><h1>' + esc(d.h) + '</h1><p class="sub">' + sub + '</p><i class="rule r2"></i>' +
+      '<div class="R"><h1>' + esc(d.h) + '</h1><p class="sub">' + sub + '</p>' +
         '<p class="body">' + esc(d.body) + '</p>' + list + tail + '</div>' +
       '<img class="logo" src="../../public/img/brand/niis-mark-hd.png">' +
     '</div>';

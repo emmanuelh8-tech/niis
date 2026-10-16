@@ -1928,11 +1928,10 @@ exports.dashboardTopic = (ctx, { slug, label, description, counties, narrative }
 // from the page's own copy in the style of the owner's SDG slide; each card covers the last as the reader
 // scrolls. [alt text, link]
 const SLIDES = [
-  ['Providing Liberia ICT data in real time. 15 counties. We collect, validate and publish Liberia’s ICT statistics for all 15 counties, and we build the infrastructure that keeps them at home.'],
-  ['A dataset is also a workforce. 174 positions across eight role types: enumerators and supervisors in every county, research leads, data engineers, GIS and sampling specialists, quality analysts and developers, recruited from Liberian STEM graduates and researchers. Hosted in-country, methodology published, staff trained locally. See open roles.', '/careers'],
-  ['Commitments already made. Not a new agenda: this is the measurement capability six existing commitments already assume Liberia has. ARREST Agenda, National Digital Strategy, Data Protection Act, AU Data Policy Framework, SDG Target 17.18, and Regional Digital Integration (ECOWAS, WARDIP).'],
+  ['What we do. 15 counties, collected, validated, published. We collect, validate and publish Liberia’s ICT statistics for all 15 counties, and we build the infrastructure that keeps them at home.'],
+  ['Why we do it. For Liberia’s national commitments, and to create jobs for young Liberians in tech: 174 positions across eight role types, from enumerators and supervisors in every county to research leads, data engineers, GIS and sampling specialists, quality analysts and developers, recruited from Liberian STEM graduates and trained locally. See open roles.', '/careers'],
   ['Commitment 1 of 6: ARREST Agenda for Inclusive Development, 2025 to 2029. ICT modernization sits in the Infrastructure pillar. NIIS is the measurement layer it is judged against.'],
-  ['Commitment 2 of 6: National Digital Strategy, 2025 to 2029. Cybersecurity and data sovereignty is one of its eight priorities. This is that pillar, made operational.'],
+  ['Commitment 2 of 6: National Digital Strategy, 2025 to 2029, of the Ministry of Posts and Telecommunications. Cybersecurity and data sovereignty is one of its eight priorities. This is that pillar, made operational.'],
   ['Commitment 3 of 6: Data Protection Act, enacted 2026. Built to Liberia’s first personal-data law: aggregate, anonymized statistics only.'],
   ['Commitment 4 of 6: AU Data Policy Framework, adopted 2022. Continental policy since 2022: member states are expected to hold and govern their own data.'],
   ['Commitment 5 of 6: United Nations Sustainable Development Goals, Target 17.18. Increase significantly the availability of high-quality, timely and reliable data disaggregated by income, gender, age, race, ethnicity, migratory status, disability, geographic location and other characteristics relevant in national contexts. County-level is the target, verbatim.'],
@@ -2010,13 +2009,16 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
         <h2 id="abAboutTitle" class="ab-about-h">About NIIS</h2>
         <span class="cs-mark" aria-hidden="true"></span>
         <h2 id="abStoryTitle" class="cs-h2" aria-label="Data sovereignty, made operational.">${csDecode('Data sovereignty, made operational.')}</h2>
-        <div class="ab-about">
-          <p><b>NIIS</b> is the acronym for the National ICT Intelligence System: a private-sector project, funded by the Government of Liberia, international agencies, private-sector stakeholders and institutions, to collect and continuously maintain Liberia’s ICT data, disaggregated across all 15 counties.</p>
-          <p>The project runs on three tiers of software. Secured databases store the ICT data we collect; a data-analytics algorithm draws on them; and the platform it feeds gives the public, anywhere in the world, access to ICT data across ${indicatorCount || 168} indicators.</p>
-          <p>NIIS is also an accelerator of ICT research. We have built a repository of all publicly available Liberian ICT research papers, we collect and host papers by Liberian ICT researchers, and we help researchers get published. We are also bringing together in one place, for the public, the ICT reports of government institutions, regulators and service providers.</p>
-          <p>We provide training and boot camps in partnership with international and local universities. And anyone who wants more data, a particular dataset or a new indicator can open a secure account on the platform, to search and save papers and reports, submit their research, and search for a job.</p>
-          <p><b>Why are we doing this?</b> For Liberia’s national commitments, and to create jobs for young Liberians in tech.</p>
-        </div>
+        <figure class="cs-people cs-people--mid">
+          <img src="/img/about/analysts.jpg?v=${ASSET_V}" alt="Liberian analysts at their screens, maps of the country open in front of them" loading="lazy" decoding="async">
+        </figure>
+        <dl class="cs-rows ab-rows">
+          <div class="cs-row"><dt><span class="cs-tag">The system</span></dt><dd data-fill><b>NIIS</b> is the acronym for the National ICT Intelligence System: a private-sector project, funded by the Government of Liberia, international agencies, private-sector stakeholders and institutions, to collect and continuously maintain Liberia’s ICT data, disaggregated across all 15 counties.</dd></div>
+          <div class="cs-row"><dt><span class="cs-tag">The software</span></dt><dd data-fill>The project runs on three tiers of software. Secured databases store the ICT data we collect; a data-analytics algorithm draws on them; and the platform it feeds gives the public, anywhere in the world, access to ICT data across ${indicatorCount || 168} indicators.</dd></div>
+          <div class="cs-row"><dt><span class="cs-tag">The research</span></dt><dd data-fill>NIIS is also an accelerator of ICT research. We have built a repository of all publicly available Liberian ICT research papers, we collect and host papers by Liberian ICT researchers, and we help researchers get published. We are also bringing together in one place, for the public, the ICT reports of government institutions, regulators and service providers.</dd></div>
+          <div class="cs-row"><dt><span class="cs-tag">The access</span></dt><dd data-fill>We provide training and boot camps in partnership with international and local universities. And anyone who wants more data, a particular dataset or a new indicator can open a secure account on the platform, to search and save papers and reports, submit their research, and search for a job.</dd></div>
+          <div class="cs-row"><dt><span class="cs-tag">The reason</span></dt><dd data-fill>For Liberia’s national commitments, and to create jobs for young Liberians in tech.</dd></div>
+        </dl>
         ${stats.length ? `<div class="ab-stats" role="list" aria-label="NIIS in numbers">${stats.map(([n, l, s], i) => `
           <div class="ab-stat" role="listitem"${rise(i)}>
             <p class="ab-stat-n" data-count="${n}">${n}</p>

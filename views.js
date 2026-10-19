@@ -3221,6 +3221,96 @@ const TALENTS = [
     note: 'Keeps the network and backup power running at a co-working space in Buchanan.', skills: ['Fibre splicing', 'MikroTik', 'Power backup'] },
   { name: 'Yassah Morris', img: 'yassah-morris', role: 'Data analyst', field: 'Data & AI', county: 'Bomi',
     note: 'Built a dashboard that tracks school enrolment across Bomi County.', skills: ['Power BI', 'Excel', 'SQL'] },
+  { name: 'Bendu Zwennes', img: 'bendu-zwennes', role: 'Mobile app developer', field: 'Software', county: 'Grand Gedeh',
+    note: 'Built an offline school-timetable app now used by teachers in Zwedru.', skills: ['Kotlin', 'Android', 'SQLite'] },
+  { name: 'Emmanuel Gonpu', img: 'emmanuel-gonpu', role: 'Backend developer', field: 'Software', county: 'Bong',
+    note: 'Wrote the payment API for a Gbarnga motorbike-taxi booking service.', skills: ['Node.js', 'PostgreSQL', 'Docker'] },
+  { name: 'Fatu Kiazolu', img: 'fatu-kiazolu', role: 'Front-end developer', field: 'Software', county: 'Grand Cape Mount',
+    note: 'Rebuilt a county health office website so it loads on 2G phones.', skills: ['React', 'Accessibility', 'CSS'] },
+  { name: 'Benedict Toweh', img: 'benedict-toweh', role: 'Software engineer', field: 'Software', county: 'Margibi',
+    note: 'Maintains open-source keyboards for writing Kpelle and Bassa on phones.', skills: ['Rust', 'Open source', 'Linux'] },
+  { name: 'Hawa Bility', img: 'hawa-bility', role: 'Web developer', field: 'Software', county: 'Bomi',
+    note: 'Teaches a Saturday coding club for girls in Tubmanburg.', skills: ['JavaScript', 'Python', 'Teaching'] },
+  { name: 'Patrick Nyanti', img: 'patrick-nyanti', role: 'DevOps engineer', field: 'Software', county: 'Grand Kru',
+    note: 'Automated the deployments of a Monrovia logistics start-up.', skills: ['Kubernetes', 'CI/CD', 'Linux'] },
+  { name: 'Elizabeth Karpeh', img: 'elizabeth-karpeh', role: 'QA engineer', field: 'Software', county: 'River Gee',
+    note: 'Tests mobile apps on low-cost phones before every release.', skills: ['Testing', 'Selenium', 'Android'] },
+  { name: 'Mark Wleh', img: 'mark-wleh', role: 'Data scientist', field: 'Data & AI', county: 'Sinoe',
+    note: 'Forecasts rice prices from market surveys for a farmers’ cooperative.', skills: ['Python', 'Pandas', 'Forecasting'] },
+  { name: 'Martha Gweh', img: 'martha-gweh', role: 'Machine-learning engineer', field: 'Data & AI', county: 'Montserrado',
+    note: 'Trained a model that reads handwritten clinic registers.', skills: ['PyTorch', 'Computer vision', 'Python'] },
+  { name: 'Christopher Fahnbulleh', img: 'christopher-fahnbulleh', role: 'Data engineer', field: 'Data & AI', county: 'Lofa',
+    note: 'Built the pipeline that joins Lofa’s school census to mobile-coverage data.', skills: ['SQL', 'Airflow', 'Python'] },
+  { name: 'Musu Kpakolo', img: 'musu-kpakolo', role: 'Statistician', field: 'Data & AI', county: 'Grand Bassa',
+    note: 'Designs household-survey samples for county development plans.', skills: ['R', 'Survey design', 'Stata'] },
+  { name: 'Jerome Dahn', img: 'jerome-dahn', role: 'AI researcher', field: 'Data & AI', county: 'Nimba',
+    note: 'Working on speech recognition for the Mano and Gio languages.', skills: ['Speech AI', 'Python', 'Linguistics'] },
+  { name: 'Agnes Paye', img: 'agnes-paye', role: 'GIS analyst', field: 'Data & AI', county: 'River Cess',
+    note: 'Maps road access to clinics across River Cess from drone imagery.', skills: ['QGIS', 'Remote sensing', 'Python'] },
+  { name: 'Gifty Barchue', img: 'gifty-barchue', role: 'Data analyst', field: 'Data & AI', county: 'Gbarpolu',
+    note: 'Tracks school enrolment against connectivity across Gbarpolu.', skills: ['Power BI', 'SQL', 'Excel'] },
+  { name: 'Henry Gbollie', img: 'henry-gbollie', role: 'Security analyst', field: 'Cybersecurity', county: 'Montserrado',
+    note: 'Hunts mobile-money fraud patterns for a Monrovia bank.', skills: ['SIEM', 'Threat hunting', 'Python'] },
+  { name: 'Lydia Nyumah', img: 'lydia-nyumah', role: 'Penetration tester', field: 'Cybersecurity', county: 'Margibi',
+    note: 'Found and responsibly reported weaknesses in three public web portals.', skills: ['Kali Linux', 'OWASP', 'Burp Suite'] },
+  { name: 'Abu Massaquoi', img: 'abu-massaquoi', role: 'SOC engineer', field: 'Cybersecurity', county: 'Grand Cape Mount',
+    note: 'Set up a round-the-clock monitoring desk for a telecom operator.', skills: ['Splunk', 'Networking', 'Incident response'] },
+  { name: 'Deborah Saye', img: 'deborah-saye', role: 'Digital forensics analyst', field: 'Cybersecurity', county: 'Bong',
+    note: 'Trains police officers in Gbarnga to secure evidence on phones.', skills: ['Forensics', 'Autopsy', 'Training'] },
+  { name: 'Robert Yarkpawolo', img: 'robert-yarkpawolo', role: 'Cloud security engineer', field: 'Cybersecurity', county: 'Maryland',
+    note: 'Hardened the cloud set-up of a Harper e-learning start-up.', skills: ['AWS', 'IAM', 'Terraform'] },
+  { name: 'Rose Barclay', img: 'rose-barclay', role: 'Electronics engineer', field: 'Hardware', county: 'Montserrado',
+    note: 'Designs solar charge controllers for rural phone-charging kiosks.', skills: ['PCB design', 'Embedded C', 'Solar'] },
+  { name: 'Thomas Kpehe', img: 'thomas-kpehe', role: 'Robotics engineer', field: 'Hardware', county: 'Nimba',
+    note: 'Built a low-cost irrigation controller for farms near Sanniquellie.', skills: ['Arduino', 'Sensors', '3D printing'] },
+  { name: 'Gbessie Paasewe', img: 'gbessie-paasewe', role: 'IoT developer', field: 'Hardware', county: 'Grand Bassa',
+    note: 'Connected water-pump sensors in Buchanan to an SMS alert service.', skills: ['IoT', 'ESP32', 'LoRa'] },
+  { name: 'Edwin Wiah', img: 'edwin-wiah', role: 'Repair technician', field: 'Hardware', county: 'Grand Kru',
+    note: 'Runs a phone and laptop repair training workshop in Barclayville.', skills: ['Electronics repair', 'Soldering', 'Training'] },
+  { name: 'Cynthia Tarr', img: 'cynthia-tarr', role: 'Hardware engineer', field: 'Hardware', county: 'Gbarpolu',
+    note: 'Prototyped a rugged tablet case for enumerators in the rainy season.', skills: ['CAD', 'Prototyping', 'Materials'] },
+  { name: 'Alexander Bropleh', img: 'alexander-bropleh', role: 'Network engineer', field: 'Networks', county: 'Montserrado',
+    note: 'Extended campus Wi-Fi across a Monrovia university campus.', skills: ['Cisco', 'Wi-Fi', 'Fibre'] },
+  { name: 'Sarah Kandakai', img: 'sarah-kandakai', role: 'Telecom engineer', field: 'Networks', county: 'Lofa',
+    note: 'Plans tower sites for rural 4G coverage across Lofa.', skills: ['RF planning', 'LTE', 'GIS'] },
+  { name: 'Alieu Sheriff', img: 'alieu-sheriff', role: 'Systems administrator', field: 'Networks', county: 'Bomi',
+    note: 'Keeps a county hospital’s records server running on solar power.', skills: ['Linux', 'Virtualisation', 'Backups'] },
+  { name: 'Lovetta Doe', img: 'lovetta-doe', role: 'Fibre technician', field: 'Networks', county: 'Margibi',
+    note: 'Splices fibre for the backbone along the Kakata highway.', skills: ['Fibre splicing', 'OTDR', 'Safety'] },
+  { name: 'George Nyenpan', img: 'george-nyenpan', role: 'Community-network builder', field: 'Networks', county: 'River Gee',
+    note: 'Built a mesh Wi-Fi network linking three villages near Fish Town.', skills: ['Mesh networking', 'OpenWrt', 'Solar'] },
+  { name: 'Arthur Quaye', img: 'arthur-quaye', role: 'IT support lead', field: 'Networks', county: 'Sinoe',
+    note: 'Keeps the computers of twelve county schools running.', skills: ['IT support', 'Windows', 'Networking'] },
+  { name: 'Precious Johnson', img: 'precious-johnson', role: 'Product designer', field: 'Design', county: 'Montserrado',
+    note: 'Designed the screens of a maternal-health text-message service.', skills: ['Figma', 'Product design', 'Research'] },
+  { name: 'Kelvin Weah', img: 'kelvin-weah', role: 'Graphic designer', field: 'Design', county: 'Grand Gedeh',
+    note: 'Draws public-health illustrations in local languages.', skills: ['Illustration', 'Branding', 'Adobe'] },
+  { name: 'Annie Massaley', img: 'annie-massaley', role: 'UI designer', field: 'Design', county: 'Sinoe',
+    note: 'Designs picture-menu interfaces for market traders who read little.', skills: ['UI design', 'Icons', 'Accessibility'] },
+  { name: 'Lamin Kortu', img: 'lamin-kortu', role: 'Motion designer', field: 'Design', county: 'Bong',
+    note: 'Animates explainers on mobile-money safety for television.', skills: ['Motion graphics', 'After Effects', 'Storyboarding'] },
+  { name: 'Faith Wolo', img: 'faith-wolo', role: 'Service designer', field: 'Design', county: 'Nimba',
+    note: 'Redesigned the waiting line of a Ganta public office with its staff.', skills: ['Service design', 'Workshops', 'Journey mapping'] },
+  { name: 'Augustus Brooks', img: 'augustus-brooks', role: 'Fintech developer', field: 'Fintech', county: 'Montserrado',
+    note: 'Built a savings-club (susu) app with group payouts.', skills: ['Payments API', 'Java', 'Security'] },
+  { name: 'Kebeh Sackor', img: 'kebeh-sackor', role: 'Product manager', field: 'Fintech', county: 'Lofa',
+    note: 'Launched mobile-money micro-loans for women traders in Voinjama.', skills: ['Product', 'Credit risk', 'Research'] },
+  { name: 'Mustapha Kaba', img: 'mustapha-kaba', role: 'Blockchain developer', field: 'Fintech', county: 'Grand Cape Mount',
+    note: 'Prototyped land-title records on a public ledger.', skills: ['Solidity', 'Smart contracts', 'Go'] },
+  { name: 'Ruth Gbarlee', img: 'ruth-gbarlee', role: 'Payments analyst', field: 'Fintech', county: 'Margibi',
+    note: 'Analyses the cost of remittances sent home by the diaspora.', skills: ['Excel', 'SQL', 'Payments'] },
+  { name: 'Nathaniel Dunbar', img: 'nathaniel-dunbar', role: 'Fintech founder', field: 'Fintech', county: 'Maryland',
+    note: 'Runs a merchant QR-payment service in Harper’s markets.', skills: ['Start-ups', 'Payments', 'Sales'] },
+  { name: 'Mary Pewee', img: 'mary-pewee', role: 'Video journalist', field: 'Digital media', county: 'Montserrado',
+    note: 'Produces short explainers on digital rights for social media.', skills: ['Video editing', 'Reporting', 'Premiere'] },
+  { name: 'Siaka Dukuly', img: 'siaka-dukuly', role: 'Podcast producer', field: 'Digital media', county: 'Bong',
+    note: 'Hosts a weekly tech podcast in Liberian English.', skills: ['Audio', 'Interviewing', 'Audition'] },
+  { name: 'Beatrice Nimely', img: 'beatrice-nimely', role: 'Social-media strategist', field: 'Digital media', county: 'Grand Bassa',
+    note: 'Runs digital campaigns for youth voter education.', skills: ['Content strategy', 'Analytics', 'Canva'] },
+  { name: 'Isaiah Gonkarnue', img: 'isaiah-gonkarnue', role: 'Photographer', field: 'Digital media', county: 'River Cess',
+    note: 'Documents ICT projects across the south-east for NGOs.', skills: ['Photography', 'Lightroom', 'Drone'] },
+  { name: 'Josephine Sayeh', img: 'josephine-sayeh', role: 'Content creator', field: 'Digital media', county: 'Gbarpolu',
+    note: 'Makes coding tutorials in Kpelle for YouTube.', skills: ['YouTube', 'Teaching', 'Editing'] },
 ];
 // Education and experience behind each sample profile (mock, as the profiles are), shown in the
 // details window that opens from a card. experience: [role, where, when]
@@ -3428,7 +3518,7 @@ exports.team = (ctx) => {
         </div>
       </div>
     </section>`;
-  // the talent pool on a turning sphere (app.js): a round photograph for each talent, and the field's mark and
+  // the talent pool on the map of Liberia (app.js): a round photograph for each talent, and the field's mark and
   // colour on its filter button
   const FIELD_MARK = { Software: ['code', '#1C5BB8'], 'Data & AI': ['chart', '#12A57E'], Cybersecurity: ['shield', '#C8102E'], Hardware: ['gauge', '#D9730D'],
     Networks: ['wifi', '#0B2C63'], Design: ['image', '#8E44AD'], Fintech: ['coin', '#1A5C38'], 'Digital media': ['camera', '#D6336C'] };
@@ -3484,11 +3574,11 @@ exports.team = (ctx) => {
           ${[['', 'All', 'layers', TALENTS.length], ...[...new Set(TALENTS.map((t) => t.field))].map((f) => [f, f, (FIELD_MARK[f] || ['sparkle'])[0], TALENTS.filter((t) => t.field === f).length])]
             .map(([f, label, ic, n], k) => `<button type="button" class="tp-orb${k ? '' : ' is-on'}" data-tp-field="${esc(f)}" aria-pressed="${k ? 'false' : 'true'}"><span class="dock-ic"><i class="dock-water" aria-hidden="true"></i>${icon(ic)}</span><span class="tp-orb-l">${esc(label)} <b>${n}</b></span></button>`).join('')}
         </div>
-        <div class="ts" data-sphere-box>
-          <div class="ts-stage" data-sphere aria-hidden="true">${TALENTS.map((t, i) => `
-            <button type="button" class="ts-node" data-person="talent" data-i="${i}" data-field="${esc(t.field)}" tabindex="-1" style="--c:${(FIELD_MARK[t.field] || ['', '#0B2C63'])[1]}"><img src="/img/talent/${t.img}.jpg?v=${ASSET_V}" alt="" width="600" height="800" loading="lazy" decoding="async" draggable="false"></button>`).join('')}
+        <div class="ts">
+          <div class="ts-stage" data-tmap aria-hidden="true">${TALENTS.map((t, i) => `
+            <button type="button" class="ts-node" data-person="talent" data-i="${i}" data-field="${esc(t.field)}" tabindex="-1" style="--c:${(FIELD_MARK[t.field] || ['', '#0B2C63'])[1]}"><img src="/img/talent/sq/${t.img}.jpg?v=${ASSET_V}" alt="" width="240" height="240" loading="lazy" decoding="async" draggable="false"></button>`).join('')}
           </div>
-          <p class="ts-cap" aria-hidden="true"><b></b><span>Drag to turn · choose a face</span></p>
+          <p class="ts-cap" aria-hidden="true"><b></b><span>Drag to tilt · choose a face</span></p>
           <ul class="ts-list" aria-label="ICT talents">${TALENTS.map((t, i) => `
             <li data-field="${esc(t.field)}"><button type="button" data-person="talent" data-i="${i}">${esc(t.name)}, ${esc(t.role)}, ${esc(t.county)}</button></li>`).join('')}
           </ul>

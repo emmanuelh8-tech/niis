@@ -6063,21 +6063,25 @@ html:has(#about-niis) { scroll-behavior: smooth; }
 .ab-rows b { font-weight: 600; }
 .ab-stat p { text-align: left; hyphens: manual; }   /* the labels under the numbers stay flush left on a phone */
 
-/* ---- Our Team: the talent pool on a turning sphere (talentSphere in app.js sets each face's place, size and
-   depth; --ts-node is a face's size). A soft disc behind marks the sphere; the name of the face under the
-   mouse shows beneath. A finger turns it sideways only, so the page still scrolls. */
+/* ---- Our Team: the talent pool on the map of Liberia (talentMap in app.js lays a honeycomb of faces over the
+   country, sets each face's place, size and depth and tilts the map under them; --ts-node is a face's size).
+   The land is drawn beneath, and a talent's county is outlined over the faces while their face is lifted.
+   A finger tilts it sideways only, so the page still scrolls. */
 .ts { display: grid; justify-items: center; margin-top: 1.4rem; }
-.ts-stage { --ts-node: 96px; position: relative; width: min(100%, 640px); aspect-ratio: 1; touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: grab; }
+.ts-stage { --ts-node: 56px; position: relative; width: min(100%, 720px); aspect-ratio: 812 / 828; perspective: 1400px; touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: grab; }
 .ts-stage.is-drag { cursor: grabbing; }
-.ts-stage::before { content: ''; position: absolute; inset: 14%; border-radius: 50%; pointer-events: none;
-  background: radial-gradient(circle at 42% 36%, rgb(255 255 255 / .9) 0%, rgb(232 236 242 / .7) 45%, rgb(214 221 231 / .35) 70%, transparent 72%); }
-.ts-node { position: absolute; left: 50%; top: 50%; width: var(--ts-node); height: var(--ts-node); margin: calc(var(--ts-node) / -2) 0 0 calc(var(--ts-node) / -2);
-  padding: 0; overflow: hidden; border: 2px solid rgb(255 255 255 / .95); border-radius: 50%; background: #E3E7EC; cursor: pointer;
-  box-shadow: 0 10px 22px -10px rgb(11 30 69 / .5), 0 0 0 1px rgb(11 30 69 / .06); will-change: transform, opacity; transition: box-shadow .2s ease; -webkit-tap-highlight-color: transparent; }
-.ts-node[hidden] { display: none; }
-.ts-node img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; pointer-events: none; -webkit-user-drag: none; }
-.ts-node:hover { box-shadow: 0 0 0 3px var(--c), 0 14px 28px -10px rgb(11 30 69 / .55); }
-.ts-node.is-match { box-shadow: 0 0 0 3px var(--c), 0 10px 22px -10px rgb(11 30 69 / .5); }
+.ts-plane, .ts-mark { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; transform: rotateX(22deg); will-change: transform; }
+.ts-shade path { fill: rgb(11 44 99 / .2); }
+.ts-land path { fill: #F2F4F7; stroke: #C9D1DC; stroke-width: 1; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.ts-mark { z-index: 2000; }
+.ts-mark path { fill: color-mix(in srgb, var(--mc, #0B2C63) 14%, transparent); stroke: var(--mc, #0B2C63); stroke-width: 2.5; vector-effect: non-scaling-stroke; stroke-linejoin: round; opacity: 0; transition: opacity .2s ease; }
+.ts-mark.is-on path { opacity: 1; }
+.ts-node { position: absolute; left: 50%; top: 50%; width: var(--ts-node); height: var(--ts-node); padding: 0; overflow: hidden; border: 2px solid #fff; border-radius: 50%;
+  background: #E3E7EC; cursor: pointer; visibility: hidden; transform: translate(-50%, -50%) scale(0);
+  box-shadow: 0 6px 12px -7px rgb(11 30 69 / .6), 0 0 0 1px rgb(11 30 69 / .06); will-change: transform; transition: box-shadow .2s ease, filter .3s ease; -webkit-tap-highlight-color: transparent; }
+.ts-node img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; -webkit-user-drag: none; }
+.ts-node.is-lift { box-shadow: 0 0 0 3px var(--c), 0 18px 32px -12px rgb(11 30 69 / .6); }
+.ts-node.is-match { box-shadow: 0 0 0 2.5px var(--c), 0 6px 12px -7px rgb(11 30 69 / .6); }
 .ts-node.is-dim { filter: grayscale(1); pointer-events: none; }
 .ts-cap { display: grid; justify-items: center; gap: .2rem; min-height: 2.8rem; margin: .6rem 0 0 !important; text-align: center; }
 .ts-cap b { font: 700 1.02rem/1.2 var(--sans); color: #0E1420; }

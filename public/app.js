@@ -924,115 +924,213 @@
     else { seen = true; run(); }
   }
 
-  // ---- the talent pool on a sphere (after the owner's img-sphere component, in plain JavaScript): each face is
-  // set on a sphere by a Fibonacci spiral; the sphere turns slowly on its own, a drag turns it and it coasts on,
-  // the faces round the back fade away, those near the rim and behind are drawn smaller, and any that would
-  // overlap shrink. A face opens the talent's profile. A field button keeps every face on the sphere but fades
-  // the others back, rings that field's people and turns the first to the front. The list beside it (for
-  // keyboards and screen readers) turns each talent to the front on focus.
-  function talentSphere(stage, onPick) {
-    var nodes = qsa('.ts-node', stage), box = stage.parentNode, list = qsa('.ts-list li', box);
-    var cap = qs('.ts-cap', box), capName = cap && qs('b', cap), capLine = cap && qs('span', cap), hint = capLine ? capLine.textContent : '';
+  // ---- the talent pool on the map of Liberia (in the sphere's place): the country is filled with a honeycomb
+  // of faces, one to each talent, each set as near its own county as the room allows. The map lies tilted in
+  // depth and sways a little on its own while a slow wave runs over the faces; a drag tilts it further and it
+  // settles back. The face under the mouse grows, the faces round it make way, its name shows beneath and its
+  // county is outlined on the map. A face opens the talent's profile (on a touch screen the first tap shows who
+  // it is, and a second opens it). A field button fades the other faces back and rings this field's people. The
+  // list beside it (for keyboards and screen readers) lifts each talent's face as it takes focus.
+  function talentMap(stage, onPick) {
+    var C = window.LIBERIA_COUNTIES;
+    var nodes = qsa('.ts-node', stage), N = nodes.length;
+    if (!C || !C.length || !N || !window.Path2D) return;
+    var box = stage.parentNode, list = qsa('.ts-list li', box);
+    var cap = qs('.ts-cap', box), capName = cap && qs('b', cap), capLine = cap && qs('span', cap);
+    var TOUCH = window.matchMedia && matchMedia('(hover: none)').matches;
+    var hint = TOUCH ? 'Tap a face to see who it is' : (capLine ? capLine.textContent : '');
+    if (capLine) capLine.textContent = hint;
     var P = (window.__PEOPLE__ && window.__PEOPLE__.talent) || [];
-    var D2R = Math.PI / 180, AUTO = REDUCE ? 0 : 0.2, DECAY = 0.96, MAXV = 6, SENS = 0.5;
-    var rot = { x: 15, y: 15 }, vel = { x: 0, y: 0 }, aim = null, drag = null, hover = -1, raf = 0, last = 0, seen = false;
-    var size = 0, R = 0, base = 0, live = [], pos = [], dim = [];
-    function norm(a) { while (a > 180) a -= 360; while (a < -180) a += 360; return a; }
-    function clamp(v) { return Math.max(-MAXV, Math.min(MAXV, v)); }
-    function rnd(seed) { var a = Math.sin(seed * 12.9898 + 4.1414) * 43758.5453; return a - Math.floor(a); }
-    // the faces' places: a Fibonacci spiral, pulled towards the poles, with a little jitter so it is not a pattern
-    function layout(idx, born) {
-      live = idx; pos = [];
-      var inc = 2 * Math.PI / ((1 + Math.sqrt(5)) / 2), n = idx.length;
-      idx.forEach(function (ni, k) {
-        var phi = Math.acos(1 - 2 * (k + .5) / n) / D2R, theta = (inc * k / D2R) % 360;
-        var bonus = Math.pow(Math.abs(phi - 90) / 90, .6) * 35;
-        phi = phi < 90 ? Math.max(5, phi - bonus) : Math.min(175, phi + bonus);
-        phi = 15 + phi / 180 * 150;
-        theta = (theta + (rnd(ni + 1) - .5) * 20 + 360) % 360;
-        phi = Math.max(0, Math.min(180, phi + (rnd(ni + 51) - .5) * 10));
-        pos.push({ th: theta, ph: phi, born: born || 0 });
-      });
-      nodes.forEach(function (nd, i) { nd.hidden = idx.indexOf(i) < 0; });
-    }
-    function measure() {
-      size = Math.round(Math.min(box.clientWidth, 640));
-      R = size * .36; base = Math.round(size * .27);
-      stage.style.width = stage.style.height = size + 'px';
-      stage.style.setProperty('--ts-node', base + 'px');
-    }
-    function place(now) {
-      var cx = Math.cos(rot.x * D2R), sx = Math.sin(rot.x * D2R), cy = Math.cos(rot.y * D2R), sy = Math.sin(rot.y * D2R);
-      var fs = -.05 * R, fe = -.15 * R, pad = base * .16, moving = false;
-      var W = pos.map(function (p) {
-        var th = p.th * D2R, ph = p.ph * D2R, x = R * Math.sin(ph) * Math.cos(th), y = R * Math.cos(ph), z = R * Math.sin(ph) * Math.sin(th);
-        var x1 = x * cy + z * sy, z1 = -x * sy + z * cy;
-        var y2 = y * cx - z1 * sx, z2 = y * sx + z1 * cx;
-        var dr = Math.min(Math.sqrt(x1 * x1 + y2 * y2) / R, 1), pole = p.ph < 30 || p.ph > 150;
-        var s = Math.max(.3, 1 - dr * (pole ? .4 : .7)) * Math.max(.5, .8 + (z2 + R) / (2 * R) * .3);
-        return { x: x1, y: y2, z: z2, s: s, vis: z2 > fe, o: z2 <= fs ? Math.max(0, (z2 - fe) / (fs - fe)) : 1 };
-      });
-      W.forEach(function (w, i) {         // the faces that would overlap shrink
-        if (!w.vis) return;
-        var adj = w.s;
-        W.forEach(function (o, k) {
-          if (k === i || !o.vis) return;
-          var d = Math.hypot(w.x - o.x, w.y - o.y), min = base * (w.s + o.s) / 2 + pad;
-          if (d < min && d > 0) adj *= Math.max(.4, 1 - (min - d) / min * .6);
+    var VB = [-26, 36, 812, 828], CX = VB[0] + VB[2] / 2, CY = VB[1] + VB[3] / 2;      // the map's frame, in its own units
+    var D2R = Math.PI / 180, PERSP = 1400, TILT = 22, MAXT = 28;
+    var D = 0, cell = [], k = 1, b = 0, B = 0, lift = [], dim = [], seen = false, born = 0, raf = 0, last = 0;
+    var hover = -1, drag = null, off = { x: 0, y: 0 }, calm = 1, shown = [], zs = [], sz = [];
+    var byName = {}; C.forEach(function (c) { byName[c.name] = c; });
+
+    // the places: a honeycomb over the country, as coarse as it can be while still giving every talent a cell
+    // well inside the coast (the country is drawn once on a small canvas, so a point is cheap to test)
+    function honeycomb() {
+      var Q = .5, W = Math.ceil(760 * Q), H = Math.ceil(780 * Q), cv = document.createElement('canvas'), g = cv.getContext && cv.getContext('2d');
+      if (!g) return null;
+      cv.width = W; cv.height = H;
+      g.setTransform(Q, 0, 0, Q, 0, -60 * Q);
+      C.forEach(function (c) { g.fill(new Path2D(c.d)); });
+      var px = g.getImageData(0, 0, W, H).data;
+      function inside(u, v) { var x = Math.round(u * Q), y = Math.round((v - 60) * Q); return x >= 0 && y >= 0 && x < W && y < H && px[(y * W + x) * 4 + 3] > 127; }
+      var S = [[0, 0]];
+      for (var i = 0; i < 6; i++) { var a = i * Math.PI / 3; S.push([Math.cos(a) * .24, Math.sin(a) * .24], [Math.cos(a + Math.PI / 6) * .44, Math.sin(a + Math.PI / 6) * .44]); }
+      function grid(d, ox, oy) {
+        var out = [], h = d * Math.sqrt(3) / 2, row = 0;
+        for (var v = 60 + oy; v < 840; v += h, row++) {
+          for (var u = ox + (row % 2 ? d / 2 : 0); u < 760; u += d) {
+            var n = 0;
+            for (var s = 0; s < S.length; s++) if (inside(u + S[s][0] * d, v + S[s][1] * d)) n++;
+            if (n >= 6) out.push({ u: u, v: v, cov: n / S.length });
+          }
+        }
+        return out;
+      }
+      var lo = 8, hi = 400;
+      for (var it = 0; it < 22; it++) { var mid = (lo + hi) / 2; if (grid(mid, mid / 2, mid / 2).length >= N) lo = mid; else hi = mid; }
+      var best = null;
+      [1.06, 1.04, 1.02, 1].some(function (f) {
+        var d = lo * f;
+        [0, .25, .5, .75].forEach(function (fx) {
+          [0, .5].forEach(function (fy) {
+            var g2 = grid(d, d * fx, d * Math.sqrt(3) / 2 * fy);
+            if (g2.length < N) return;
+            g2.sort(function (p, q) { return q.cov - p.cov; });
+            g2.length = N;
+            var sc = g2.reduce(function (t, p) { return t + p.cov; }, 0);
+            if (!best || sc > best.sc) best = { d: d, cells: g2, sc: sc };
+          });
         });
-        w.t = Math.max(.25, adj);
+        return !!best;
       });
-      W.forEach(function (w, k) {
-        var nd = nodes[live[k]], p = pos[k], a = 1;
-        if (p.born) { a = Math.min(1, (now - p.born) / 520); a = 1 - Math.pow(1 - a, 3); if (a < 1) moving = true; else p.born = 0; }
-        if (!w.vis || a <= 0) { nd.style.visibility = 'hidden'; return; }
-        var faded = dim[live[k]], sc = w.t * (live[k] === hover ? Math.min(1.2, 1.2 / w.t) : 1) * (.4 + .6 * a) * (faded ? .78 : 1);
-        nd.style.visibility = '';
-        nd.style.opacity = (w.o * a * (faded ? .22 : 1)).toFixed(3);
-        nd.style.zIndex = Math.round(1000 + w.z);
-        nd.style.transform = 'translate3d(' + w.x.toFixed(1) + 'px,' + w.y.toFixed(1) + 'px,0) scale(' + sc.toFixed(3) + ')';
-      });
-      return moving;
+      if (!best) { var g3 = grid(lo, lo / 2, lo / 2); g3.length = Math.min(g3.length, N); best = { d: lo, cells: g3 }; }
+      return best;
+    }
+    // who goes where: each talent as near the middle of their county as they can get (nearest pairs first,
+    // then trading places while any two are better off swapped)
+    function seat(cells) {
+      var home = nodes.map(function (nd, i) { var c = byName[(P[i] || {}).county]; return c ? [c.cx, c.cy] : [380, 450]; });
+      function cost(i, j) { var dx = cells[j].u - home[i][0], dy = cells[j].v - home[i][1]; return dx * dx + dy * dy; }
+      var pairs = [], at = [], taken = [], n = 0;
+      for (var i = 0; i < N; i++) for (var j = 0; j < cells.length; j++) pairs.push([cost(i, j), i, j]);
+      pairs.sort(function (p, q) { return p[0] - q[0]; });
+      for (var p = 0; p < pairs.length && n < N; p++) {
+        var pr = pairs[p];
+        if (at[pr[1]] === undefined && !taken[pr[2]]) { at[pr[1]] = pr[2]; taken[pr[2]] = true; n++; }
+      }
+      for (var pass = 0; pass < 6; pass++) {
+        var better = false;
+        for (var a = 0; a < N; a++) for (var c = a + 1; c < N; c++) {
+          if (at[a] === undefined || at[c] === undefined) continue;
+          if (cost(a, at[c]) + cost(c, at[a]) < cost(a, at[a]) + cost(c, at[c]) - 1) { var t = at[a]; at[a] = at[c]; at[c] = t; better = true; }
+        }
+        if (!better) break;
+      }
+      return nodes.map(function (nd, i) { return at[i] === undefined ? null : cells[at[i]]; });
+    }
+
+    // the land under the faces, and the outline that marks a talent's county, both tilted with the faces
+    var NS = 'http://www.w3.org/2000/svg';
+    function svg(cls) {
+      var s = document.createElementNS(NS, 'svg');
+      s.setAttribute('class', cls); s.setAttribute('viewBox', VB.join(' ')); s.setAttribute('aria-hidden', 'true'); s.setAttribute('focusable', 'false');
+      return s;
+    }
+    function paths(parent, cls) {
+      var g = document.createElementNS(NS, 'g'); g.setAttribute('class', cls);
+      C.forEach(function (c) { var p = document.createElementNS(NS, 'path'); p.setAttribute('d', c.d); g.appendChild(p); });
+      parent.appendChild(g);
+    }
+    var plane = svg('ts-plane'), mark = svg('ts-mark'), markPath = document.createElementNS(NS, 'path');
+    var defs = document.createElementNS(NS, 'defs'), blur = document.createElementNS(NS, 'filter'), fe = document.createElementNS(NS, 'feGaussianBlur');
+    blur.setAttribute('id', 'tsShade'); blur.setAttribute('x', '-10%'); blur.setAttribute('y', '-10%'); blur.setAttribute('width', '120%'); blur.setAttribute('height', '120%');
+    fe.setAttribute('stdDeviation', '9'); blur.appendChild(fe); defs.appendChild(blur); plane.appendChild(defs);
+    paths(plane, 'ts-shade'); plane.lastChild.setAttribute('filter', 'url(#tsShade)'); plane.lastChild.setAttribute('transform', 'translate(0 16)');
+    paths(plane, 'ts-land');
+    mark.appendChild(markPath);
+    stage.insertBefore(plane, stage.firstChild);
+    stage.appendChild(mark);
+
+    function measure() {
+      var w = Math.round(Math.min(box.clientWidth, 720));
+      stage.style.width = w + 'px';
+      k = w / VB[2];
+      b = Math.max(14, D * k * .95);
+      B = Math.max(Math.min(b * 2.4, 150), Math.min(84, w * .24));
+      stage.style.setProperty('--ts-node', b.toFixed(1) + 'px');
+      sz = [];
     }
     function locked() { return document.documentElement.classList.contains('ui-locked'); }
+    function ease(x) { var c = 1.4; x = Math.max(0, Math.min(1, x)) - 1; return 1 + (c + 1) * x * x * x + c * x * x; }   // out, with a little overshoot
     function frame(now) {
       raf = 0;
-      var dt = last ? Math.min(.05, (now - last) / 1000) : 1 / 60, f = dt * 60; last = now;
-      var busy = false;
+      var dt = last ? Math.min(.05, (now - last) / 1000) : 1 / 60; last = now;
+      var t = now / 1000, busy = false;
+      calm += ((hover >= 0 || drag ? 0 : 1) - calm) * Math.min(1, dt * 4);
+      var amt = REDUCE ? 0 : calm;
+      if (amt > .001) busy = true;
       if (!drag) {
-        if (aim) {                       // turning a talent to the front
-          var ax = norm(aim.x - rot.x), ay = norm(aim.y - rot.y), k = Math.min(1, dt * 6);
-          rot.x = norm(rot.x + ax * k); rot.y = norm(rot.y + ay * k);
-          if (Math.abs(ax) < .2 && Math.abs(ay) < .2) aim = null;
-          vel.x = vel.y = 0; busy = true;
-        } else {
-          var d = Math.pow(DECAY, f);
-          vel.x *= d; vel.y *= d;
-          if (Math.abs(vel.x) < .01) vel.x = 0;
-          if (Math.abs(vel.y) < .01) vel.y = 0;
-          var spin = hover < 0 && !locked() ? AUTO : 0;
-          rot.x = norm(rot.x + clamp(vel.x) * f);
-          rot.y = norm(rot.y + (clamp(vel.y) + spin) * f);
-          busy = spin > 0 || vel.x !== 0 || vel.y !== 0;
-        }
+        off.x += -off.x * Math.min(1, dt * 3.2); off.y += -off.y * Math.min(1, dt * 3.2);
+        if (Math.abs(off.x) < .02) off.x = 0;
+        if (Math.abs(off.y) < .02) off.y = 0;
+        if (off.x || off.y) busy = true;
       }
-      if (place(now)) busy = true;
-      if (seen && !document.hidden && (busy || drag)) raf = requestAnimationFrame(frame);
+      var rx = Math.max(4, Math.min(38, TILT + amt * 2.5 * Math.sin(t * .31) + off.x));      // never so steep the faces pile up
+      var ry = Math.max(-MAXT, Math.min(MAXT, amt * 7 * Math.sin(t * .23) + off.y));
+      var tf = 'rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg)';
+      plane.style.transform = mark.style.transform = tf;
+      var cx = Math.cos(rx * D2R), sx = Math.sin(rx * D2R), cy = Math.cos(ry * D2R), sy = Math.sin(ry * D2R);
+      var up = [];
+      for (var i = 0; i < N; i++) {
+        var goal = i === hover ? 1 : 0, l = lift[i] || 0;
+        l += (goal - l) * Math.min(1, dt * 11);
+        if (Math.abs(goal - l) < .004) l = goal; else busy = true;
+        lift[i] = l;
+        if (l > .004 && cell[i]) up.push(i);
+      }
+      var dpx = D * k, reach = dpx * 3.1;
+      for (var j = 0; j < N; j++) {
+        var nd = nodes[j], p = cell[j];
+        if (!p) { nd.style.visibility = 'hidden'; continue; }
+        var X = (p.u - CX) * k, Y = (p.v - CY) * k, Z = 0, s = 1;
+        if (amt > .001) {                 // the wave, rolling in from the coast
+          var ph = t * 1.5 - (p.u * .8 + p.v * .5) / (D * 2.4);
+          Z = amt * dpx * .3 * Math.sin(ph); s = 1 + amt * .05 * Math.sin(ph);
+        }
+        for (var u = 0; u < up.length; u++) {        // making way for a face that grows
+          var h = up[u];
+          if (h === j) continue;
+          var dx = X - (cell[h].u - CX) * k, dy = Y - (cell[h].v - CY) * k, r = Math.sqrt(dx * dx + dy * dy);
+          if (r <= 0 || r >= reach) continue;
+          var f = lift[h] * Math.max(0, Math.min(1, 1 - (r - dpx * .9) / (reach - dpx * .9)));
+          var push = f * (B - b) * .5;
+          X += dx / r * push; Y += dy / r * push; s *= 1 - .2 * f;
+        }
+        Z += lift[j] * 46;
+        var x1 = X * cy + Z * sy, z1 = -X * sy + Z * cy, y2 = Y * cx - z1 * sx, z2 = Y * sx + z1 * cx, q = PERSP / (PERSP - z2);
+        var a = 1;
+        if (born && !REDUCE) {
+          a = (now - born - 60 - ((p.u - 14) / 732 * .55 + (p.v - 76) / 748 * .45) * 900) / 560;
+          if (a < 1) busy = true;
+          a = a <= 0 ? 0 : ease(a);
+        } else if (!born) a = 0;
+        var size = Math.round((b + lift[j] * (B - b)) * 10) / 10;
+        if (sz[j] !== size) { nd.style.width = nd.style.height = size + 'px'; sz[j] = size; }
+        nd.style.visibility = a > 0 ? 'visible' : 'hidden';
+        nd.style.transform = 'translate3d(' + (x1 * q).toFixed(1) + 'px,' + (y2 * q).toFixed(1) + 'px,0) translate(-50%,-50%) scale(' + (q * s * a).toFixed(3) + ')';
+        var o = (dim[j] ? .22 : 1) * Math.min(1, a * 1.5);
+        o = o.toFixed(2);
+        if (shown[j] !== o) { nd.style.opacity = o; shown[j] = o; }
+        var zi = lift[j] > .02 ? 3000 + Math.round(lift[j] * 100) : 1000 + Math.round(z2);
+        if (zs[j] !== zi) { nd.style.zIndex = zi; zs[j] = zi; }
+        nd.classList.toggle('is-lift', lift[j] > .5);
+      }
+      if (seen && !document.hidden && !locked() && (busy || drag)) raf = requestAnimationFrame(frame);
       else last = 0;
     }
     function run() { if (!raf && seen && !document.hidden) { last = 0; raf = requestAnimationFrame(frame); } }
     function tell(i) {
+      var who = i >= 0 && P[i], c = who && byName[who.county];
+      if (c) { markPath.setAttribute('d', c.d); mark.style.setProperty('--mc', nodes[i].style.getPropertyValue('--c') || '#0B2C63'); }
+      mark.classList.toggle('is-on', !!c);
       if (!cap) return;
-      if (i < 0 || !P[i]) { capName.textContent = ''; capLine.textContent = hint; cap.classList.remove('is-on'); return; }
-      capName.textContent = P[i].name; capLine.textContent = P[i].role + ' · ' + P[i].county; cap.classList.add('is-on');
+      if (!who) { capName.textContent = ''; capLine.textContent = hint; cap.classList.remove('is-on'); return; }
+      capName.textContent = who.name;
+      capLine.textContent = who.role + ' · ' + who.county + (TOUCH ? ' · tap again to open' : '');
+      cap.classList.add('is-on');
     }
+    function pick(i) { hover = i; tell(i); run(); }
     function btnFor(i) { return qs('.ts-list button[data-i="' + i + '"]', box); }
 
-    // a drag turns the sphere (with a finger, only sideways: up and down still scroll the page)
+    // a drag tilts the map (with a finger, only sideways: up and down still scroll the page); it settles back
     stage.addEventListener('pointerdown', function (e) {
       if (e.button) return;
-      drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, t: e.timeStamp, moved: false, node: e.target.closest('.ts-node') };
-      aim = null; vel.x = vel.y = 0; run();
+      drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, moved: false, node: e.target.closest('.ts-node'), type: e.pointerType };
+      run();
     });
     stage.addEventListener('pointermove', function (e) {
       if (!drag || e.pointerId !== drag.id) return;
@@ -1042,71 +1140,77 @@
         try { stage.setPointerCapture(e.pointerId); } catch (_) {}
         stage.classList.add('is-drag');
       }
-      var vx = e.pointerType === 'mouse' ? clamp(-(e.clientY - drag.y) * SENS) : 0, vy = clamp((e.clientX - drag.x) * SENS);
-      rot.x = norm(rot.x + vx); rot.y = norm(rot.y + vy); vel.x = vx; vel.y = vy;
-      drag.x = e.clientX; drag.y = e.clientY; drag.t = e.timeStamp;
+      if (e.pointerType === 'mouse') off.x = Math.max(4 - TILT, Math.min(38 - TILT, off.x - (e.clientY - drag.y) * .22));
+      off.y = Math.max(-MAXT, Math.min(MAXT, off.y + (e.clientX - drag.x) * .22));
+      drag.x = e.clientX; drag.y = e.clientY;
       run();
     });
     function release(e) {
       if (!drag || e.pointerId !== drag.id) return;
       var d = drag; drag = null;
       stage.classList.remove('is-drag');
-      if (d.moved && e.timeStamp - d.t > 90) vel.x = vel.y = 0;      // held still before letting go: no fling
-      if (!d.moved && d.node && e.type === 'pointerup') onPick(btnFor(d.node.dataset.i) || d.node);
+      if (!d.moved && e.type === 'pointerup') {
+        if (d.node) {
+          var i = Number(d.node.dataset.i);
+          if (d.type === 'mouse' || hover === i) onPick(btnFor(i) || d.node);
+          else pick(i);                 // a first tap: show who it is
+        } else if (d.type !== 'mouse') pick(-1);
+      }
       run();
     }
     stage.addEventListener('pointerup', release);
     stage.addEventListener('pointercancel', release);
-    // a face under the mouse grows a little, the turning pauses, and its name shows beneath
+    // a face under the mouse grows, the map holds still, and its name and county show
     stage.addEventListener('pointerover', function (e) {
       var nd = e.target.closest('.ts-node');
-      if (!nd || e.pointerType !== 'mouse') return;
-      hover = Number(nd.dataset.i); tell(hover); run();
+      if (!nd || e.pointerType !== 'mouse' || drag) return;
+      pick(Number(nd.dataset.i));
     });
     stage.addEventListener('pointerout', function (e) {
       var nd = e.target.closest('.ts-node');
-      if (!nd || (e.relatedTarget && nd.contains(e.relatedTarget)) || hover !== Number(nd.dataset.i)) return;
+      if (!nd || e.pointerType !== 'mouse' || (e.relatedTarget && nd.contains(e.relatedTarget)) || hover !== Number(nd.dataset.i)) return;
       // back to the talent focused in the list, if one is
       var f = document.activeElement && document.activeElement.closest && document.activeElement.closest('.ts-list button');
-      hover = f ? Number(f.dataset.i) : -1; tell(hover); run();
+      pick(f ? Number(f.dataset.i) : -1);
     });
-    // the list: a talent taking focus turns to the front; choosing it opens the profile
-    box.addEventListener('focusin', function (e) {
-      var b = e.target.closest('.ts-list button');
-      if (!b) return;
-      var i = Number(b.dataset.i), k = live.indexOf(i);
-      if (k < 0) return;
-      aim = { x: 90 - pos[k].ph, y: pos[k].th - 90 }; hover = i; tell(i); run();
-    });
-    box.addEventListener('focusout', function (e) { if (e.target.closest('.ts-list')) { hover = -1; tell(-1); run(); } });
-    qsa('.ts-list button', box).forEach(function (b) { b.addEventListener('click', function () { onPick(b); }); });
+    // the list: a talent taking focus lifts their face; choosing it opens the profile
+    box.addEventListener('focusin', function (e) { var b2 = e.target.closest('.ts-list button'); if (b2) pick(Number(b2.dataset.i)); });
+    box.addEventListener('focusout', function (e) { if (e.target.closest('.ts-list')) pick(-1); });
+    qsa('.ts-list button', box).forEach(function (b2) { b2.addEventListener('click', function () { onPick(b2); }); });
 
-    // a field button fades the other faces back and rings this field's people, turning the first to the front
+    // a field button fades the other faces back and rings this field's people
     var chips = qsa('[data-tp-field]');
-    chips.forEach(function (b) {
-      b.addEventListener('click', function () {
-        var f = b.dataset.tpField, first = -1;
+    chips.forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        var f = bt.dataset.tpField;
         pressOnly(chips, 'data-tp-field', f);
         nodes.forEach(function (nd, i) {
           dim[i] = !!f && nd.dataset.field !== f;
           nd.classList.toggle('is-dim', dim[i]);
           nd.classList.toggle('is-match', !!f && !dim[i]);
-          if (f && !dim[i] && first < 0) first = i;
         });
         list.forEach(function (li) { li.hidden = !!f && li.dataset.field !== f; });
-        if (first >= 0) { var k = live.indexOf(first); aim = { x: 90 - pos[k].ph, y: pos[k].th - 90 }; }
-        hover = -1; tell(-1); run();
+        pick(-1);
       });
     });
 
+    var hc = honeycomb();
+    if (!hc) return;
+    D = hc.d; cell = seat(hc.cells);
+    stage.classList.add('is-map');
     measure();
-    layout(nodes.map(function (_, i) { return i; }));
     var lastW = box.clientWidth;
-    window.addEventListener('resize', function () { if (box.clientWidth !== lastW) { lastW = box.clientWidth; measure(); place(performance.now()); } });
+    window.addEventListener('resize', function () { if (box.clientWidth !== lastW) { lastW = box.clientWidth; measure(); last = 0; frame(performance.now()); } });
     document.addEventListener('visibilitychange', run);
-    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { seen = es[es.length - 1].isIntersecting; if (seen) run(); }).observe(stage);
-    else { seen = true; run(); }
-    place(performance.now());
+    if (window.MutationObserver) new MutationObserver(run).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        seen = es[es.length - 1].isIntersecting;
+        if (seen && !born) born = performance.now();
+        if (seen) run();
+      }, { threshold: .15 }).observe(stage);
+    } else { seen = true; born = performance.now(); run(); }
+    frame(performance.now());
   }
 
   function initTeam() {
@@ -1128,9 +1232,9 @@
     var wheel = qs('[data-wheel]');
     if (wheel) teamWheel(wheel, openCard);
 
-    // ---- the talent pool: the people on a turning sphere; the field buttons gather it to one field
-    var sphere = qs('[data-sphere]');
-    if (sphere) talentSphere(sphere, function (btn) { openCard(btn); });
+    // ---- the talent pool: the people on the map of Liberia; the field buttons pick out one field
+    var map = qs('[data-tmap]');
+    if (map) talentMap(map, function (btn) { openCard(btn); });
   }
 
   // ============================================================

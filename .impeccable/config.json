@@ -35,6 +35,15 @@
         "value": "cubic-bezier(.34, 1.36, .5, 1)",
         "createdAt": "2026-10-15T13:06:33.245Z",
         "reason": "Owner-supplied glass-folder-cards.tsx defines --gf-spring as this curve for the lid hinge and the files' rise; public/glass-folder.js is a faithful port of it"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "public/app.js"
+        ],
+        "createdAt": "2026-10-19T15:45:54.101Z",
+        "reason": "Claude: the regional-report viewer's img gets its src from initRegionReport before the dialog opens; app.js builds its images at run time"
       }
     ]
   }

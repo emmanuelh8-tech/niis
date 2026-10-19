@@ -1711,7 +1711,7 @@
   // ---- Home: the featured papers on a 3D cylinder of cards (after the owner's 3d-carousel, in plain
   // JavaScript). It drifts slowly; a drag spins it and it coasts, then settles on a card; the arrows step a
   // card at a time; a card reached by keyboard turns to the front. Choosing a card opens it large, with the
-  // paper's details and a link to it. The cards round the back go dark and lose their words.
+  // paper's details and a link to it. The cards round the back fade away.
   function initPaperRing() {
     var box = qs('[data-ring]'), src = qs('#prData');
     if (!box || !src) return;
@@ -1720,7 +1720,7 @@
     var AUTO = REDUCE ? 0 : -5, SENS = 0.32, view = null, from = null;   // AUTO: degrees a second
     faces.forEach(function (f, k) { f.style.setProperty('--a', (k * step) + 'deg'); });
     function measure() {
-      cw = innerWidth <= 640 ? 1100 : innerWidth <= 1100 ? 1800 : 2300;
+      cw = innerWidth <= 640 ? 1750 : innerWidth <= 1100 ? 2100 : 2800;
       box.style.setProperty('--cw', cw + 'px');
       box.style.setProperty('--fw', (cw / n) + 'px');
       box.style.setProperty('--rad', (cw / (2 * Math.PI)) + 'px');
@@ -1729,7 +1729,7 @@
     function draw() {
       ring.style.transform = 'rotateY(' + rot.toFixed(2) + 'deg)';
       faces.forEach(function (f, k) {      // which cards face away
-        var a = ((k * step + rot) % 360 + 540) % 360 - 180, back = Math.abs(a) > 75;
+        var a = ((k * step + rot) % 360 + 540) % 360 - 180, back = Math.abs(a) > 92;
         if (f._b !== back) { f._b = back; f.classList.toggle('is-back', back); }
       });
     }

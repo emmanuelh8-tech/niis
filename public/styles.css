@@ -6092,11 +6092,11 @@ html:has(#about-niis) { scroll-behavior: smooth; }
 .ts-note { margin-top: .4rem !important; text-align: center; }
 
 /* ---- Home: the featured papers on a 3D cylinder (initPaperRing in app.js sets --cw, the cylinder's width,
-   --fw a card's width and --rad its radius). A dark stage, the cards round the front larger, those round the
-   back dark and wordless; a chosen card opens large over the page (.prv). */
-.pr { position: relative; height: 500px; margin-top: 1.2rem; overflow: hidden; border-radius: 22px;
-  background: radial-gradient(70% 90% at 50% 45%, #1A3A78 0%, #0D2350 52%, #071532 100%); }
-.pr-stage { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; perspective: 1000px;
+   --fw a card's width and --rad its radius). It stands on the page itself, the cards round the front larger,
+   those round the back faded away, the sides soft; a chosen card opens large over the page (.prv). */
+.pr { position: relative; height: 560px; margin-top: .6rem; overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%); }
+.pr-stage { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; perspective: 1400px;
   touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: grab; }
 .pr-stage.is-drag { cursor: grabbing; }
 .pr-ring { position: relative; flex: none; width: var(--cw, 1800px); height: 100%; transform-style: preserve-3d; will-change: transform; }
@@ -6107,19 +6107,19 @@ html:has(#about-niis) { scroll-behavior: smooth; }
 .pr-face:focus-visible { outline: none; }
 .pr-face:focus-visible .pr-card { box-shadow: 0 0 0 3px #fff, 0 0 0 6px #C8102E; }
 .pr-card { position: relative; display: block; width: 100%; aspect-ratio: 3 / 4; overflow: hidden; border-radius: 12px; background: #0B2C63;
-  box-shadow: 0 18px 30px -16px rgb(0 0 0 / .65), inset 0 0 0 1px rgb(255 255 255 / .12); transition: filter .4s ease, opacity .4s ease; }
+  box-shadow: 0 22px 34px -18px rgb(11 30 69 / .45), 0 2px 6px rgb(11 30 69 / .12); transition: filter .4s ease, opacity .4s ease; }
 .pr-img { position: absolute; inset: 0; background-size: cover; background-position: center; filter: blur(4px); transition: filter .15s cubic-bezier(.32,.72,0,1); }
 .pr.is-in .pr-img { filter: none; }
 .pr-cap { position: absolute; left: 0; right: 0; bottom: 0; display: grid; gap: .3rem; padding: 2.2rem .7rem .7rem;
   background: linear-gradient(180deg, transparent, rgb(4 12 32 / .9)); transition: opacity .3s ease; }
 .pr-tag { font: 600 .56rem/1.2 var(--font-label); letter-spacing: .14em; text-transform: uppercase; color: #FFCC00; }
 .pr-t { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; font: 600 .78rem/1.25 var(--sans); color: #fff; }
-.pr-face.is-back .pr-card { filter: brightness(.55) saturate(.6); }
-.pr-face.is-back .pr-cap { opacity: 0; }
+.pr-face { transition: opacity .35s ease; }
+.pr-face.is-back { opacity: 0; pointer-events: none; }   /* the far side of the cylinder: on the white page only the front arc shows */
 .pr-hint { position: absolute; left: 0; right: 0; bottom: .9rem; margin: 0; text-align: center; pointer-events: none;
-  font: 500 .64rem/1 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: rgb(255 255 255 / .6); }
+  font: 500 .64rem/1 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: #5A6575; }
 @media (max-width: 640px) {
-  .pr { height: 380px; border-radius: 16px; }
+  .pr { height: 380px; }
   .pr-face { padding: 5px; }
   .pr-t { -webkit-line-clamp: 3; font-size: .56rem; }
   .pr-tag { font-size: .46rem; }

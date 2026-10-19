@@ -1708,6 +1708,152 @@
     }
   }
 
+  // ---- Home: the featured papers on a 3D cylinder of cards (after the owner's 3d-carousel, in plain
+  // JavaScript). It drifts slowly; a drag spins it and it coasts, then settles on a card; the arrows step a
+  // card at a time; a card reached by keyboard turns to the front. Choosing a card opens it large, with the
+  // paper's details and a link to it. The cards round the back go dark and lose their words.
+  function initPaperRing() {
+    var box = qs('[data-ring]'), src = qs('#prData');
+    if (!box || !src) return;
+    var stage = qs('.pr-stage', box), ring = qs('.pr-ring', box), faces = qsa('.pr-face', box), D = JSON.parse(src.textContent);
+    var n = faces.length, step = 360 / n, rot = 0, vel = 0, aim = null, drag = null, hover = false, raf = 0, last = 0, seen = false, cw = 0;
+    var AUTO = REDUCE ? 0 : -5, SENS = 0.32, view = null, from = null;   // AUTO: degrees a second
+    faces.forEach(function (f, k) { f.style.setProperty('--a', (k * step) + 'deg'); });
+    function measure() {
+      cw = innerWidth <= 640 ? 1100 : innerWidth <= 1100 ? 1800 : 2300;
+      box.style.setProperty('--cw', cw + 'px');
+      box.style.setProperty('--fw', (cw / n) + 'px');
+      box.style.setProperty('--rad', (cw / (2 * Math.PI)) + 'px');
+    }
+    function nearest(a) { return a + Math.round((rot - a) / 360) * 360; }
+    function draw() {
+      ring.style.transform = 'rotateY(' + rot.toFixed(2) + 'deg)';
+      faces.forEach(function (f, k) {      // which cards face away
+        var a = ((k * step + rot) % 360 + 540) % 360 - 180, back = Math.abs(a) > 75;
+        if (f._b !== back) { f._b = back; f.classList.toggle('is-back', back); }
+      });
+    }
+    function open() { return !!view && !view.hidden; }
+    function frame(now) {
+      raf = 0;
+      var dt = last ? Math.min(.05, (now - last) / 1000) : 1 / 60, busy = false; last = now;
+      if (!drag) {
+        if (aim !== null) {
+          var d = aim - rot; rot += d * Math.min(1, dt * 7);
+          if (Math.abs(d) < .05) { rot = aim; aim = null; } busy = true;
+        } else if (Math.abs(vel) > 6) {   // a spin coasts down, then settles on the nearest card
+          rot += vel * dt; vel *= Math.pow(.04, dt); busy = true;
+          if (Math.abs(vel) <= 6) { vel = 0; aim = Math.round(rot / step) * step; }
+        } else if (AUTO && !hover && !open() && !document.documentElement.classList.contains('ui-locked')) {
+          rot += AUTO * dt; busy = true;
+        }
+      }
+      draw();
+      if (seen && !document.hidden && (busy || drag)) raf = requestAnimationFrame(frame); else last = 0;
+    }
+    function run() { if (!raf && seen && !document.hidden) { last = 0; raf = requestAnimationFrame(frame); } }
+
+    // a drag spins it (a finger, sideways only: the page still scrolls)
+    stage.addEventListener('pointerdown', function (e) {
+      if (e.button) return;
+      drag = { id: e.pointerId, x0: e.clientX, x: e.clientX, t: e.timeStamp, v: 0, moved: false, face: e.target.closest('.pr-face') };
+      aim = null; vel = 0; run();
+    });
+    stage.addEventListener('pointermove', function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      if (!drag.moved) {
+        if (Math.abs(e.clientX - drag.x0) < 6) return;
+        drag.moved = true;
+        try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+        stage.classList.add('is-drag');
+      }
+      var dx = e.clientX - drag.x, dt = Math.max(1, e.timeStamp - drag.t);
+      rot += dx * SENS; drag.v = dx * SENS / dt * 1000;
+      drag.x = e.clientX; drag.t = e.timeStamp; run();
+    });
+    function release(e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var d = drag; drag = null;
+      stage.classList.remove('is-drag');
+      if (d.moved) {
+        vel = e.timeStamp - d.t < 80 ? Math.max(-720, Math.min(720, d.v)) : 0;
+        if (Math.abs(vel) <= 6) { vel = 0; aim = Math.round(rot / step) * step; }
+      }
+      run();
+    }
+    stage.addEventListener('pointerup', release);
+    stage.addEventListener('pointercancel', release);
+    // a click that was not a drag opens the card; the link itself works without this script
+    stage.addEventListener('click', function (e) {
+      var f = e.target.closest('.pr-face');
+      if (!f) return;
+      e.preventDefault();
+      if (stage.classList.contains('was-drag')) return;
+      show(Number(f.dataset.p), f);
+    });
+    stage.addEventListener('pointerdown', function () { stage.classList.remove('was-drag'); }, true);
+    stage.addEventListener('pointermove', function () { if (drag && drag.moved) stage.classList.add('was-drag'); });
+    stage.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { hover = true; } });
+    stage.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') { hover = false; run(); } });
+    // the keyboard: a card taking focus turns to the front
+    box.addEventListener('focusin', function (e) {
+      var f = e.target.closest('.pr-face');
+      if (!f) return;
+      hover = true; aim = nearest(-faces.indexOf(f) * step); run();
+    });
+    box.addEventListener('focusout', function () { hover = false; run(); });
+    qsa('#featuredPapers .fp-arrow').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var base = aim !== null ? aim : Math.round(rot / step) * step;
+        vel = 0; aim = base - Number(b.dataset.dir) * step; run();
+      });
+    });
+
+    // the card, opened large: its picture, its kind, its title, who wrote it and when, and the way in
+    function build() {
+      view = document.createElement('div');
+      view.className = 'prv'; view.hidden = true;
+      view.innerHTML = '<div class="prv-shade" data-prv-close></div>' +
+        '<div class="prv-dlg" role="dialog" aria-modal="true" aria-labelledby="prvT" tabindex="-1">' +
+          '<button type="button" class="prv-x" data-prv-close aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' +
+          '<div class="prv-img"></div>' +
+          '<div class="prv-body"><span class="tag prv-tag"></span><h3 id="prvT"></h3><p class="prv-meta"></p>' +
+            '<a class="prv-go" href="#">Read the paper <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a></div>' +
+        '</div>';
+      document.body.appendChild(view);
+      view.addEventListener('click', function (e) { if (e.target.closest('[data-prv-close]')) close(); });
+      document.addEventListener('keydown', function (e) {
+        if (!open()) return;
+        if (e.key === 'Escape') { e.preventDefault(); close(); } else trapTab(e, qs('.prv-dlg', view));
+      });
+    }
+    function show(p, el) {
+      if (!view) build();
+      var d = D[p];
+      from = el || null;
+      qs('.prv-img', view).style.backgroundImage = d.img ? "url('" + d.img + "')" : '';
+      qs('.prv-tag', view).textContent = d.tag;
+      qs('#prvT', view).textContent = d.title;
+      qs('.prv-meta', view).textContent = 'by ' + d.by + ' · ' + d.date;
+      qs('.prv-go', view).href = d.href;
+      view.hidden = false; void view.offsetWidth; view.classList.add('is-open');
+      document.documentElement.classList.add('ui-locked');
+      try { qs('.prv-dlg', view).focus({ preventScroll: true }); } catch (e) {}
+    }
+    function close() {
+      view.classList.remove('is-open');
+      document.documentElement.classList.remove('ui-locked');
+      setTimeout(function () { view.hidden = true; run(); }, REDUCE ? 0 : 320);
+      if (from) try { from.focus({ preventScroll: true }); } catch (e) {}
+    }
+
+    measure(); draw();
+    window.addEventListener('resize', function () { measure(); draw(); });
+    document.addEventListener('visibilitychange', run);
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { seen = es[es.length - 1].isIntersecting; if (seen) { box.classList.add('is-in'); run(); } }).observe(box);
+    else { seen = true; box.classList.add('is-in'); run(); }
+  }
+
   // ---------- boot ----------
   var page = window.__NICTD_PAGE__;
   document.addEventListener('DOMContentLoaded', function () {
@@ -1725,6 +1871,7 @@
     if (qs('[data-kt]')) initKinetic();
     if (qs('[data-slides]')) initSlides();
     if (qs('[data-region-report]')) initRegionReport();
+    if (qs('[data-ring]')) initPaperRing();
     if (page === 'programs') initPrograms();
     if (page === 'login') initLogin();
     if (page === 'dashboard-topic') initDashboardTopic();

@@ -593,93 +593,39 @@ const FEATURED_PAPERS = [
   { id: 3, tag: 'Working Paper', img: 'fintech', title: 'Mobile Money & Financial Inclusion Across the 15 Counties', author: 'Digital Economy Working Group', date: 'Apr 2025' },
   { id: 1, tag: 'Policy Brief', img: 'broadband', title: 'The Urban-Rural Broadband Divide: County Evidence', author: 'NIIS Research', date: 'Mar 2025' },
 ];
+// the featured papers on a 3D cylinder of cards (initPaperRing in app.js, after the owner's 3d-carousel): the set
+// runs round twice, so the ring is full; a card opens large, with the paper's details and a link to it
 function featuredPapers() {
-  const card = (p) => `<a class="fp-card" href="/research/${p.id}">
-    <div class="fp-thumb" style="${slotBg('papers', p.img, true)}"></div>
-    <div class="fp-body">
-      <span class="tag">${esc(p.tag)}</span>
-      <h4>${esc(p.title)}</h4>
-      <div class="fp-meta">by ${esc(p.author)} &nbsp;·&nbsp; ${esc(p.date)}</div>
-    </div>
-  </a>`;
+  const ring = FEATURED_PAPERS.concat(FEATURED_PAPERS);
+  const face = (p, k) => {
+    const copy = k >= FEATURED_PAPERS.length;
+    return `<a class="pr-face" href="/research/${p.id}" data-p="${k % FEATURED_PAPERS.length}"${copy ? ' tabindex="-1" aria-hidden="true"' : ` aria-label="${esc(p.title)}, ${esc(p.tag)}, ${esc(p.date)}"`}>
+        <span class="pr-card"><span class="pr-img" style="${slotBg('papers', p.img, true)}"></span>
+          <span class="pr-cap"><span class="pr-tag">${esc(p.tag)}</span><span class="pr-t">${esc(p.title)}</span></span></span>
+      </a>`;
+  };
+  const data = FEATURED_PAPERS.map((p) => ({ href: `/research/${p.id}`, tag: p.tag, title: p.title, by: p.author, date: p.date, img: imgs.url('papers', p.img) || '' }));
   return `<section class="wrap section reveal" id="featuredPapers">
     <div class="sec-head-dh">
       <h2 data-perch="start">Featured Research Papers</h2>
       <div class="fp-nav">
         <a class="more" href="/research" style="margin-right:.8rem">All papers ${icon('arrow')}</a>
-        <button class="fp-arrow skip" data-dir="-1" aria-label="Previous">${icon('chevrons', 'icn ui-flip')}</button>
-        <button class="fp-arrow skip" data-dir="1" aria-label="Next">${icon('chevrons')}</button>
+        <button class="fp-arrow skip" data-dir="-1" aria-label="Previous paper">${icon('chevrons', 'icn ui-flip')}</button>
+        <button class="fp-arrow skip" data-dir="1" aria-label="Next paper">${icon('chevrons')}</button>
       </div>
     </div>
-    <div class="fp-track" id="fpTrack" data-worm>${FEATURED_PAPERS.map(card).join('')}${FEATURED_PAPERS.map(card).join('')}</div>
+    <div class="pr" data-ring data-worm role="region" aria-label="Featured research papers">
+      <div class="pr-stage"><div class="pr-ring">${ring.map(face).join('')}
+      </div></div>
+      <p class="pr-hint" aria-hidden="true">Drag to turn · choose a paper</p>
+    </div>
+    <script type="application/json" id="prData">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>
   </section>`;
 }
 const featuredPapersScript = `
 (function(){
-  // Continuous slow left-drift for the card rows. Hover pauses; leaving resumes.
-  // Each row renders its cards twice, so we can wrap at the halfway point seamlessly.
-  function marquee(track, speed){
-    if(!track) return null;
-    var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var paused=false, raf=0, last=0;
-    // keep the position as a float: scrollLeft is rounded by the browser, so
-    // sub-pixel per-frame increments would otherwise be discarded and never move.
-    var pos=track.scrollLeft;
-    function half(){ return track.scrollWidth/2; }
-    function step(ts){
-      if(!last) last=ts;
-      var dt=Math.min(64, ts-last); last=ts;
-      if(!paused){
-        var h=half();
-        pos += speed*(dt/1000);
-        if(h>0 && pos>=h) pos-=h;
-        track.scrollLeft = pos;
-      } else {
-        pos = track.scrollLeft;   // stay in sync if the user scrolls while paused
-      }
-      raf=requestAnimationFrame(step);
-    }
-    track.addEventListener('mouseenter', function(){ paused=true; });
-    track.addEventListener('mouseleave', function(){ paused=false; });
-    track.addEventListener('focusin', function(){ paused=true; });
-    track.addEventListener('focusout', function(){ paused=false; });
-    // a finger takes over: the drift stops, the swipe flows on with the phone's own momentum, and
-    // the drift picks up again from wherever the row came to rest. Before a swipe starts, the row
-    // is moved onto its second copy (which looks identical), so it can be swiped either way
-    var resumeT=0;
-    track.addEventListener('touchstart', function(){
-      paused=true; clearTimeout(resumeT);
-      var h=half(); if(h>0 && track.scrollLeft<h*0.25){ track.scrollLeft+=h; pos=track.scrollLeft; }
-    }, {passive:true});
-    function letGo(){
-      clearTimeout(resumeT);
-      resumeT=setTimeout(function(){ var h=half(); pos=track.scrollLeft; if(h>0 && pos>=h) pos-=h; track.scrollLeft=pos; paused=false; }, 2600);
-    }
-    track.addEventListener('touchend', letGo, {passive:true});
-    track.addEventListener('touchcancel', letGo, {passive:true});
-    if(!reduce) raf=requestAnimationFrame(step);
-    return {
-      nudge: function(dir){
-        var c=track.querySelector(':scope > *');
-        var w=c ? c.getBoundingClientRect().width+24 : 320;
-        var h=half();
-        pos = track.scrollLeft + dir*w*1.5;
-        if(h>0 && pos>=h) pos-=h;
-        if(pos<0) pos += h;
-        track.scrollLeft = pos;
-      },
-      pause: function(){ paused=true; }, resume: function(){ paused=false; }
-    };
-  }
-  window.__nictdMarquee = marquee;
-
   // the card rows are in place from the start (no reveal on scroll)
   document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in'); });
-
-  var fp = marquee(document.getElementById('fpTrack'), 26);
-  document.querySelectorAll('#featuredPapers .fp-arrow').forEach(function(b){
-    b.addEventListener('click', function(){ if(fp) fp.nudge(Number(b.dataset.dir)); });
-  });
 })();
 `;
 

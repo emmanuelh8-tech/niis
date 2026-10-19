@@ -85,7 +85,7 @@ async function start() {
   const meas = document.createElement('canvas').getContext('2d');
   const HEADS = 'h1, h2, h3, [data-perch]';
   const ITEMS = '.panel, .card, [class$="-card"], [class*="-card "], .lsc-map, .vid-frame, .dx-stat, .sp2-sheet, .btn, .rp-btn, .cs-btn';
-  const NO = '.gov-nav, .nav-sheet, [data-no-perch], .hero-slider, #sqTrends, #rcStage, #fpTrack, .lsc-deck, .dx-fs, .xdd-panel, .sp2-bar, .to-top, .lsc-card, dialog, [hidden]';
+  const NO = '.gov-nav, .nav-sheet, [data-no-perch], .hero-slider, #sqTrends, #rcStage, [data-ring], .prv, .lsc-deck, .dx-fs, .xdd-panel, .sp2-bar, .to-top, .lsc-card, dialog, [hidden]';
   const known = new WeakMap();
   let perches = [];
   function scan() {

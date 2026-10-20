@@ -2886,11 +2886,12 @@ function bbcLayout({ h1, lead, rows, tag = 'h1', id = '' }) {
 // page's picture is its slot in the Image Library ('headers'); an uploaded picture replaces the film,
 // so footage never plays under a different photograph. The list starts right under it.
 const listHero = ({ id, title, dim, sub, ctas, slot, film }) => {
-  const still = imgs.url('headers', slot);
+  const ver = (u) => (/^\//.test(u) ? u + (u.includes('?') ? '&' : '?') + 'v=' + ASSET_V : u);   // a new film or photo is fetched afresh
+  const still = ver(imgs.url('headers', slot));
   const media = film && !imgs.isCustom('headers', slot)
     ? `<video class="cs-film" autoplay muted loop playsinline preload="auto" poster="${esc(still)}" aria-hidden="true">
-        <source src="${esc(film.small)}" type="video/mp4" media="(max-width: 760px)">
-        <source src="${esc(film.src)}" type="video/mp4">
+        <source src="${esc(ver(film.small))}" type="video/mp4" media="(max-width: 760px)">
+        <source src="${esc(ver(film.src))}" type="video/mp4">
       </video>`
     : `<div class="cs-film lh-still" style="background-image:url('${esc(still)}')" aria-hidden="true"></div>`;
   return `<div class="cs lh">

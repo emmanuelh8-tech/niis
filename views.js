@@ -710,94 +710,6 @@ function filterBar({ placeholder, facetLabel, facetAll, options = [], total = 0,
   </div>`;
 }
 
-// Drives every .fbar on the page. Kept dependency free and tolerant of a missing
-// dropdown, so the same script serves a search-only bar and a search-plus-facet bar.
-const libraryFilterScript = `
-(function(){
-  var bars=[].slice.call(document.querySelectorAll('[data-library]'));
-  if(!bars.length) return;
-  bars.forEach(function(root){
-    var input=root.querySelector('.fbar-search input');
-    var go=root.querySelector('.fbar-go');
-    var clear=root.querySelector('.fbar-clear');
-    var facet=root.querySelector('.lib-year');
-    var count=root.querySelector('.fbar-count b');
-    var countWrap=root.querySelector('.fbar-count');
-    var active=root.querySelector('.fbar-active');
-    var chips=root.querySelector('.fbar-chips');
-    var empty=document.querySelector('[data-lib-empty]');
-    var scope=root.closest('[data-lib-scope]')||document;
-    var items=[].slice.call(scope.querySelectorAll('[data-lib-item]'));
-    var facetLabel=root.querySelector('.fbar-facet-label');
-    var facetName=facetLabel?facetLabel.textContent.trim():'Filter';
-    // the pill variant keeps its facet in a row of pills instead of a select
-    var pills=[].slice.call(root.querySelectorAll('.fbar-pill'));
-    function facetVal(){ if(facet) return facet.value; var on=root.querySelector('.fbar-pill.is-on'); return on?on.getAttribute('data-val'):''; }
-    function setPill(val){ pills.forEach(function(p){ var on=p.getAttribute('data-val')===val; p.classList.toggle('is-on',on); p.setAttribute('aria-checked',on?'true':'false'); }); }
-    pills.forEach(function(p){ p.addEventListener('click',function(){ setPill(p.getAttribute('data-val')); apply(); }); });
-
-    function chip(label,onClear){
-      var b=document.createElement('button');
-      b.type='button'; b.className='fbar-chip';
-      b.innerHTML='<span></span><i aria-hidden="true">&times;</i>';
-      b.querySelector('span').textContent=label;
-      b.setAttribute('aria-label','Remove filter: '+label);
-      b.addEventListener('click',function(){ onClear(); apply(); });
-      return b;
-    }
-
-    function apply(){
-      var q=(input.value||'').trim().toLowerCase();
-      var f=facetVal();
-      var n=0;
-      items.forEach(function(it){
-        var hay=(it.getAttribute('data-lib-search')||'').toLowerCase();
-        var val=it.getAttribute('data-lib-facet');
-        if(val===null) val=it.getAttribute('data-lib-year');
-        var okQ=!q||hay.indexOf(q)>-1;
-        var okF=!f||val===f;
-        var show=okQ&&okF;
-        it.hidden=!show;
-        if(show) n++;
-      });
-      if(count) count.textContent=n;
-      if(countWrap) countWrap.classList.toggle('is-empty',n===0);
-      if(empty) empty.hidden=n!==0;
-
-      // reflect what is applied, so a filter is never silently on (the pill variant shows it in
-      // the pills and the search itself, so it has no chip row)
-      if(chips){
-        chips.innerHTML='';
-        if(q) chips.appendChild(chip('"'+input.value.trim()+'"',function(){ input.value=''; }));
-        if(f&&facet){
-          var opt=facet.options[facet.selectedIndex];
-          chips.appendChild(chip(facetName+': '+opt.text,function(){ facet.value=''; }));
-        }
-      }
-      var any=!!(q||f);
-      if(active) active.hidden=!any;
-      if(clear) clear.hidden=!any;
-    }
-
-    input.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); apply(); } });
-    input.addEventListener('input',apply);
-    if(go) go.addEventListener('click',apply);
-    if(facet) facet.addEventListener('change',apply);
-    if(clear) clear.addEventListener('click',function(){
-      input.value=''; if(facet) facet.value=''; if(pills.length) setPill(''); apply(); input.focus();
-    });
-    apply();
-  });
-  // "/" jumps to the pill variant's search, unless the visitor is already typing somewhere
-  document.addEventListener('keydown',function(e){
-    if(e.key!=='/'||e.metaKey||e.ctrlKey||e.altKey) return;
-    var t=e.target; if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
-    var i=document.querySelector('.fbar--pills .fbar-search input'); if(!i) return;
-    e.preventDefault(); i.focus();
-  });
-})();
-`;
-
 // Back-compat shim: the older call signature is still used in a few places.
 function libraryFilter(placeholder, years, total, facetLabel = 'Year', facetAll = 'All years') {
   return filterBar({
@@ -3035,12 +2947,9 @@ function pageHeader(slug, title, sub = '') {
 }
 
 // ============ OUR PARTNERS ============
-// Logo on the left, the institution and its role in the middle, the focal point on the right.
-// Logos and focal-point photographs are supplied by each partner through the Image Library.
-// Where one is absent the card falls back to a lettered monogram or a neutral avatar: the page
-// never invents an institution's branding, and never shows an invented face beside a real name.
-const PARTNER_CATS = ['Government', 'Regulator', 'Statistics', 'Financial', 'Private sector', 'Academic', 'Development partner'];
-
+// The institutions by logo and name only (the owner's choice): the book, then a wall of tiles.
+// Logos are supplied by each partner through the Image Library. Where one is absent the tile shows a
+// lettered monogram, so the page never invents an institution's branding.
 function monogram(p) {
   // A real acronym stands in for a missing logo far better than three sliced characters, so use
   // the short name whole when it already is one (MoPT, LTA, LISGIS). Otherwise build initials.
@@ -3054,92 +2963,34 @@ function monogram(p) {
   return letters || '?';
 }
 
-function partnerCard(p) {
+// one institution: its logo and its name, opening its website when it has one
+function partnerTile(p) {
   const logo = imgs.url('partnerLogos', p.slug);
-  const face = imgs.url('partnerFocals', p.slug);
-  const st = { proposed: 'Engagement proposed', engaged: 'In discussion', signed: 'Agreement signed' }[p.status] || p.status;
-  return `<article class="pt-card" data-lib-item data-lib-facet="${esc(p.category)}" data-lib-search="${esc((p.name + ' ' + (p.short_name || '') + ' ' + p.category + ' ' + p.role).toLowerCase())}">
-    <div class="pt-logo">
-      ${logo
-        ? `<img src="${esc(logo)}" alt="${esc(p.name)} logo" loading="lazy">`
-        : `<span class="pt-monogram" data-len="${monogram(p).length}" aria-hidden="true">${esc(monogram(p))}</span>
-           <span class="pt-logo-note">Logo to be supplied</span>`}
-    </div>
-
-    <div class="pt-body">
-      <div class="pt-head">
-        <span class="pt-cat">${esc(p.category)}</span>
-        <span class="pt-status is-${esc(p.status)}">${esc(st)}</span>
-      </div>
-      <h3>${esc(p.name)}</h3>
-      ${p.short_name && p.short_name !== p.name ? `<p class="pt-abbr">${esc(p.short_name)}</p>` : ''}
-      <p class="pt-role">${esc(p.role)}</p>
-      ${p.contributes ? `<p class="pt-contrib"><span>Contributes</span>${esc(p.contributes)}</p>` : ''}
-      ${p.website ? `<a class="pt-link" href="${esc(p.website)}" target="_blank" rel="noopener noreferrer">Visit website ${icon('arrow')}</a>` : ''}
-    </div>
-
-    <aside class="pt-focal">
-      <p class="pt-focal-label">Focal point</p>
-      <div class="pt-face">
-        ${face
-          ? `<img src="${esc(face)}" loading="lazy" alt="${p.focal_name
-            ? esc(p.focal_name)
-            : 'Placeholder portrait. No focal point has been nominated for this institution yet.'}">`
-          : `<svg viewBox="0 0 48 48" class="pt-avatar" aria-hidden="true">
-               <circle cx="24" cy="17" r="9"></circle>
-               <path d="M6 46c0-9.4 8.1-15 18-15s18 5.6 18 15"></path>
-             </svg>`}
-      </div>
-      ${p.focal_name
-        ? `<p class="pt-focal-name">${esc(p.focal_name)}</p>
-           ${p.focal_title ? `<p class="pt-focal-title">${esc(p.focal_title)}</p>` : ''}
-           ${p.focal_unit ? `<p class="pt-focal-unit">${esc(p.focal_unit)}</p>` : ''}
-           ${p.focal_email ? `<a class="pt-focal-mail" href="mailto:${esc(p.focal_email)}">${esc(p.focal_email)}</a>` : ''}`
-        : `<p class="pt-focal-tbc">To be nominated</p>
-           <p class="pt-focal-hint">Each partner names one focal point who submits and signs off that institution's data.</p>`}
-    </aside>
-  </article>`;
+  const mark = logo
+    ? `<img src="${esc(logo)}" alt="" loading="lazy" decoding="async">`
+    : `<span class="pt-monogram" data-len="${monogram(p).length}" aria-hidden="true">${esc(monogram(p))}</span>`;
+  const inner = `<span class="pt-tile-logo">${mark}</span><span class="pt-tile-name">${esc(p.name)}</span>`;
+  return `<li>${p.website
+    ? `<a class="pt-tile" href="${esc(p.website)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(p.name)} (website, opens in a new tab)">${inner}</a>`
+    : `<div class="pt-tile">${inner}</div>`}</li>`;
 }
 
-exports.partners = (ctx, { partners = [] }) => {
-  const counts = PARTNER_CATS.map((c) => ({ cat: c, n: partners.filter((p) => p.category === c).length }))
-    .filter((x) => x.n > 0);
-  return shell(ctx, {
-    title: 'Our Partners', active: '/partners', workspaceActive: 'partners', body: `
+exports.partners = (ctx, { partners = [] }) => shell(ctx, {
+  title: 'Our Partners', active: '/partners', workspaceActive: 'partners', body: `
   ${partnerBook(partners)}
 
-  <div class="wrap section page-black">
-    ${filterBar({
-      placeholder: 'Search partners by name, sector or role…',
-      facetLabel: 'Sector',
-      facetAll: 'All sectors',
-      options: counts.map((c) => ({ value: c.cat, label: c.cat + ' (' + c.n + ')' })),
-      total: partners.length,
-      noun: 'shown',
-    })}
-
-    <div class="pt-list">
-      ${partners.map(partnerCard).join('')}
-    </div>
-
-    <section class="pt-join">
-      <h3>Becoming a partner</h3>
-      <p>Institutions that hold ICT related data and wish to contribute to the national database are welcome to
-        approach the ICT Statistics and Policy Unit. Partnership means supplying an agreed set of indicators on a
-        published schedule, under a written data sharing agreement, with a named focal point on each side.</p>
-      <a class="btn btn-teal" href="/about">${icon('mail')} Contact the ICT Statistics and Policy Unit</a>
-    </section>
-
+  <section class="wrap section pt-wall-sec" aria-labelledby="ptWallH">
+    <h2 id="ptWallH" class="sr-only">Partner institutions</h2>
+    ${partners.length
+      ? `<ul class="pt-wall" role="list">${partners.map(partnerTile).join('')}</ul>`
+      : '<p class="pt-note">Partner institutions will be listed here.</p>'}
     <p class="pt-note">Logos are the property of their respective organisations and are shown to identify
-      them. Partnership is at various stages of discussion and is confirmed institution by institution.
-      Focal point portraits are placeholders until each institution nominates its own.</p>
-  </div>
+      them. Partnership is at various stages of discussion and is confirmed institution by institution.</p>
+  </section>
   <script>
   ${partnerBookScript}
-  ${libraryFilterScript}
   </script>`,
-  });
-};
+});
 
 // ============ ICT REPORTS ============
 // Under the banner: the latest release as a feature, the counts, the library (type chips and a

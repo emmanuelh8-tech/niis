@@ -104,8 +104,8 @@ const COLLECTIONS = {
       // partners the owner added on 2026-10-20; each logo goes in public/img/partnerLogos or is uploaded here
       { key: 'prinstine', label: 'Prinstine Group', def: '/img/partnerLogos/prinstine.png' },
       { key: 'dw-consultancy', label: 'D & W Consultancy', def: '/img/partnerLogos/dw-consultancy.png' },
-      { key: 'afriktech', label: 'Afriktech Liberia', def: '/img/partnerLogos/afriktech.png' },
-      { key: 'gonet', label: 'Gonet', def: '/img/partnerLogos/gonet.png' },
+      { key: 'afriktech', label: 'Afriktech Solutions', def: '/img/partnerLogos/afriktech.png' },
+      { key: 'gonet', label: 'Gonet Academy', def: '/img/partnerLogos/gonet.png' },
       { key: 'ul', label: 'University of Liberia', def: '/img/partnerLogos/ul.png' },
     ],
   },

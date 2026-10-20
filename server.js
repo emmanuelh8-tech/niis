@@ -161,8 +161,8 @@ const SEEDED = {
 const ADDED_PARTNERS = [
   { slug: 'prinstine', name: 'Prinstine Group' },
   { slug: 'dw-consultancy', name: 'D & W Consultancy' },
-  { slug: 'afriktech', name: 'Afriktech Liberia' },
-  { slug: 'gonet', name: 'Gonet' },
+  { slug: 'afriktech', name: 'Afriktech Solutions' },
+  { slug: 'gonet', name: 'Gonet Academy' },
   { slug: 'ul', name: 'University of Liberia' },
 ];
 const notSeeded = (kind, rows) => (rows || []).filter((r) => !SEEDED[kind].has(String(r.title || '').trim()));

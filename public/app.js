@@ -1819,15 +1819,29 @@
   function initPaperRing() {
     var box = qs('[data-ring]'), src = qs('#prData');
     if (!box || !src) return;
-    var stage = qs('.pr-stage', box), ring = qs('.pr-ring', box), faces = qsa('.pr-face', box), D = JSON.parse(src.textContent);
-    var n = faces.length, step = 360 / n, rot = 0, vel = 0, aim = null, drag = null, hover = false, raf = 0, last = 0, seen = false, cw = 0;
+    var stage = qs('.pr-stage', box), ring = qs('.pr-ring', box), all = qsa('.pr-face', box), D = JSON.parse(src.textContent);
+    var faces = all, n = all.length, step = 360 / n, rot = 0, vel = 0, aim = null, drag = null, hover = false, raf = 0, last = 0, seen = false, lastW = -1;
     var AUTO = REDUCE ? 0 : -5, SENS = 0.32, view = null, from = null;   // AUTO: degrees a second
-    faces.forEach(function (f, k) { f.style.setProperty('--a', (k * step) + 'deg'); });
+    // the ring is sized to the section it stands in. Wide, it holds every paper twice, its sides reaching the
+    // section's edges. On a phone it is a six-sided drum of the papers once, small enough to stay whole on
+    // the screen, so it is seen to turn rather than slide off the sides.
     function measure() {
-      cw = innerWidth <= 640 ? 1750 : innerWidth <= 1100 ? 2100 : 2800;
-      box.style.setProperty('--cw', cw + 'px');
-      box.style.setProperty('--fw', (cw / n) + 'px');
-      box.style.setProperty('--rad', (cw / (2 * Math.PI)) + 'px');
+      var W = box.clientWidth;
+      if (W === lastW) return;
+      lastW = W;
+      var few = W < 560, copies = all.length / 2;
+      faces = few ? all.slice(0, copies) : all;
+      all.forEach(function (f, k) { f.style.display = few && k >= copies ? 'none' : ''; f._b = undefined; });
+      n = faces.length; step = 360 / n;
+      faces.forEach(function (f, k) { f.style.setProperty('--a', (k * step) + 'deg'); });
+      var R = few ? (W / 2 - 10) * Math.cos(Math.PI / n) : W * .47;
+      var fw = 2 * R * Math.tan(Math.PI / n), persp = R * (few ? 5 : 5.5), grow = persp / (persp - R), pad = few ? 5 : 8;
+      box.style.setProperty('--cw', Math.round(2 * R) + 'px');
+      box.style.setProperty('--fw', fw.toFixed(1) + 'px');
+      box.style.setProperty('--rad', R.toFixed(1) + 'px');
+      stage.style.perspective = Math.round(persp) + 'px';
+      box.style.height = Math.round((fw * 4 / 3 + pad * 2) * grow + (few ? 60 : 84)) + 'px';
+      rot = Math.round(rot / step) * step; aim = null;
     }
     function nearest(a) { return a + Math.round((rot - a) / 360) * 360; }
     function draw() {

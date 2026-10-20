@@ -2884,8 +2884,7 @@ function bbcLayout({ h1, lead, rows, tag = 'h1', id = '' }) {
 // About and Careers: the headline in two lines, two buttons and a line on what is here, over a real
 // picture. That is a film, or a photograph under a slow camera move (nobody in it is animated). Each
 // page's picture is its slot in the Image Library ('headers'); an uploaded picture replaces the film,
-// so footage never plays under a different photograph. The tail carries the hero's blue down into
-// the white page, as About's next section does.
+// so footage never plays under a different photograph. The list starts right under it.
 const listHero = ({ id, title, dim, sub, ctas, slot, film }) => {
   const still = imgs.url('headers', slot);
   const media = film && !imgs.isCustom('headers', slot)
@@ -2904,7 +2903,6 @@ const listHero = ({ id, title, dim, sub, ctas, slot, film }) => {
         ${sub ? `<p class="cs-hero-sub">${esc(sub)}</p>` : ''}
       </div>
     </section>
-    <div class="lh-tail" aria-hidden="true"></div>
   </div>`;
 };
 // a hero button to a page or an anchor; data-open asks the page to open that report in place

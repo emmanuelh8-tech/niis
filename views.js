@@ -604,7 +604,7 @@ const LIBERIA_RESEARCH = [
     venue: 'Asian Journal of Education and Social Studies', venueShort: 'Asian J. Education & Social Studies', cite: '52(5), 514–527',
     published_on: '2026-05-09', when: '9 May 2026', doi: '10.9734/ajess/2026/v52i53036',
     summary: 'A theoretical paper that sets out a Liberia-centred framework for bringing Internet of Things capabilities into teacher education, while keeping pedagogy, mentoring, equity, privacy and institutional governance at the centre.' },
-  { slug: 'kanu-2025-digital-public-infrastructure', img: 'national', tag: 'Journal article',
+  { slug: 'kanu-2025-digital-public-infrastructure', pdf: true, licence: 'CC BY 4.0', img: 'national', tag: 'Journal article',
     title: 'Digital Public Infrastructure, the Building Blocks for Digital Financial Inclusion and Taxation of the Digital Economy in Liberia',
     authors: 'David Hope Kanu', short: 'D. H. Kanu',
     venue: 'International Journal of Economics, Business and Management Research', venueShort: 'IJEBMR', cite: '9(11), 76–124',
@@ -677,7 +677,7 @@ function featuredPapers() {
           <span class="pr-cap"><span class="pr-tag">${esc(p.venueShort)}</span><span class="pr-t">${esc(p.title)}</span></span></span>
       </a>`;
   };
-  const data = FEATURED_PAPERS.map((p) => ({ href: `/research/p/${p.slug}`, tag: p.venue, title: p.title, by: p.short, date: p.when, img: paperPhoto(p) }));
+  const data = FEATURED_PAPERS.map((p) => ({ href: `/research/p/${p.slug}#paper-pdf`, tag: p.venue, title: p.title, by: p.short, date: p.when, img: paperPhoto(p) }));
   return `<section class="wrap section reveal" id="featuredPapers">
     <div class="sec-head-dh">
       <h2 data-perch="start">Featured Research Papers</h2>
@@ -2781,7 +2781,7 @@ const pvIcon = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${PV_ICONS[k]
 function pdfViewer({ url, title, note = '' }) {
   const src = `${url || PDF_SOON}?v=${ASSET_V}`;
   const btn = (k, label) => `<button type="button" class="pv-btn" data-pv="${k}" aria-label="${label}" title="${label}">${pvIcon(k)}</button>`;
-  return `<section class="pv" data-pdf="${esc(src)}" data-v="${ASSET_V}" aria-label="${esc(title)}, the PDF">
+  return `<section class="pv" id="paper-pdf" data-pdf="${esc(src)}" data-v="${ASSET_V}" aria-label="${esc(title)}, the PDF">
       <aside class="pv-side" aria-label="Pages"><div class="pv-thumbs"></div></aside>
       <div class="pv-main">
         <div class="pv-bar">
@@ -2816,7 +2816,7 @@ exports.journalPaper = (ctx, p) => {
   const lic = { 'CC BY 4.0': 'https://creativecommons.org/licenses/by/4.0/', 'CC BY 3.0': 'https://creativecommons.org/licenses/by/3.0/' }[p.licence];
   const pdfNote = p.pdf
     ? `The paper as published by ${esc(p.venue)}, shared under ${lic ? `the <a href="${lic}" target="_blank" rel="noopener noreferrer">${esc(p.licence)}</a>` : 'its'} licence, unchanged.`
-    : `The PDF of this paper is not on the platform yet. ${esc(p.venue)} publishes it: <a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">read it there</a>.`;
+    : `The PDF of this paper is not on the platform yet: ${esc(p.venue)} does not let it be shared. It will be added when it can be.`;
   return shell(ctx, {
     title: p.title, workspaceActive: 'research', extraHead: PDF_HEAD, body: `
   <div class="wrap section narrow paper-page">
@@ -2827,7 +2827,7 @@ exports.journalPaper = (ctx, p) => {
         <h1>${esc(p.title)}</h1>
         <p class="authors">${esc(p.authors)} · <span class="mono">${esc(p.when)}</span></p>
         <p class="paper-venue">${esc(p.venue)}${p.cite ? ', ' + esc(p.cite) : ''}</p>
-        <a class="btn btn-teal" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">Read the paper ${icon('arrow')}</a>
+        <a class="btn btn-teal" href="#paper-pdf">Read the paper ${icon('arrow')}</a>
         ${shareBar(ctx, '/research/p/' + p.slug, p.title)}
       </div>
     </div>
@@ -3250,7 +3250,7 @@ exports.reportPage = (ctx, { slug, indicators = [], domainLabels = {} }) => {
       <div>
         <h1>${esc(r.title)}</h1>
         <p class="authors">${esc(r.tag)} · <span class="mono">${esc(r.date)}</span></p>
-        <a class="btn btn-teal" href="/data">Explore the data ${icon('arrow')}</a>
+        <div class="paper-ctas"><a class="btn btn-teal" href="#paper-pdf">Read the report ${icon('arrow')}</a><a class="btn btn-ghost" href="/data">Explore the data ${icon('arrow')}</a></div>
         ${shareBar(ctx, '/reports/' + slug, r.title)}
       </div>
     </div>

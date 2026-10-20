@@ -5,6 +5,7 @@ Page header banners (slots in the admin Image Library, /admin/images):
   header-4.jpeg -> Research Papers
   header-5.jpeg -> Data Explorer
   header-6.png  -> Careers
+  team-ropes.jpg -> Our Team (AI-generated braided ropes, made at the owner's request)
   default.svg   -> fallback (currently used by Log In)
 
 To change a page's banner, overwrite that header-N file (keep the same name/extension),

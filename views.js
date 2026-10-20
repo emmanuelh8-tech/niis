@@ -2947,42 +2947,27 @@ function pageHeader(slug, title, sub = '') {
 }
 
 // ============ OUR PARTNERS ============
-// The institutions by logo and name only (the owner's choice): the book, then a wall of tiles.
-// Logos are supplied by each partner through the Image Library. Where one is absent the tile shows a
-// lettered monogram, so the page never invents an institution's branding.
-function monogram(p) {
-  // A real acronym stands in for a missing logo far better than three sliced characters, so use
-  // the short name whole when it already is one (MoPT, LTA, LISGIS). Otherwise build initials.
-  const short = (p.short_name || '').trim();
-  if (/^[A-Za-z]{2,6}$/.test(short)) return short.toUpperCase();
-  const src = (short || p.name || '').replace(/[^A-Za-z ]/g, ' ').trim();
-  const words = src.split(/\s+/).filter(Boolean);
-  const letters = (words.length > 1
-    ? words.slice(0, 3).map((w) => (/^[A-Z]{2,3}$/.test(w) ? w : w[0]))
-    : src.slice(0, 3).split('')).join('').toUpperCase().slice(0, 5);
-  return letters || '?';
-}
-
+// The institutions by logo and name only (the owner's choice): the book, then a wall of tiles. Only
+// partners whose logo has been supplied (through the Image Library) are shown, so the page never
+// invents an institution's branding; the owner took the group entries without one off the page.
 // one institution: its logo and its name, opening its website when it has one
 function partnerTile(p) {
-  const logo = imgs.url('partnerLogos', p.slug);
-  const mark = logo
-    ? `<img src="${esc(logo)}" alt="" loading="lazy" decoding="async">`
-    : `<span class="pt-monogram" data-len="${monogram(p).length}" aria-hidden="true">${esc(monogram(p))}</span>`;
-  const inner = `<span class="pt-tile-logo">${mark}</span><span class="pt-tile-name">${esc(p.name)}</span>`;
+  const inner = `<span class="pt-tile-logo"><img src="${esc(imgs.url('partnerLogos', p.slug))}" alt="" loading="lazy" decoding="async"></span><span class="pt-tile-name">${esc(p.name)}</span>`;
   return `<li>${p.website
     ? `<a class="pt-tile" href="${esc(p.website)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(p.name)} (website, opens in a new tab)">${inner}</a>`
     : `<div class="pt-tile">${inner}</div>`}</li>`;
 }
 
-exports.partners = (ctx, { partners = [] }) => shell(ctx, {
+exports.partners = (ctx, { partners = [] }) => {
+  const withLogo = partners.filter((p) => imgs.url('partnerLogos', p.slug));
+  return shell(ctx, {
   title: 'Our Partners', active: '/partners', workspaceActive: 'partners', body: `
   ${partnerBook(partners)}
 
   <section class="wrap section pt-wall-sec" aria-labelledby="ptWallH">
     <h2 id="ptWallH" class="sr-only">Partner institutions</h2>
-    ${partners.length
-      ? `<ul class="pt-wall" role="list">${partners.map(partnerTile).join('')}</ul>`
+    ${withLogo.length
+      ? `<ul class="pt-wall" role="list">${withLogo.map(partnerTile).join('')}</ul>`
       : '<p class="pt-note">Partner institutions will be listed here.</p>'}
     <p class="pt-note">Logos are the property of their respective organisations and are shown to identify
       them. Partnership is at various stages of discussion and is confirmed institution by institution.</p>
@@ -2990,7 +2975,8 @@ exports.partners = (ctx, { partners = [] }) => shell(ctx, {
   <script>
   ${partnerBookScript}
   </script>`,
-});
+  });
+};
 
 // ============ ICT REPORTS ============
 // Under the banner: the latest release as a feature, the counts, the library (type chips and a

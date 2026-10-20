@@ -2318,8 +2318,8 @@ tr.unread td { background: var(--gold-soft); }
 /* ============================================================================
    OUR PARTNERS
    The institutions by logo and name only: a wall of tiles under the book. Logos
-   are supplied by the partners through the Image Library; an absent one falls back
-   to a monogram of the institution's acronym, never to an invented logo.
+   are supplied by the partners through the Image Library; a partner without one
+   is not shown, so no logo is ever invented.
    ========================================================================== */
 .pt-wall { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin: 0; padding: 0; list-style: none; }
 .pt-wall > li { display: flex; min-width: 0; }
@@ -2331,15 +2331,6 @@ a.pt-tile:active { transform: translateY(0); }
 .pt-tile-logo { display: flex; align-items: center; justify-content: center; height: 96px; }
 .pt-tile-logo img { max-width: 168px; max-height: 96px; width: auto; height: auto; object-fit: contain; }
 .pt-tile-name { font-family: var(--serif); font-size: 1.02rem; line-height: 1.3; color: #000; text-wrap: balance; }
-/* Wider than tall, because it stands in for a logo and holds a real acronym. The serif is a
-   broad face, so the type steps down as the acronym lengthens and never touches the edges. */
-.pt-monogram { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; letter-spacing: .02em;
-  color: #fff; background: linear-gradient(140deg, var(--navy), var(--teal)); width: 92px; height: 74px;
-  border-radius: 13px; display: flex; align-items: center; justify-content: center;
-  padding: 0 .4rem; line-height: 1; overflow: hidden; white-space: nowrap; }
-.pt-monogram[data-len="4"] { font-size: 1.22rem; }
-.pt-monogram[data-len="5"] { font-size: 1rem; letter-spacing: .01em; }
-.pt-monogram[data-len="6"] { font-size: .86rem; letter-spacing: 0; }
 @media (max-width: 1080px) { .pt-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 720px) {
   .pt-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
@@ -2347,7 +2338,6 @@ a.pt-tile:active { transform: translateY(0); }
   .pt-tile-logo { height: 70px; }
   .pt-tile-logo img { max-width: 120px; max-height: 70px; }
   .pt-tile-name { font-size: .86rem; }
-  .pt-monogram { width: 76px; height: 60px; font-size: 1.2rem; }
 }
 
 /* ============================================================================

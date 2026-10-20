@@ -583,28 +583,99 @@ const heroSliderScript = `
 })();
 `;
 
-// Featured research papers, a "Latest News"-style card carousel with prev/next arrows.
-// Featured images live at /img/papers/<img>.jpg (real photos where available, themed gradient fallback otherwise).
-const FEATURED_PAPERS = [
-  { id: 1, tag: 'Flagship Report', img: 'connectivity', title: 'State of Connectivity in Liberia 2025', author: 'ICT Statistics & Policy Unit', date: 'Aug 2025' },
-  { id: 4, tag: 'National Baseline', img: 'national', title: 'National Digital Transformation Strategy: Progress Review', author: 'Ministry of Posts & Telecommunications', date: 'Jul 2025' },
-  { id: 3, tag: 'Report', img: 'governance', title: 'Digital Trust, National ID & E-Government Baseline', author: 'Governance & Data Protection Desk', date: 'Jun 2025' },
-  { id: 2, tag: 'Joint Study', img: 'education', title: 'ICT in Education: School Connectivity & Device Access', author: 'Ministry of Education · NIIS', date: 'May 2025' },
-  { id: 3, tag: 'Working Paper', img: 'fintech', title: 'Mobile Money & Financial Inclusion Across the 15 Counties', author: 'Digital Economy Working Group', date: 'Apr 2025' },
-  { id: 1, tag: 'Policy Brief', img: 'broadband', title: 'The Urban-Rural Broadband Divide: County Evidence', author: 'NIIS Research', date: 'Mar 2025' },
-];
+// Peer-reviewed research on ICT in Liberia, published in journals (the owner supplied the list; each
+// entry was checked against its publisher or the DOI registry, Crossref or Europe PMC, before it went in).
+// The summaries are NIIS's own, never the abstracts; each paper has a page here (/research/p/<slug>) and
+// opens at its publisher. 'when' is the date as precisely as the record gives it. Each carries a real
+// photograph (never an AI image): 'img' is one of the owner's paper photos (an Image Library slot,
+// 'papers'), 'photo' a real photograph from the site's other folders.
+const LIBERIA_RESEARCH = [
+  { slug: 'jolugbo-reeves-taylor-2026-instability-absorption', img: 'governance', tag: 'Journal article',
+    title: 'Instability absorption by tertiary educators: Technology adoption under conditions of fragility in the Liberian higher education sector',
+    authors: 'Olajide Jolugbo, Agnes Reeves-Taylor', short: 'O. Jolugbo, A. Reeves-Taylor',
+    venue: 'The African Journal of Information and Communication (AJIC)', venueShort: 'AJIC', cite: 'No. 37, 1–12',
+    published_on: '2026-07-17', when: '17 Jul 2026', doi: '10.23962/ajic.i37.26232',
+    summary: 'Interviews and a survey of 22 educators at 11 Liberian tertiary institutions show that digital teaching keeps running because educators absorb the disruptions of unstable infrastructure, not because systems are supplied and accepted. The authors propose an instability absorption model to describe it.' },
+  { slug: 'gilbert-2026-iot-teacher-education', img: 'broadband', tag: 'Framework',
+    title: 'Internet of Things for Teacher Education in Liberia: A Privacy-Preserving Theoretical Framework for Resource-Constrained Sub-Saharan African Contexts',
+    authors: 'Chris Gilbert, Duah Jeremiah Leakpor, Kwitee D. Gaylah, John K. Constance, Mercy A. Gilbert', short: 'C. Gilbert et al.',
+    venue: 'Asian Journal of Education and Social Studies', venueShort: 'Asian J. Education & Social Studies', cite: '52(5), 514–527',
+    published_on: '2026-05-09', when: '9 May 2026', doi: '10.9734/ajess/2026/v52i53036',
+    summary: 'A theoretical paper that sets out a Liberia-centred framework for bringing Internet of Things capabilities into teacher education, while keeping pedagogy, mentoring, equity, privacy and institutional governance at the centre.' },
+  { slug: 'kanu-2025-digital-public-infrastructure', img: 'national', tag: 'Journal article',
+    title: 'Digital Public Infrastructure, the Building Blocks for Digital Financial Inclusion and Taxation of the Digital Economy in Liberia',
+    authors: 'David Hope Kanu', short: 'D. H. Kanu',
+    venue: 'International Journal of Economics, Business and Management Research', venueShort: 'IJEBMR', cite: '9(11), 76–124',
+    published_on: '2025', when: '2025', doi: '10.51505/ijebmr.2025.91106',
+    summary: 'Argues that fragmented and duplicated e-government services hold back Liberia’s digital transformation, and sets out digital public infrastructure as the base for digital financial inclusion and for taxing the digital economy.' },
+  { slug: 'kennedy-2025-digital-inclusion-education', img: 'education', tag: 'Review',
+    title: 'Digital Inclusion in Liberia’s Education Sector: Review of Barriers, Policy Gaps, and Strategic Interventions',
+    authors: 'Gabriel M. Kennedy', short: 'G. M. Kennedy',
+    venue: 'American Journal of Educational Research', venueShort: 'American J. Educational Research', cite: '13(3), 102–110',
+    published_on: '2025-03-09', when: '9 Mar 2025', doi: '10.12691/education-13-3-1',
+    summary: 'A review of the infrastructure, cost, cultural and policy barriers to digital inclusion in Liberia’s schools and universities, weighed against the Liberia ICT Policy 2019–2024 and the National Development Plan 2025–2029, with a strategy to widen access.' },
+  { slug: 'kennedy-2025-ict-higher-education', photo: '/img/papers/skills.jpg', tag: 'Review',
+    title: 'Integrating ICT in Higher Education in Liberia: A Review of Best Practices, Challenges, and Opportunities',
+    authors: 'Gabriel M. Kennedy', short: 'G. M. Kennedy',
+    venue: 'Journal of Education and Practice', venueShort: 'J. Education and Practice', cite: '16(3)',
+    published_on: '2025-03', when: 'Mar 2025', doi: '10.7176/JEP/16-3-14',
+    summary: 'Reviews ICT integration in Liberian higher education against programmes in Rwanda, Egypt and South Africa, and names weak digital infrastructure, limited funding, faculty resistance, the digital-literacy gap and the absence of a national ICT-in-education policy as the main obstacles.' },
+  { slug: 'kennedy-2024-lecturers-tpack', photo: '/img/headers/header-1.jpeg', tag: 'Journal article',
+    title: 'Assessing Lecturers’ Technological Pedagogical Content Knowledge in Teaching Online Courses at Selected Universities in Liberia',
+    authors: 'Gabriel M. Kennedy', short: 'G. M. Kennedy',
+    venue: 'American Journal of Educational Research', venueShort: 'American J. Educational Research', cite: '12(6), 201–214',
+    published_on: '2024-06-23', when: '23 Jun 2024', doi: '10.12691/education-12-6-3',
+    summary: 'Surveys 155 lecturers at three Liberian universities, and interviews ten more, on their knowledge for teaching online. Lecturers showed a basic grasp of it and uneven technology skills; the study calls for targeted training and better technical infrastructure.' },
+  { slug: 'kennedy-2024-mandatory-ict-covid', photo: '/img/headers/header-4.jpeg', tag: 'Journal article',
+    title: 'Challenges of Mandatory ICT Use Among University Lecturers and Students During COVID-19 in Liberia',
+    authors: 'Gabriel M. Kennedy', short: 'G. M. Kennedy',
+    venue: 'International Journal of Smart Technology and Learning', venueShort: 'Int. J. Smart Technology & Learning', cite: '',
+    published_on: '2024', when: '2024', doi: '10.1504/IJSMARTTL.2024.10064867',
+    summary: 'Examines what lecturers and students at Liberian universities faced when the COVID-19 pandemic made the use of ICT for teaching and learning compulsory.' },
+  { slug: 'kennedy-2023-ict-teacher-education', photo: '/img/headers/header-2.jpeg', tag: 'Case study',
+    title: 'Challenges of ICT Integration in Teachers’ Education: A Case Study of the College of Education, University of Liberia',
+    authors: 'Gabriel M. Kennedy', short: 'G. M. Kennedy',
+    venue: 'International Journal of Social Science and Education Research Studies', venueShort: 'IJSSERS', cite: '3(5)',
+    published_on: '2023-05-13', when: '13 May 2023', doi: '10.55677/ijssers/V03I5Y2023-15',
+    summary: 'A case study of the College of Education at the University of Liberia, the country’s leading teacher-training institution, on the difficulties of bringing ICT into the training of teachers.' },
+  { slug: 'feng-2018-ebola-sms-health-seeking', photo: '/img/headers/header-3.jpeg', tag: 'Journal article',
+    title: 'Tracking health seeking behavior during an Ebola outbreak via mobile phones and SMS',
+    authors: 'Shuo Feng, Karen A. Grépin, Rumi Chunara', short: 'S. Feng et al.',
+    venue: 'npj Digital Medicine', venueShort: 'npj Digital Medicine', cite: '1, 51',
+    published_on: '2018-10-02', when: '2 Oct 2018', doi: '10.1038/s41746-018-0055-z',
+    summary: 'A national SMS poll of 6,694 people in Liberia, run from March to June 2015 and compared with the 2013 Demographic and Health Survey, tracked how people sought care during the Ebola outbreak; deliveries in health facilities fell during the outbreak.' },
+  { slug: 'zeng-cleon-2018-land-information-system', img: 'fintech', tag: 'Journal article',
+    title: 'Factors affecting the adoption of a land information system: An empirical analysis in Liberia',
+    authors: 'Zhongping Zeng, Christian Bobby Cleon', short: 'Z. Zeng, C. B. Cleon',
+    venue: 'Land Use Policy', venueShort: 'Land Use Policy', cite: '73, 353–362',
+    published_on: '2018-04', when: 'Apr 2018', doi: '10.1016/j.landusepol.2017.12.034',
+    summary: 'Combines three technology-acceptance theories in one model and tests it on a survey of 102 Liberian public servants: personal innovativeness, attitude and perceived control drive the intention to adopt a land information system.' },
+  { slug: 'kuehne-2016-ebola-mobile-phone-survey', img: 'connectivity', tag: 'Journal article',
+    title: 'Mortality, Morbidity and Health-Seeking Behaviour during the Ebola Epidemic 2014–2015 in Monrovia: Results from a Mobile Phone Survey',
+    authors: 'Annick Kuehne, Emily Lynch, Eleanor Marshall, Amanda Tiffany, Isaac Alley, Luke Bawo, Moses Massaquoi, Chiara Lodesani, Philippe Le Vaillant, Klaudia Porten, Etienne Gignoux',
+    short: 'A. Kuehne et al.',
+    venue: 'PLOS Neglected Tropical Diseases', venueShort: 'PLOS Negl. Trop. Diseases', cite: '10(8), e0004899',
+    published_on: '2016-08-23', when: '23 Aug 2016', doi: '10.1371/journal.pntd.0004899',
+    summary: 'Médecins Sans Frontières surveyed a random sample of Monrovia households by mobile phone, from December 2014 to March 2015, to measure deaths, illness and how people sought care during the Ebola epidemic.' },
+].map((p, n) => ({ ...p, n, url: 'https://doi.org/' + p.doi }));
+const researchBySlug = (s) => LIBERIA_RESEARCH.find((p) => p.slug === s);
+const paperPhoto = (p) => (p.img ? imgs.url('papers', p.img) : p.photo ? `${p.photo}?v=${ASSET_V}` : '');
+// the six on the home page's cylinder, newest first
+const FEATURED_PAPERS = ['jolugbo-reeves-taylor-2026-instability-absorption', 'gilbert-2026-iot-teacher-education', 'kanu-2025-digital-public-infrastructure',
+  'kennedy-2025-digital-inclusion-education', 'zeng-cleon-2018-land-information-system', 'kuehne-2016-ebola-mobile-phone-survey'].map(researchBySlug).filter(Boolean);
 // the featured papers on a 3D cylinder of cards (initPaperRing in app.js, after the owner's 3d-carousel): the set
-// runs round twice, so the ring is full; a card opens large, with the paper's details and a link to it
+// runs round twice, so the ring is full. Each card is the paper's photograph (the owner's own paper photos)
+// under its journal and title; a card opens large, with the paper's details and a link to its page.
 function featuredPapers() {
   const ring = FEATURED_PAPERS.concat(FEATURED_PAPERS);
   const face = (p, k) => {
     const copy = k >= FEATURED_PAPERS.length;
-    return `<a class="pr-face" href="/research/${p.id}" data-p="${k % FEATURED_PAPERS.length}"${copy ? ' tabindex="-1" aria-hidden="true"' : ` aria-label="${esc(p.title)}, ${esc(p.tag)}, ${esc(p.date)}"`}>
+    return `<a class="pr-face" href="/research/p/${p.slug}" data-p="${k % FEATURED_PAPERS.length}"${copy ? ' tabindex="-1" aria-hidden="true"' : ` aria-label="${esc(p.title)}, ${esc(p.venue)}, ${esc(p.when)}"`}>
         <span class="pr-card"><span class="pr-img" style="${slotBg('papers', p.img, true)}"></span>
-          <span class="pr-cap"><span class="pr-tag">${esc(p.tag)}</span><span class="pr-t">${esc(p.title)}</span></span></span>
+          <span class="pr-cap"><span class="pr-tag">${esc(p.venueShort)}</span><span class="pr-t">${esc(p.title)}</span></span></span>
       </a>`;
   };
-  const data = FEATURED_PAPERS.map((p) => ({ href: `/research/${p.id}`, tag: p.tag, title: p.title, by: p.author, date: p.date, img: imgs.url('papers', p.img) || '' }));
+  const data = FEATURED_PAPERS.map((p) => ({ href: `/research/p/${p.slug}`, tag: p.venue, title: p.title, by: p.short, date: p.when, img: paperPhoto(p) }));
   return `<section class="wrap section reveal" id="featuredPapers">
     <div class="sec-head-dh">
       <h2 data-perch="start">Featured Research Papers</h2>
@@ -1025,16 +1096,13 @@ function sqCard(s, i, col, place = col) {
   return `<button type="button" class="sq-card" role="tab" id="sqTab-${place}" data-slide="${i}" data-col="${col}" data-kind="${sqKind(col)}" aria-selected="${col === 0}" aria-controls="sqPanel" aria-label="${esc(s.title)}" tabindex="${col === 0 ? 0 : -1}"><img class="sq-pic" src="${esc(s.img)}" alt="" decoding="async" draggable="false"><span class="sq-over" aria-hidden="true"><span class="sq-cap"><span class="sq-title" data-go>${esc(s.title)}</span><span class="sq-over-in">${esc(s.cat)} · ${esc(s.date)}</span></span></span><span class="sq-spine" aria-hidden="true"><span class="sq-spine-in" data-go>${esc(s.title)}</span></span></button>`;
 }
 function latestUpdates(headlines) {
-  if (!headlines || !headlines.length) return '';
-  // every update comes in (so each keeps its photo); the carousel shows the latest eight
-  const slides = headlines.slice(0, 8).map((h, i) => {
-    const title = String(h.title || '').trim();
-    return {
-      title, desc: firstSentence(h.body),
-      img: updPhoto(headlines, i),
-      cat: updCategory(h.category), date: updDate(h.published_on), href: '/updates/' + updateSlug(h),
-    };
-  });
+  // NIIS's own updates and the news reported elsewhere, newest first; the carousel shows the latest eight.
+  // A story from elsewhere opens at its source, in a new tab.
+  const slides = newsFeed(headlines || []).slice(0, 8).map((x) => (x.ext
+    ? { title: x.ext.title, desc: x.ext.sum, img: extNewsImg(x.ext), cat: x.ext.source, date: updDate(x.ext.date), href: x.ext.href, ext: true }
+    : { title: String(x.own.title || '').trim(), desc: firstSentence(x.own.body), img: updPhoto(headlines, x.k),
+      cat: updCategory(x.own.category), date: updDate(x.own.published_on), href: '/updates/' + updateSlug(x.own) }));
+  if (!slides.length) return '';
   const n = slides.length;
   const slats = Math.max(1, Math.min(3, n - 4));
   const visible = 4 + slats;
@@ -1043,9 +1111,9 @@ function latestUpdates(headlines) {
     : sqCard(slides[0], 0, 0);
   const copy = slides.map((s, i) => `<div class="sq-slide${i === 0 ? ' is-open' : ''}" aria-hidden="${i !== 0}">
         <p>${esc(s.desc)}</p>
-        <a class="sq-go" href="${esc(s.href)}" tabindex="${i === 0 ? 0 : -1}">Read update ${SQ_GO}</a>
+        <a class="sq-go" href="${esc(s.href)}" tabindex="${i === 0 ? 0 : -1}"${s.ext ? ' target="_blank" rel="noopener noreferrer"' : ''}>${s.ext ? 'Read at ' + esc(s.cat) : 'Read update'} ${SQ_GO}</a>
       </div>`).join('');
-  const data = JSON.stringify(slides.map(({ title, img, cat, date, href }) => ({ title, img, cat, date, href }))).replace(/</g, '\\u003c');
+  const data = JSON.stringify(slides.map(({ title, img, cat, date, href, ext }) => ({ title, img, cat, date, href, ext: !!ext }))).replace(/</g, '\\u003c');
   return `<section class="wrap section reveal" id="latestUpdates" style="padding-top:0">
     <div class="sec-head-dh">
       <h2 id="sqTrendsTitle" data-perch>ICT News &amp; Updates</h2>
@@ -1159,7 +1227,7 @@ const latestUpdatesScript = `
   strip.addEventListener('click',function(e){
     var b=e.target.closest('.sq-card'); if(!b) return;
     var col=+b.getAttribute('data-col');
-    if(col===0||(col>0&&col<=3&&e.target.closest('[data-go]'))){ var d=data[+b.getAttribute('data-slide')]; if(d&&d.href) location.href=d.href; return; }
+    if(col===0||(col>0&&col<=3&&e.target.closest('[data-go]'))){ var d=data[+b.getAttribute('data-slide')]; if(d&&d.href){ if(d.ext) window.open(d.href,'_blank','noopener'); else location.href=d.href; } return; }
     if(col>0) step(col);
   });
   strip.addEventListener('mousemove',function(e){
@@ -2330,7 +2398,7 @@ const researchPromoScript = `
 // Built from the live partner list, so it never drifts from the cards below it. Only partners
 // with a supplied logo appear here; the rest are on the cards.
 function partnerBook(partners) {
-  const withLogo = partners.filter((p) => imgs.url('partnerLogos', p.slug));
+  const withLogo = partners.filter((p) => imgs.exists('partnerLogos', p.slug));
   const PER_SPREAD = 6;
   const spreads = [];
   for (let i = 0; i < withLogo.length; i += PER_SPREAD) spreads.push(withLogo.slice(i, i + PER_SPREAD));
@@ -2490,7 +2558,25 @@ function pcLines() {
         <g fill="none" stroke="url(#pcLn)" stroke-width=".42">${d}</g>
       </svg>`;
 }
+// the cover's ground for each design: the photograph under the flag's bands, the network, the ribbon with the
+// photograph in a disc, or the photograph darkened in a frame
+const PC_BANDS = `<svg class="pc-art" viewBox="0 0 100 141" preserveAspectRatio="none" aria-hidden="true">
+        <polygon points="0,0 100,0 100,17 0,25" fill="#fff"/>
+        <polygon points="0,25 100,17 100,19.4 0,27.4" fill="#0B2C63"/>
+        <polygon points="0,84 100,55 100,60 0,89" fill="#C8102E"/>
+        <polygon points="0,89 100,60 100,63.5 0,92.5" fill="#0B2C63"/>
+        <polygon points="0,92.5 100,63.5 100,141 0,141" fill="#fff"/>
+        <rect y="137.6" width="100" height="3.4" fill="#0B2C63"/><rect y="137.6" width="34" height="3.4" fill="#C8102E"/>
+      </svg>`;
+function pcArt(kind, img, seed) {
+  return kind === 'photo' ? `${img('pc-photo')}
+      ${PC_BANDS}`
+    : kind === 'net' ? pcNet(seed)
+    : kind === 'lines' ? `${pcLines()}<span class="pc-disc">${img('pc-photo')}</span>`
+    : `${img('pc-photo')}<i class="pc-shade"></i><i class="pc-frame"></i>`;
+}
 function rpCover(p) {
+  if (p.venue) return rpJournalCover(p);
   const id = Number(p.id) || 0, year = String(p.published_on || '').slice(0, 4);
   const kind = PC_KIND[p.tag] || ['photo', 'net', 'lines', 'dark'][id % 4];
   const pool = PC_PHOTOS[kind], photo = pool ? `/img/about/${pool[id % pool.length]}.jpg?v=${ASSET_V}` : '';
@@ -2499,18 +2585,7 @@ function rpCover(p) {
   const words = `<span class="pc-words"><i class="pc-rule"></i><span class="pc-title">${esc(p.title)}</span><span class="pc-by">${esc(p.authors || '')}</span></span>`;
   const foot = `<span class="pc-foot"><span>National ICT Intelligence System</span><b>${esc(year)}</b></span>`;
   const img = (cls) => `<img class="${cls}" src="${photo}" alt="" loading="lazy" decoding="async">`;
-  const art = kind === 'photo' ? `${img('pc-photo')}
-      <svg class="pc-art" viewBox="0 0 100 141" preserveAspectRatio="none" aria-hidden="true">
-        <polygon points="0,0 100,0 100,17 0,25" fill="#fff"/>
-        <polygon points="0,25 100,17 100,19.4 0,27.4" fill="#0B2C63"/>
-        <polygon points="0,84 100,55 100,60 0,89" fill="#C8102E"/>
-        <polygon points="0,89 100,60 100,63.5 0,92.5" fill="#0B2C63"/>
-        <polygon points="0,92.5 100,63.5 100,141 0,141" fill="#fff"/>
-        <rect y="137.6" width="100" height="3.4" fill="#0B2C63"/><rect y="137.6" width="34" height="3.4" fill="#C8102E"/>
-      </svg>`
-    : kind === 'net' ? pcNet(id)
-    : kind === 'lines' ? `${pcLines()}<span class="pc-disc">${img('pc-photo')}</span>`
-    : `${img('pc-photo')}<i class="pc-shade"></i><i class="pc-frame"></i>`;
+  const art = pcArt(kind, img, id);
   return `<div class="pc pc--${kind}" aria-hidden="true">
       ${art}
       ${head}
@@ -2518,13 +2593,33 @@ function rpCover(p) {
       ${foot}
     </div>`;
 }
+// A paper published in a journal: the covers' own designs with its real photograph, its journal and year in
+// the foot, and no NIIS mark, since NIIS did not publish it.
+function rpJournalCover(p) {
+  const kind = ['photo', 'dark', 'lines'][(p.n || 0) % 3], year = String(p.published_on || '').slice(0, 4), src = paperPhoto(p);
+  const img = (cls) => `<img class="${cls}" src="${esc(src)}" alt="" loading="lazy" decoding="async">`;
+  return `<div class="pc pc--${kind} pc--journal" aria-hidden="true">
+      ${pcArt(kind, img, 101 + (p.n || 0) * 7)}
+      <span class="pc-head"><span class="pc-kicker">${esc(p.tag)}</span></span>
+      <span class="pc-words"><i class="pc-rule"></i><span class="pc-title">${esc(p.title)}</span><span class="pc-by">${esc(p.short)}</span></span>
+      <span class="pc-foot"><span>${esc(p.venueShort)}</span><b>${esc(year)}</b></span>
+    </div>`;
+}
+// the date, the journal and the authors under a paper's headline, in the news rows' format
+const rsMeta = (p) => `<span class="bbc-meta"><time datetime="${esc(p.published_on)}">${esc(p.when)}</time><span class="bbc-sep" aria-hidden="true"></span><span>${esc(p.venue)}</span><span class="bbc-sep" aria-hidden="true"></span><span>${esc(p.short)}</span></span>`;
 exports.research = (ctx, { papers = [], canManage = false, canSubmit = false, notice = '' }) => {
   const paperYear = (p) => String(p.published_on || '').slice(0, 4);
   // The paper library in the news-page format: the newest paper leads (its cover large, the red
-  // "Latest" marker, its abstract), the rest follow as rows; the Explorer's filter bar narrows it.
-  const paperRow = (p) => ({ href: '/research/' + p.id, art: rpCover(p), title: String(p.title || ''), body: String(p.abstract || ''),
-    meta: bbcMeta(String(p.published_on || '').slice(0, 10), p.tag, esc(p.authors || '')),
-    attrs: ` data-rs-item data-year="${esc(paperYear(p))}" data-tag="${esc(p.tag)}" data-search="${esc((p.title + ' ' + p.authors + ' ' + p.abstract + ' ' + p.tag).toLowerCase())}"` });
+  // "Latest" marker, its abstract or summary), the rest follow as rows; the Explorer's filter bar
+  // narrows it. It holds the papers published through NIIS and the research on Liberia published in
+  // journals (LIBERIA_RESEARCH), newest first.
+  const paperRow = (p) => (p.venue
+    ? { href: '/research/p/' + p.slug, art: rpCover(p), title: p.title, body: p.summary, meta: rsMeta(p),
+      attrs: ` data-rs-item data-year="${esc(paperYear(p))}" data-tag="${esc(p.tag)}" data-search="${esc((p.title + ' ' + p.authors + ' ' + p.summary + ' ' + p.tag + ' ' + p.venue).toLowerCase())}"` }
+    : { href: '/research/' + p.id, art: rpCover(p), title: String(p.title || ''), body: String(p.abstract || ''),
+      meta: bbcMeta(String(p.published_on || '').slice(0, 10), p.tag, esc(p.authors || '')),
+      attrs: ` data-rs-item data-year="${esc(paperYear(p))}" data-tag="${esc(p.tag)}" data-search="${esc((p.title + ' ' + p.authors + ' ' + p.abstract + ' ' + p.tag).toLowerCase())}"` });
+  if (!canManage) papers = papers.concat(LIBERIA_RESEARCH).sort((x, y) => String(y.published_on || '').localeCompare(String(x.published_on || '')));
   const years = [...new Set(papers.map(paperYear).filter(Boolean))].sort((x, y) => y.localeCompare(x));
   const types = [...new Set(papers.map((p) => p.tag).filter(Boolean))].sort();
   const library = papers.length ? `<section class="rs" id="paper-search" aria-label="Research papers">
@@ -2661,6 +2756,29 @@ exports.paper = (ctx, p, canManage = false) => shell(ctx, {
     ${p.body ? `<h2>Report</h2><p class="muted">${esc(p.body)}</p>` : ''}
   </div>`,
 });
+exports.LIBERIA_RESEARCH = LIBERIA_RESEARCH;
+exports.journalPaper = (ctx, p) => {
+  const cite = `${p.authors} (${String(p.published_on).slice(0, 4)}). ${p.title}. ${p.venue}${p.cite ? ', ' + p.cite : ''}. https://doi.org/${p.doi}`;
+  return shell(ctx, {
+    title: p.title, workspaceActive: 'research', body: `
+  <div class="wrap section narrow paper-page">
+    <p class="kicker"><a href="/research">← Research papers</a></p>
+    <div class="paper-detail-head">
+      <div class="paper-cover-lg">${rpCover(p)}</div>
+      <div>
+        <h1>${esc(p.title)}</h1>
+        <p class="authors">${esc(p.authors)} · <span class="mono">${esc(p.when)}</span></p>
+        <p class="paper-venue">${esc(p.venue)}${p.cite ? ', ' + esc(p.cite) : ''}</p>
+        <a class="btn btn-teal" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">Read the paper ${icon('arrow')}</a>
+        ${shareBar(ctx, '/research/p/' + p.slug, p.title)}
+      </div>
+    </div>
+    <h2>Summary</h2><p class="muted">${esc(p.summary)}</p>
+    <h2>Cite this paper</h2><p class="paper-cite">${esc(cite)}</p>
+    <p class="paper-note">Published in ${esc(p.venue)}, not by NIIS. The summary is ours; the paper itself, at its publisher, has the full method and findings.</p>
+  </div>`,
+  });
+};
 // Words that rise through a mask, each in its own clip. 'rw-in' rises on load (CSS only, so it
 // never hides the words); 'nw-in' waits for its entry to scroll in. A heading set this way keeps
 // its plain text as its accessible name.
@@ -2819,36 +2937,86 @@ const listHero = ({ id, title, dim, sub, ctas, slot, film }) => {
   </div>`;
 };
 // a hero button to a page or an anchor; data-open asks the page to open that report in place
-const lhBtn = (href, label, { dark = false, open = null } = {}) => `<a class="cs-btn${dark ? ' cs-btn-dark' : ''}" href="${esc(href)}"${open != null ? ` data-open="${open}"` : ''}><span>${esc(label)}</span>${dark ? '' : `<i aria-hidden="true">${icon('arrow')}</i>`}</a>`;
+const lhBtn = (href, label, { dark = false, open = null, ext = false } = {}) => `<a class="cs-btn${dark ? ' cs-btn-dark' : ''}" href="${esc(href)}"${open != null ? ` data-open="${open}"` : ''}${ext ? ' target="_blank" rel="noopener noreferrer"' : ''}><span>${esc(label)}</span>${dark ? '' : `<i aria-hidden="true">${icon('arrow')}</i>`}</a>`;
 const bbcMeta = (iso, label, extra = '') => `<span class="bbc-meta"><time datetime="${esc(iso)}">${esc(updAgo(iso))}</time><span class="bbc-sep" aria-hidden="true"></span><span>${esc(label)}</span>${extra ? `<span class="bbc-sep" aria-hidden="true"></span><span>${extra}</span>` : ''}</span>`;
 // ICT news from Liberia reported elsewhere: each row names its source and opens the article there
 // (headline, date and photo as published; photos downloaded with the owner's approval).
 const EXT_NEWS = [
+  { date: '2026-10-15', source: 'LTA', img: 'lta-pricing',
+    title: 'LTA Seeks Greater Transparency in Mobile Pricing and Promotional Offers',
+    sum: 'The Liberia Telecommunications Authority called on mobile operators to be clearer about their prices and promotional offers.',
+    href: 'https://lta.gov.lr/lta-seeks-greater-transparency-in-mobile-pricing-and-promotional-offers/' },
+  { date: '2026-10-15', source: 'LTA', img: 'lta-infra-rules',
+    title: 'LTA Seeks Stakeholder Input on Draft Telecommunications Infrastructure Regulations',
+    sum: 'The LTA opened a consultation on draft Telecommunications Infrastructure Regulations and invited stakeholders to comment.',
+    href: 'https://lta.gov.lr/lta-seeks-stakeholder-input-on-draft-telecommunications-infrastructure-regulations/' },
+  { date: '2026-09-23', source: 'LTA', img: 'lta-mru',
+    title: 'Massaquoi Calls for Cross-Border Digital Integration in MRU',
+    sum: 'The LTA’s Massaquoi called for cross-border digital integration across the Mano River Union.',
+    href: 'https://lta.gov.lr/massaquoi-calls-for-cross-border-digital-integration-in-mru/' },
+  { date: '2026-09-14', source: 'LTA', img: 'lta-lr-governance',
+    title: 'Stakeholders Advance Governance Framework for Liberia’s .LR Domain',
+    sum: 'Stakeholders moved forward a governance framework for Liberia’s .lr country domain.',
+    href: 'https://lta.gov.lr/stakeholders-advance-governance-framework-for-liberias-lr-domain/' },
   { date: '2026-09-07', source: 'Liberian Observer', img: 'lta-buchanan',
     title: 'LTA Opens First County Consumer Support Center in Buchanan',
+    sum: 'The LTA opened its first consumer support centre outside Monrovia, in Buchanan, Grand Bassa County.',
     href: 'https://www.liberianobserver.com/news/lta-opens-first-county-consumer-support-center-in-buchanan/article_07cdb5f6-80ff-4e39-8f45-a990e5bdf119.html' },
-  { date: '2026-07-25', source: 'LTA', img: 'lta-atu',
+  { date: '2026-08-26', source: 'LTA', img: 'lta-satellite',
+    title: 'LTA Adopts Satellite Guidelines to Expand Connectivity and Strengthen Regulation',
+    sum: 'The LTA adopted guidelines for satellite services, to widen connectivity and strengthen regulation.',
+    href: 'https://lta.gov.lr/lta-adopts-satellite-guidelines-to-expand-connectivity-and-strengthen-regulation/' },
+  { date: '2026-08-26', source: 'LTA', img: 'lta-lr-control',
+    title: 'LTA Takes Major Step Toward National Control of Liberia’s .lr Digital Identity',
+    sum: 'The LTA announced a step toward national control of the .lr domain, Liberia’s digital identity.',
+    href: 'https://lta.gov.lr/lta-takes-major-step-toward-national-control-of-liberias-lr-digital-identity/' },
+  { date: '2026-08-13', source: 'Connecting Africa', img: 'ca-licensing',
+    title: 'Liberia launches automated telecom licensing, renewal system',
+    sum: 'The LTA launched an automated licensing and renewal system, so applicants can apply online instead of returning to its headquarters.',
+    href: 'https://www.connectingafrica.com/connectivity/liberia-launches-automated-telecom-licensing-renewal-system' },
+  { date: '2026-07-30', source: 'LTA', img: 'lta-atu',
     title: 'LTA Secures US$361,151 ATU Debt Waiver, Restores Liberia’s Voting Rights',
+    sum: 'Liberia secured a waiver of the arrears it owed the African Telecommunications Union, which restored its full voting rights.',
     href: 'https://lta.gov.lr/lta-secures-us361151-atu-debt-waiver-restores-liberias-voting-rights/' },
   { date: '2026-07-17', source: 'FrontPage Africa', img: 'lta-reforms',
     title: 'LTA Unveils Sweeping Telecom Reforms, Revokes Star Cell License After Six Years of Inactivity',
+    sum: 'The LTA announced telecom reforms and revoked Star Cell’s licence after six years of inactivity.',
     href: 'https://frontpageafricaonline.com/liberia-lta-unveils-sweeping-telecom-reforms-revokes-star-cell-license-after-six-years-of-inactivity/' },
   { date: '2026-06-16', source: 'TechAfrica News', img: 'transco-fibre',
     title: 'Liberia Advances Regional Fiber Optic Expansion Strategy Through TRANSCO CLSG Partnership',
+    sum: 'Liberia is advancing a regional fibre-optic expansion strategy through a partnership with TRANSCO CLSG.',
     href: 'https://techafricanews.com/2026/06/16/liberia-advances-regional-fiber-optic-expansion-strategy-through-transco-clsg-partnership/' },
+  { date: '2026-02-03', source: 'Ecofin Agency', img: 'ecofin-strategy',
+    title: 'Liberia outlines national digital transformation plan for 2025–2029',
+    sum: 'The government set out a digital roadmap to 2029, eight focus areas under four pillars, aimed at growth, better public services, jobs and a narrower gap for rural communities.',
+    href: 'https://www.ecofinagency.com/news-digital/0302-52542-liberia-outlines-national-digital-transformation-plan-for-2025-2029' },
+  { date: '2025-07-23', source: 'Ecofin Agency', img: 'ecofin-cable',
+    title: 'Liberia, ECOWAS & World Bank collaborate on second West Africa submarine cable plan',
+    sum: 'The Ministry of Posts and Telecommunications, ECOWAS and the World Bank are backing a second submarine cable for Liberia, Sierra Leone, Guinea, Guinea-Bissau and The Gambia, to land at Buchanan as a backup to the ACE cable.',
+    href: 'https://www.ecofinagency.com/news-digital/2307-47813-liberia-ecowas-world-bank-collaborate-on-second-west-africa-submarine-cable-plan' },
 ];
+// NIIS's own updates (each with a page here) and the news above (each opening at its source), as one
+// list, newest first; 'k' keeps an update's place among NIIS's own, which its photo depends on
+const updDay = (d) => (/^(\d{4}-\d{2}-\d{2})/.exec(String(d || '')) || [])[1] || '';
+const newsFeed = (items) => items.map((u, k) => ({ day: updDay(u.published_on), own: u, k }))
+  .concat(EXT_NEWS.map((n) => ({ day: n.date, ext: n })))
+  .sort((x, y) => y.day.localeCompare(x.day));
+const extNewsImg = (n) => `/img/news/ext/${n.img}.webp?v=${ASSET_V}`;
 exports.updates = (ctx, items) => {
   const iso = (u) => (/^(\d{4}-\d{2}-\d{2})/.exec(String(u.published_on || '')) || [])[1] || '';
   const demo = (u) => STAT_FIGURE.test(String(u.title || '') + ' ' + String(u.body || ''));
   const meta = (u) => bbcMeta(iso(u), updCategory(u.category), demo(u) ? '<span title="Demonstration figures">Demo data</span>' : '');
-  const lead = items[0] ? { href: '/updates/' + updateSlug(items[0]), img: updPhoto(items, 0), title: String(items[0].title || ''),
-    body: String(items[0].body || ''), meta: demo(items[0]) ? meta(items[0]) : '' } : null;
-  const rows = items.slice(1).map((u, k) => ({ id: updateAnchor(u), href: '/updates/' + updateSlug(u), img: updPhoto(items, k + 1), title: String(u.title || ''), meta: meta(u) }))
-    .concat(EXT_NEWS.map((n) => ({ href: n.href, ext: n.source, img: `/img/news/ext/${n.img}.webp?v=${ASSET_V}`, title: n.title, meta: bbcMeta(n.date, n.source) })));
+  const row = (x) => (x.ext
+    ? { href: x.ext.href, ext: x.ext.source, img: extNewsImg(x.ext), title: x.ext.title, body: x.ext.sum, meta: bbcMeta(x.ext.date, x.ext.source) }
+    : { id: updateAnchor(x.own), href: '/updates/' + updateSlug(x.own), img: updPhoto(items, x.k), title: String(x.own.title || ''), body: String(x.own.body || ''), meta: meta(x.own) });
+  const feed = newsFeed(items).map(row);
+  // the lead shows its summary; NIIS's own update carries its date line only when it states demonstration figures
+  const lead = feed[0] ? { ...feed[0], meta: feed[0].ext || demo(newsFeed(items)[0].own) ? feed[0].meta : '' } : null;
+  const rows = feed.slice(1);
   const hero = listHero({
     id: 'nuTitle', title: 'News & Updates.', dim: 'What is new in NIIS and in Liberia’s ICT sector.', slot: 'updates',
     film: { src: '/media/mission.mp4', small: '/media/mission-720.mp4' },
-    ctas: (lead ? lhBtn(lead.href, 'Read the latest update') : '') + lhBtn(lead || rows.length ? '#nuList' : '/data', lead || rows.length ? 'See all updates' : 'Explore the data', { dark: true }),
+    ctas: (lead ? lhBtn(lead.href, 'Read the latest update', { ext: !!lead.ext }) : '') + lhBtn(lead || rows.length ? '#nuList' : '/data', lead || rows.length ? 'See all updates' : 'Explore the data', { dark: true }),
   });
   return shell(ctx, {
     title: 'News & Updates', active: '/updates', body: hero + (lead || rows.length
@@ -2959,7 +3127,7 @@ function partnerTile(p) {
 }
 
 exports.partners = (ctx, { partners = [] }) => {
-  const withLogo = partners.filter((p) => imgs.url('partnerLogos', p.slug));
+  const withLogo = partners.filter((p) => imgs.exists('partnerLogos', p.slug));
   return shell(ctx, {
   title: 'Our Partners', active: '/partners', workspaceActive: 'partners', body: `
   ${partnerBook(partners)}

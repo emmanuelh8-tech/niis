@@ -76,7 +76,7 @@ const COLLECTIONS = {
   },
   partnerLogos: {
     label: 'Partner logos',
-    note: 'Official logo supplied by each partner institution. Empty slots fall back to a lettered monogram tile.',
+    note: 'Official logo supplied by each partner institution. A partner without one is not shown on Our Partners.',
     slots: [
       { key: 'mopt', label: 'Ministry of Posts and Telecommunications', def: '' },
       { key: 'lta', label: 'Liberia Telecommunications Authority', def: '' },
@@ -101,6 +101,12 @@ const COLLECTIONS = {
       { key: 'undp', label: 'United Nations Development Programme', def: '' },
       { key: 'itu', label: 'International Telecommunication Union', def: '' },
       { key: 'sdg', label: 'UN Sustainable Development Goals', def: '' },
+      // partners the owner added on 2026-10-20; each logo goes in public/img/partnerLogos or is uploaded here
+      { key: 'prinstine', label: 'Prinstine Group', def: '/img/partnerLogos/prinstine.png' },
+      { key: 'dw-consultancy', label: 'D & W Consultancy', def: '/img/partnerLogos/dw-consultancy.png' },
+      { key: 'afriktech', label: 'Afriktech Liberia', def: '/img/partnerLogos/afriktech.png' },
+      { key: 'gonet', label: 'Gonet', def: '/img/partnerLogos/gonet.png' },
+      { key: 'ul', label: 'University of Liberia', def: '/img/partnerLogos/ul.png' },
     ],
   },
   partnerFocals: {

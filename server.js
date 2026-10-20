@@ -147,6 +147,25 @@ function readBodyBuffer(req, limit = 10e6) {
   });
 }
 // Careers applications: CVs live outside /public and are never served by the static handler.
+// The demonstration papers and updates the database was first seeded with. The public pages leave them
+// out (the owner asked for no more placeholders) until they are deleted in the admin screens, where
+// they still show; anything else entered there is published as usual.
+const SEEDED = {
+  papers: new Set(['State of Connectivity in Liberia 2025', 'The Urban-Rural Connectivity Gap: County Evidence',
+    'Mobile Money and Financial Inclusion in Liberia', 'Digital Trust and Governance: A Baseline']),
+  updates: new Set(['2025 annual indicator refresh published', 'Internet penetration passes one third of the population',
+    'Digital Trust & Governance dashboard launched', 'Operator data-sharing feeds onboarded', 'Data Query builder and public API v1 released']),
+};
+// Partners the owner added (2026-10-20) ahead of their entry in the database. Each shows on Our Partners
+// once its logo is supplied (Image Library, Partner logos); an entry with the same slug in the database wins.
+const ADDED_PARTNERS = [
+  { slug: 'prinstine', name: 'Prinstine Group' },
+  { slug: 'dw-consultancy', name: 'D & W Consultancy' },
+  { slug: 'afriktech', name: 'Afriktech Liberia' },
+  { slug: 'gonet', name: 'Gonet' },
+  { slug: 'ul', name: 'University of Liberia' },
+];
+const notSeeded = (kind, rows) => (rows || []).filter((r) => !SEEDED[kind].has(String(r.title || '').trim()));
 const APPLY_DIR = path.join(__dirname, 'data', 'applications');
 const CV_MAX = 4 * 1024 * 1024;   // under the 4.5 MB request limit of a hosted function (Vercel)
 const CV_TYPES = { pdf: 'application/pdf', doc: 'application/msword', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' };
@@ -504,8 +523,8 @@ async function handler(req, res) {
         const keyCodes = getContent('key_numbers', 'mobile_subscriptions,internet_penetration,fixed_broadband_subs,mobile_money_accounts')
           .split(',').map((s) => s.trim()).filter((c) => cache.indicatorByCode.has(c)).slice(0, 4);
         const [headlines, papers, keyLatest, lastUpd] = await Promise.all([
-          sdb.sel('updates?select=*&order=published_on.desc'),
-          sdb.sel('papers?select=*&status=eq.published&visible=eq.true&deleted=eq.false&order=published_on.desc&limit=4'),
+          sdb.sel('updates?select=*&order=published_on.desc').then((r) => notSeeded('updates', r)),
+          sdb.sel('papers?select=*&status=eq.published&visible=eq.true&deleted=eq.false&order=published_on.desc&limit=4').then((r) => notSeeded('papers', r)),
           Promise.all(keyCodes.map((c) => latestNational(c))),
           lastUpdated(),
         ]);
@@ -564,8 +583,16 @@ async function handler(req, res) {
         const canManage = hasPerm(user, 'manage_content');
         const papers = canManage
           ? await sdb.sel('papers?select=*&order=created_at.desc,published_on.desc')
-          : await sdb.sel('papers?select=*&status=eq.published&visible=eq.true&deleted=eq.false&order=published_on.desc');
+          : notSeeded('papers', await sdb.sel('papers?select=*&status=eq.published&visible=eq.true&deleted=eq.false&order=published_on.desc'));
         return send(res, 200, views.research(ctx, { papers, canManage, canSubmit: !!user, notice: url.searchParams.get('notice') || '' }));
+      }
+      // a paper published in a journal, with its page here (views.LIBERIA_RESEARCH)
+      const jpM = /^\/research\/p\/([a-z0-9-]+)$/.exec(p);
+      if (jpM) {
+        const jp = views.LIBERIA_RESEARCH.find((x) => x.slug === jpM[1]);
+        if (!jp) return send(res, 404, views.notFound(ctx));
+        logEvent('page_view', p, user);
+        return send(res, 200, views.journalPaper(ctx, jp));
       }
       const paperM = p.match(/^\/research\/(\d+)$/);
       if (paperM) {
@@ -573,7 +600,7 @@ async function handler(req, res) {
         const rows = await sdb.sel(`papers?select=*&id=eq.${Number(paperM[1])}`);
         const paper = rows[0];
         // non-admins may only open a live, non-deleted paper
-        if (!paper || (!canManage && (paper.status !== 'published' || !paper.visible || paper.deleted))) return send(res, 404, views.notFound(ctx));
+        if (!paper || (!canManage && (paper.status !== 'published' || !paper.visible || paper.deleted || !notSeeded('papers', [paper]).length))) return send(res, 404, views.notFound(ctx));
         logEvent('page_view', p, user);
         return send(res, 200, views.paper(ctx, paper, canManage));
       }
@@ -591,12 +618,12 @@ async function handler(req, res) {
       }
       if (p === '/updates') {
         logEvent('page_view', p, user);
-        return send(res, 200, views.updates(ctx, await sdb.sel('updates?select=*&order=published_on.desc')));
+        return send(res, 200, views.updates(ctx, notSeeded('updates', await sdb.sel('updates?select=*&order=published_on.desc'))));
       }
       // one update on its own page; the slug is the title, as the homepage carousel links it
       const updMatch = /^\/updates\/([a-z0-9-]+)$/.exec(p);
       if (updMatch) {
-        const rows = await sdb.sel('updates?select=*&order=published_on.desc');
+        const rows = notSeeded('updates', await sdb.sel('updates?select=*&order=published_on.desc'));
         const index = rows.findIndex((u) => views.updateSlug(u) === updMatch[1]);
         if (index < 0) return send(res, 404, views.notFound(ctx));
         logEvent('page_view', p, user);
@@ -659,7 +686,8 @@ async function handler(req, res) {
       if (p === '/sponsors') return redirect(res, '/partners');
       if (p === '/partners') {
         logEvent('page_view', p, user);
-        const partners = await sdb.sel('partners?select=*&visible=eq.true&order=sort_order,name');
+        const listed = await sdb.sel('partners?select=*&visible=eq.true&order=sort_order,name');
+        const partners = listed.concat(ADDED_PARTNERS.filter((a) => !listed.some((p) => p.slug === a.slug)));
         return send(res, 200, views.partners(ctx, { partners }));
       }
       // Dashboards was replaced by Our Partners in the navigation. The page itself is kept

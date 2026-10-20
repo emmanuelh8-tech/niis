@@ -5918,6 +5918,13 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 :is(.pc--net, .pc--dark) .pc-foot { color: rgb(255 255 255 / .6); }
 :is(.pc--net, .pc--dark) .pc-foot b { color: #fff; }
 .paper-cover-lg .pc { width: 100%; }
+/* a journal's paper: the journal named in the foot, the kicker on the left */
+.pc--journal .pc-head { justify-content: flex-start; }
+.pc--journal .pc-kicker { text-align: left; }
+.pc--journal .pc-foot span { font-weight: 700; }
+.paper-venue { margin: -.2rem 0 1rem; font-size: .92rem; font-style: italic; color: #2A3446; }
+.paper-cite { font-size: .88rem; line-height: 1.6; overflow-wrap: anywhere; }
+.paper-note { margin-top: 1.6rem; font-size: .8rem; color: #5A6575; }
 
 /* ---- About: the mission, the problem and the answer as kinetic type (initKinetic in app.js), set as
    the reference film sets its words: Montserrat ExtraBold, near-black with the page's blue, on light grey.

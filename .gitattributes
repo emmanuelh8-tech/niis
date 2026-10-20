@@ -1,0 +1,4 @@
+# documents and vendored libraries are kept byte for byte (no line-ending conversion)
+*.pdf binary
+*.pfb binary
+public/vendor/** -text

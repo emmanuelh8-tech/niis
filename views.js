@@ -2881,7 +2881,7 @@ function bbcLayout({ h1, lead, rows, tag = 'h1', id = '' }) {
   </div>`;
 }
 // The opening of the two news-style pages (ICT Reports, News & Updates), in the film-hero design of
-// About and Careers: the headline in two lines, two buttons and a line on what is here, over a real
+// About and Careers: the headline in two lines and two buttons (a line under them only if given), over a real
 // picture. That is a film, or a photograph under a slow camera move (nobody in it is animated). Each
 // page's picture is its slot in the Image Library ('headers'); an uploaded picture replaces the film,
 // so footage never plays under a different photograph. The list starts right under it.
@@ -2936,7 +2936,6 @@ exports.updates = (ctx, items) => {
     id: 'nuTitle', title: 'News & Updates.', dim: 'What is new in NIIS and in Liberia’s ICT sector.', slot: 'updates',
     film: { src: '/media/mission.mp4', small: '/media/mission-720.mp4' },
     ctas: (lead ? lhBtn(lead.href, 'Read the latest update') : '') + lhBtn(lead || rows.length ? '#nuList' : '/data', lead || rows.length ? 'See all updates' : 'Explore the data', { dark: true }),
-    sub: 'Updates from the NIIS team, with ICT news from the LTA and Liberia’s press.',
   });
   return shell(ctx, {
     title: 'News & Updates', active: '/updates', body: hero + (lead || rows.length
@@ -3166,7 +3165,6 @@ exports.reports = (ctx, { indicators = [], domainLabels = {} } = {}) => {
   ${listHero({
     id: 'rpTitle', title: 'ICT Reports.', dim: 'Liberia’s digital sector, on the record.', slot: 'reports',
     ctas: (first ? lhBtn(lead.href, 'Read the latest report', { open: first.i }) : '') + lhBtn('/data', 'Explore the data', { dark: true }),
-    sub: `${list.length} national reports on the telecom sector, broadband, pricing, digital inclusion and cyber readiness, each with the indicators behind it.`,
   })}
   ${bbcLayout({ h1: 'All ICT reports', lead, rows, tag: 'h2', id: 'rpList' })}
   <dialog class="rx-modal" id="rx-modal" aria-labelledby="rx-m-title">

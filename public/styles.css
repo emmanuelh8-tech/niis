@@ -1512,6 +1512,26 @@ tr.unread td { background: var(--gold-soft); }
   .cs-film-scrim { background: linear-gradient(180deg, rgb(5 7 12 / .72) 0%, rgb(5 7 12 / .45) 45%, rgb(14 42 98 / .7) 82%, #1A438F 100%); }
 }
 
+/* ---- the same opening on the two news-style pages (listHero in views.js): a little shorter than a full
+   screen, so the list's first story is in reach. A photograph drifts under a slow camera move; the tail
+   carries the hero's blue down into the white page. */
+.cs.lh { margin-bottom: 0; background: none; }
+.lh-hero { min-height: calc(86svh - var(--nav-h)); }
+.lh-still { background: center / cover no-repeat; transform-origin: 64% 42%; animation: lh-drift 28s ease-in-out infinite alternate; will-change: transform; }
+@keyframes lh-drift { from { transform: scale(1.03); } to { transform: scale(1.13) translate3d(-1.6%, -1.2%, 0); } }
+.lh-tail { height: clamp(5rem, 12vh, 8rem); background: linear-gradient(180deg, #1A438F 0%, #3A63AE 14%, #7E9FD6 34%, #C3D3EC 58%, #EDF2F8 80%, #fff 100%); }
+/* the words sit over busy footage (a city from the air), so the scrim holds a little more on the left */
+.lh-hero .cs-film-scrim {
+  background:
+    linear-gradient(90deg, rgb(5 7 12 / .86) 0%, rgb(5 7 12 / .6) 36%, rgb(5 7 12 / .16) 66%, rgb(5 7 12 / 0) 100%),
+    linear-gradient(180deg, rgb(5 7 12 / .5) 0%, rgb(5 7 12 / 0) 24%, rgb(5 7 12 / 0) 58%, rgb(14 42 98 / .72) 88%, #1A438F 100%); }
+#rpList, #nuList { scroll-margin-top: calc(var(--nav-h) + 1rem); }
+@media (prefers-reduced-motion: reduce) { .lh-still { animation: none; } }
+@media (max-width: 860px) {
+  .lh-hero { min-height: calc(78svh - var(--nav-h)); }
+  .lh-hero .cs-film-scrim { background: linear-gradient(180deg, rgb(5 7 12 / .8) 0%, rgb(5 7 12 / .55) 45%, rgb(14 42 98 / .74) 82%, #1A438F 100%); }
+}
+
 /* ---- who the work is for */
 .cs-mission { padding: clamp(6rem, 14vh, 9rem) 0 clamp(4rem, 10vh, 7rem); color: var(--cs-ink);
   background: linear-gradient(180deg, #1A438F 0%, #8FADDC 5%, #D3DFEF 11%, #EDF2F7 40%, var(--cs-paper) 100%); }

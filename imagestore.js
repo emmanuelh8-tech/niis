@@ -138,7 +138,8 @@ const COLLECTIONS = {
     slots: [
       { key: 'data-explorer', label: 'Data Explorer', def: '/img/headers/header-5.jpeg' },
       { key: 'data-landscape', label: 'Data Landscape', def: '/img/about/hero.jpg' },
-      { key: 'reports', label: 'ICT Reports', def: '/img/headers/header-2.jpeg' },
+      { key: 'reports', label: 'ICT Reports', def: '/img/about/hero.jpg' },
+      { key: 'updates', label: 'News & Updates (replaces the film)', def: '/media/mission-poster.jpg' },
       { key: 'careers', label: 'Careers', def: '/img/headers/header-6.png' },
       { key: 'dashboards', label: 'Dashboards', def: '/img/headers/header-3.jpeg' },
       { key: 'research', label: 'Research Papers', def: '/img/headers/header-4.jpeg' },

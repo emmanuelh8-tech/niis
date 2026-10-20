@@ -2841,7 +2841,7 @@ function newsAd(key, k) {
 // and come in pairs after every four headlines on narrower ones.
 //   lead / rows: { href, img | art (HTML, e.g. a paper's cover), title, body?, meta?, ext?: source name,
 //                  open?: dialog index, attrs?: extra attributes (filters) }
-function bbcLayout({ h1, lead, rows, tag = 'h1' }) {
+function bbcLayout({ h1, lead, rows, tag = 'h1', id = '' }) {
   const linkAttrs = (x) => `href="${esc(x.href)}"${x.ext ? ' target="_blank" rel="noopener noreferrer"' : ''}${x.open != null ? ` data-open="${x.open}"` : ''}`;
   const pic = (x, w, h, eager) => (x.art ? `<span class="bbc-cover">${x.art}</span>`
     : x.img ? `<img src="${esc(x.img)}" alt="" width="${w}" height="${h}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">` : '<i class="bbc-noimg" aria-hidden="true"></i>');
@@ -2870,7 +2870,7 @@ function bbcLayout({ h1, lead, rows, tag = 'h1' }) {
     if ((k + 2) % 4 === 0) list += adRow();
   });
   while (pairs.length) list += adRow();
-  return `<div class="bbc-page">
+  return `<div class="bbc-page"${id ? ` id="${esc(id)}"` : ''}>
   <aside class="bbc-rail is-left" aria-label="Advertisements">${AD_LEFT.map((key, k) => newsAd(key, k * 2)).join('')}</aside>
   <div class="bbc">
     <${tag} class="sr-only">${h1}</${tag}>
@@ -2880,6 +2880,35 @@ function bbcLayout({ h1, lead, rows, tag = 'h1' }) {
   <aside class="bbc-rail is-right" aria-label="Advertisements">${AD_RIGHT.map((key, k) => newsAd(key, k * 2 + 1)).join('')}</aside>
   </div>`;
 }
+// The opening of the two news-style pages (ICT Reports, News & Updates), in the film-hero design of
+// About and Careers: the headline in two lines, two buttons and a line on what is here, over a real
+// picture. That is a film, or a photograph under a slow camera move (nobody in it is animated). Each
+// page's picture is its slot in the Image Library ('headers'); an uploaded picture replaces the film,
+// so footage never plays under a different photograph. The tail carries the hero's blue down into
+// the white page, as About's next section does.
+const listHero = ({ id, title, dim, sub, ctas, slot, film }) => {
+  const still = imgs.url('headers', slot);
+  const media = film && !imgs.isCustom('headers', slot)
+    ? `<video class="cs-film" autoplay muted loop playsinline preload="auto" poster="${esc(still)}" aria-hidden="true">
+        <source src="${esc(film.small)}" type="video/mp4" media="(max-width: 760px)">
+        <source src="${esc(film.src)}" type="video/mp4">
+      </video>`
+    : `<div class="cs-film lh-still" style="background-image:url('${esc(still)}')" aria-hidden="true"></div>`;
+  return `<div class="cs lh">
+    <section class="cs-hero cs-hero--film lh-hero" aria-labelledby="${id}">
+      ${media}
+      <div class="cs-film-scrim" aria-hidden="true"></div>
+      <div class="cs-wrap cs-hero-in">
+        <h1 id="${id}" class="cs-h1" aria-label="${esc(title + ' ' + dim)}">${csDecode(title)}${csDecode(dim, 'cs-dim')}</h1>
+        <div class="cs-ctas">${ctas}</div>
+        ${sub ? `<p class="cs-hero-sub">${esc(sub)}</p>` : ''}
+      </div>
+    </section>
+    <div class="lh-tail" aria-hidden="true"></div>
+  </div>`;
+};
+// a hero button to a page or an anchor; data-open asks the page to open that report in place
+const lhBtn = (href, label, { dark = false, open = null } = {}) => `<a class="cs-btn${dark ? ' cs-btn-dark' : ''}" href="${esc(href)}"${open != null ? ` data-open="${open}"` : ''}><span>${esc(label)}</span>${dark ? '' : `<i aria-hidden="true">${icon('arrow')}</i>`}</a>`;
 const bbcMeta = (iso, label, extra = '') => `<span class="bbc-meta"><time datetime="${esc(iso)}">${esc(updAgo(iso))}</time><span class="bbc-sep" aria-hidden="true"></span><span>${esc(label)}</span>${extra ? `<span class="bbc-sep" aria-hidden="true"></span><span>${extra}</span>` : ''}</span>`;
 // ICT news from Liberia reported elsewhere: each row names its source and opens the article there
 // (headline, date and photo as published; photos downloaded with the owner's approval).
@@ -2905,10 +2934,16 @@ exports.updates = (ctx, items) => {
     body: String(items[0].body || ''), meta: demo(items[0]) ? meta(items[0]) : '' } : null;
   const rows = items.slice(1).map((u, k) => ({ id: updateAnchor(u), href: '/updates/' + updateSlug(u), img: updPhoto(items, k + 1), title: String(u.title || ''), meta: meta(u) }))
     .concat(EXT_NEWS.map((n) => ({ href: n.href, ext: n.source, img: `/img/news/ext/${n.img}.webp?v=${ASSET_V}`, title: n.title, meta: bbcMeta(n.date, n.source) })));
+  const hero = listHero({
+    id: 'nuTitle', title: 'News & Updates.', dim: 'What is new in NIIS and in Liberia’s ICT sector.', slot: 'updates',
+    film: { src: '/media/mission.mp4', small: '/media/mission-720.mp4' },
+    ctas: (lead ? lhBtn(lead.href, 'Read the latest update') : '') + lhBtn(lead || rows.length ? '#nuList' : '/data', lead || rows.length ? 'See all updates' : 'Explore the data', { dark: true }),
+    sub: 'Updates from the NIIS team, with ICT news from the LTA and Liberia’s press.',
+  });
   return shell(ctx, {
-    title: 'News & Updates', active: '/updates', body: lead || rows.length
-      ? bbcLayout({ h1: 'News &amp; Updates', lead, rows })
-      : '<div class="bbc"><p class="bbc-empty">No updates have been published yet.</p></div>',
+    title: 'News & Updates', active: '/updates', body: hero + (lead || rows.length
+      ? bbcLayout({ h1: 'Latest news and updates', lead, rows, tag: 'h2', id: 'nuList' })
+      : '<div class="bbc"><p class="bbc-empty">No updates have been published yet.</p></div>'),
   });
 };
 // ============ ONE UPDATE ============
@@ -3130,7 +3165,12 @@ exports.reports = (ctx, { indicators = [], domainLabels = {} } = {}) => {
   const state = list.map((r) => ({ title: r.title, tag: r.tag, date: r.date, desc: r.desc, bg: r.bg, related: related(r) }));
   return shell(ctx, {
     title: 'ICT Reports', active: '/reports', workspaceActive: 'reports', body: `
-  ${bbcLayout({ h1: 'ICT Reports', lead, rows })}
+  ${listHero({
+    id: 'rpTitle', title: 'ICT Reports.', dim: 'Liberia’s digital sector, on the record.', slot: 'reports',
+    ctas: (first ? lhBtn(lead.href, 'Read the latest report', { open: first.i }) : '') + lhBtn('/data', 'Explore the data', { dark: true }),
+    sub: `${list.length} national reports on the telecom sector, broadband, pricing, digital inclusion and cyber readiness, each with the indicators behind it.`,
+  })}
+  ${bbcLayout({ h1: 'All ICT reports', lead, rows, tag: 'h2', id: 'rpList' })}
   <dialog class="rx-modal" id="rx-modal" aria-labelledby="rx-m-title">
     <div class="rx-m-img" id="rx-m-img"></div>
     <button type="button" class="rx-m-x" data-close aria-label="Close">${icon('x')}</button>

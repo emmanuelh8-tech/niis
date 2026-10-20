@@ -1,6 +1,6 @@
 Page header banners (slots in the admin Image Library, /admin/images):
   header-1.jpeg -> About
-  header-2.jpeg -> ICT Reports
+  header-2.jpeg -> (unused; ICT Reports now opens on /img/about/hero.jpg)
   header-3.jpeg -> Dashboards
   header-4.jpeg -> Research Papers
   header-5.jpeg -> Data Explorer

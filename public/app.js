@@ -1961,6 +1961,8 @@
   // ---------- boot ----------
   var page = window.__NICTD_PAGE__;
   document.addEventListener('DOMContentLoaded', function () {
+    // the news-style pages' hero film stays on its poster when motion is reduced
+    if (REDUCE) qsa('.lh video').forEach(function (v) { v.removeAttribute('autoplay'); v.pause(); });
     // the bar's real height, for the anchors that land just under it (--nav-real)
     var bar = qs('.gov-nav');
     function barH() { if (bar) document.documentElement.style.setProperty('--nav-real', bar.offsetHeight + 'px'); }

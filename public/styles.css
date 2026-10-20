@@ -6114,3 +6114,85 @@ html:has(#about-niis) { scroll-behavior: smooth; }
   .prv-img { min-height: 0; aspect-ratio: 4 / 3; }
 }
 @media (prefers-reduced-motion: reduce) { .prv-shade, .prv-dlg { transition: none; } }
+
+/* ---- the PDF viewer (pdfviewer.js) under every research paper and report, after the owner's pdf-viewer
+   component: the page list on the left (it folds away; on a phone it opens over the pages), the toolbar
+   over the pages, the pages on a grey ground. It runs wider than the text around it. */
+.pv { --pv-line: rgb(11 30 69 / .14); position: relative; display: grid; grid-template-columns: 220px minmax(0, 1fr);
+  height: min(86vh, 940px); margin: 1.6rem calc(50% - min(560px, 50vw - 16px)) .6rem; overflow: hidden;
+  border: 1px solid #000; border-radius: 14px; background: #fff; }
+.pv.is-side-off { grid-template-columns: 0 minmax(0, 1fr); }
+.pv-side { min-width: 0; overflow: hidden; border-right: 1px solid var(--pv-line); background: #F6F8FB; }
+.pv.is-side-off .pv-side { border-right: 0; }
+.pv-thumbs { position: relative; display: flex; flex-direction: column; align-items: center; gap: .8rem; height: 100%; overflow-y: auto; padding: 1.3rem 0; }
+.pv-thumb { display: grid; justify-items: center; gap: .35rem; width: 172px; padding: .55rem; border: 0; border-radius: 8px; background: none; cursor: pointer; }
+.pv-thumb:hover { background: #E7ECF3; }
+.pv-thumb.is-on { background: #DCE5F1; }
+.pv-thumb-img { display: block; width: 150px; background: #fff; box-shadow: 0 0 0 1px var(--pv-line), 0 1px 3px rgb(11 30 69 / .12); }
+.pv-thumb-img canvas { display: block; width: 100%; height: 100%; }
+.pv-thumb-n { font-size: .8rem; color: #5A6575; }
+.pv-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.pv-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .4rem .6rem; padding: .45rem .6rem; border-bottom: 1px solid var(--pv-line); background: #fff; }
+.pv-grp { display: flex; align-items: center; gap: .25rem; min-width: 0; }
+.pv-btn { display: inline-grid; place-items: center; flex: none; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 6px; background: none; color: #1E2A3D; cursor: pointer; }
+.pv-btn:hover { background: #EEF2F7; text-decoration: none; }
+.pv-btn:disabled { opacity: .35; cursor: default; background: none; }
+.pv-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pv-btn[aria-pressed="true"], .pv-btn[aria-expanded="true"] { background: #E4ECF8; color: #0B2C63; }
+.pv-btn:focus-visible, .pv-zoom:focus-visible, .pv-thumb:focus-visible { outline: 2px solid #1C5BB8; outline-offset: 1px; }
+.pv-count { font-size: .85rem; color: #5A6575; white-space: nowrap; }
+.pv-count b { font-weight: 600; color: #1E2A3D; }
+.pv-sep { width: 1px; height: 20px; margin: 0 .2rem; background: var(--pv-line); }
+.pv-zoom { height: 30px; padding: 0 .4rem; border: 1px solid var(--pv-line); border-radius: 6px; background: #fff; font: 500 .8rem var(--sans); color: #1E2A3D; cursor: pointer; }
+.pv-findwrap { position: relative; }
+.pv-find { position: absolute; top: calc(100% + 8px); right: 0; z-index: 5; display: grid; gap: .4rem; width: min(260px, 80vw); padding: .7rem;
+  border: 1px solid var(--pv-line); border-radius: 10px; background: #fff; box-shadow: 0 14px 30px -12px rgb(11 30 69 / .35); }
+.pv-find[hidden] { display: none; }
+.pv-find input { width: 100%; height: 34px; padding: 0 .65rem; border: 1px solid var(--pv-line); border-radius: 6px; font: 400 .9rem var(--sans); }
+.pv-hits { font-size: .78rem; color: #5A6575; }
+.pv-hits:empty { display: none; }
+.pv-scroll { position: relative; flex: 1; min-height: 0; overflow: auto; background: #EEF1F5; overscroll-behavior: contain; }
+.pv-pages { display: flex; flex-direction: column; align-items: center; gap: 2rem; width: max-content; min-width: 100%; padding: 32px; }
+.pv-page { position: relative; flex: none; overflow: hidden; background: #fff; box-shadow: 0 0 0 1px var(--pv-line), 0 2px 8px rgb(11 30 69 / .12); }
+.pv-page canvas { display: block; }
+.pv-load { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: .6rem; margin: 0; font-size: .85rem; color: #5A6575; }
+.pv-load[hidden], .pv-msg[hidden] { display: none; }
+.pv-spin svg { width: 22px; height: 22px; fill: none; stroke: #0B2C63; stroke-width: 2; stroke-linecap: round; animation: pv-spin 1s linear infinite; }
+@keyframes pv-spin { to { transform: rotate(360deg); } }
+.pv-msg { position: absolute; inset: 0; display: grid; place-content: center; margin: 0; padding: 2rem; text-align: center; font-size: .92rem; }
+.pv-note { margin: 0 calc(50% - min(560px, 50vw - 16px)) 2.2rem; font-size: .8rem; line-height: 1.5; color: #5A6575; }
+/* the text over each page, from PDF.js's own viewer styles: invisible but selectable; the search marks it */
+.textLayer { position: absolute; inset: 0; overflow: clip; opacity: 1; line-height: 1; text-align: initial; -webkit-text-size-adjust: none; text-size-adjust: none;
+  forced-color-adjust: none; transform-origin: 0 0; caret-color: CanvasText; z-index: 0;
+  --min-font-size: 1; --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size)); --min-font-size-inv: calc(1 / var(--min-font-size)); }
+.textLayer :is(span, br) { color: transparent; position: absolute; white-space: pre; cursor: text; transform-origin: 0% 0%; }
+.textLayer > :not(.markedContent), .textLayer .markedContent span:not(.markedContent) { z-index: 1; --font-height: 0; font-size: calc(var(--text-scale-factor) * var(--font-height));
+  --scale-x: 1; --rotate: 0deg; transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv)); }
+.textLayer .markedContent { display: contents; }
+.textLayer span[role="img"] { user-select: none; cursor: default; }
+.textLayer ::selection { background: rgb(28 91 184 / .28); }
+.textLayer br::selection { background: transparent; }
+.textLayer .endOfContent { display: block; position: absolute; inset: 100% 0 0; z-index: 0; cursor: default; user-select: none; }
+.textLayer mark { color: transparent; background: rgb(255 204 0 / .5); border-radius: 2px; }
+@media (max-width: 760px) {
+  .pv { grid-template-columns: minmax(0, 1fr); height: 78vh; border-radius: 12px; }
+  .pv.is-side-off { grid-template-columns: minmax(0, 1fr); }
+  .pv-side { position: absolute; z-index: 4; top: var(--pv-bar-h, 47px); bottom: 0; left: 0; width: 200px; box-shadow: 12px 0 30px -18px rgb(11 30 69 / .5); }
+  .pv.is-side-off .pv-side { display: none; }
+  .pv-thumb { width: 170px; }
+  .pv-bar { padding: .35rem .4rem; }
+  .pv-grp { gap: .1rem; }
+  .pv-sep { display: none; }
+  .pv-pages { gap: 1rem; padding: 16px; }
+}
+
+/* a report's page: the catalogue categories its subject draws on */
+.rp-rel { display: grid; gap: .7rem; margin: .4rem 0 2.2rem; }
+.rp-rel-cat { display: grid; gap: .35rem; padding: 1rem 1.15rem; border: 1px solid var(--line); border-radius: 12px; color: inherit; }
+.rp-rel-cat:hover { border-color: #0B2C63; text-decoration: none; }
+.rp-rel-cat span { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+.rp-rel-cat b { color: #0B2C63; }
+.rp-rel-cat em { font-style: normal; font-size: .82rem; font-weight: 600; color: #1C5BB8; white-space: nowrap; }
+.rp-rel-cat small { font-size: .84rem; line-height: 1.5; color: #5A6575; }
+.rc-link { color: inherit; }
+.rc-link:hover { text-decoration: underline; }

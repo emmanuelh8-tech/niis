@@ -588,9 +588,11 @@ const heroSliderScript = `
 // The summaries are NIIS's own, never the abstracts; each paper has a page here (/research/p/<slug>) and
 // opens at its publisher. 'when' is the date as precisely as the record gives it. Each carries a real
 // photograph (never an AI image): 'img' is one of the owner's paper photos (an Image Library slot,
-// 'papers'), 'photo' a real photograph from the site's other folders.
+// 'papers'), 'photo' a real photograph from the site's other folders. 'pdf' marks the papers whose licence
+// lets the platform carry the PDF itself (public/docs/research/<slug>.pdf, unchanged from the publisher);
+// the others show the placeholder PDF until their file can be carried.
 const LIBERIA_RESEARCH = [
-  { slug: 'jolugbo-reeves-taylor-2026-instability-absorption', img: 'governance', tag: 'Journal article',
+  { slug: 'jolugbo-reeves-taylor-2026-instability-absorption', pdf: true, licence: 'CC BY 4.0', img: 'governance', tag: 'Journal article',
     title: 'Instability absorption by tertiary educators: Technology adoption under conditions of fragility in the Liberian higher education sector',
     authors: 'Olajide Jolugbo, Agnes Reeves-Taylor', short: 'O. Jolugbo, A. Reeves-Taylor',
     venue: 'The African Journal of Information and Communication (AJIC)', venueShort: 'AJIC', cite: 'No. 37, 1–12',
@@ -608,19 +610,19 @@ const LIBERIA_RESEARCH = [
     venue: 'International Journal of Economics, Business and Management Research', venueShort: 'IJEBMR', cite: '9(11), 76–124',
     published_on: '2025', when: '2025', doi: '10.51505/ijebmr.2025.91106',
     summary: 'Argues that fragmented and duplicated e-government services hold back Liberia’s digital transformation, and sets out digital public infrastructure as the base for digital financial inclusion and for taxing the digital economy.' },
-  { slug: 'kennedy-2025-digital-inclusion-education', img: 'education', tag: 'Review',
+  { slug: 'kennedy-2025-digital-inclusion-education', pdf: true, licence: 'CC BY 4.0', img: 'education', tag: 'Review',
     title: 'Digital Inclusion in Liberia’s Education Sector: Review of Barriers, Policy Gaps, and Strategic Interventions',
     authors: 'Gabriel M. Kennedy', short: 'G. M. Kennedy',
     venue: 'American Journal of Educational Research', venueShort: 'American J. Educational Research', cite: '13(3), 102–110',
     published_on: '2025-03-09', when: '9 Mar 2025', doi: '10.12691/education-13-3-1',
     summary: 'A review of the infrastructure, cost, cultural and policy barriers to digital inclusion in Liberia’s schools and universities, weighed against the Liberia ICT Policy 2019–2024 and the National Development Plan 2025–2029, with a strategy to widen access.' },
-  { slug: 'kennedy-2025-ict-higher-education', photo: '/img/papers/skills.jpg', tag: 'Review',
+  { slug: 'kennedy-2025-ict-higher-education', pdf: true, licence: 'CC BY 3.0', photo: '/img/papers/skills.jpg', tag: 'Review',
     title: 'Integrating ICT in Higher Education in Liberia: A Review of Best Practices, Challenges, and Opportunities',
     authors: 'Gabriel M. Kennedy', short: 'G. M. Kennedy',
     venue: 'Journal of Education and Practice', venueShort: 'J. Education and Practice', cite: '16(3)',
     published_on: '2025-03', when: 'Mar 2025', doi: '10.7176/JEP/16-3-14',
     summary: 'Reviews ICT integration in Liberian higher education against programmes in Rwanda, Egypt and South Africa, and names weak digital infrastructure, limited funding, faculty resistance, the digital-literacy gap and the absence of a national ICT-in-education policy as the main obstacles.' },
-  { slug: 'kennedy-2024-lecturers-tpack', photo: '/img/headers/header-1.jpeg', tag: 'Journal article',
+  { slug: 'kennedy-2024-lecturers-tpack', pdf: true, licence: 'CC BY 4.0', photo: '/img/headers/header-1.jpeg', tag: 'Journal article',
     title: 'Assessing Lecturers’ Technological Pedagogical Content Knowledge in Teaching Online Courses at Selected Universities in Liberia',
     authors: 'Gabriel M. Kennedy', short: 'G. M. Kennedy',
     venue: 'American Journal of Educational Research', venueShort: 'American J. Educational Research', cite: '12(6), 201–214',
@@ -632,13 +634,13 @@ const LIBERIA_RESEARCH = [
     venue: 'International Journal of Smart Technology and Learning', venueShort: 'Int. J. Smart Technology & Learning', cite: '',
     published_on: '2024', when: '2024', doi: '10.1504/IJSMARTTL.2024.10064867',
     summary: 'Examines what lecturers and students at Liberian universities faced when the COVID-19 pandemic made the use of ICT for teaching and learning compulsory.' },
-  { slug: 'kennedy-2023-ict-teacher-education', photo: '/img/headers/header-2.jpeg', tag: 'Case study',
+  { slug: 'kennedy-2023-ict-teacher-education', pdf: true, licence: 'CC BY 4.0', photo: '/img/headers/header-2.jpeg', tag: 'Case study',
     title: 'Challenges of ICT Integration in Teachers’ Education: A Case Study of the College of Education, University of Liberia',
     authors: 'Gabriel M. Kennedy', short: 'G. M. Kennedy',
     venue: 'International Journal of Social Science and Education Research Studies', venueShort: 'IJSSERS', cite: '3(5)',
     published_on: '2023-05-13', when: '13 May 2023', doi: '10.55677/ijssers/V03I5Y2023-15',
     summary: 'A case study of the College of Education at the University of Liberia, the country’s leading teacher-training institution, on the difficulties of bringing ICT into the training of teachers.' },
-  { slug: 'feng-2018-ebola-sms-health-seeking', photo: '/img/headers/header-3.jpeg', tag: 'Journal article',
+  { slug: 'feng-2018-ebola-sms-health-seeking', pdf: true, licence: 'CC BY 4.0', photo: '/img/headers/header-3.jpeg', tag: 'Journal article',
     title: 'Tracking health seeking behavior during an Ebola outbreak via mobile phones and SMS',
     authors: 'Shuo Feng, Karen A. Grépin, Rumi Chunara', short: 'S. Feng et al.',
     venue: 'npj Digital Medicine', venueShort: 'npj Digital Medicine', cite: '1, 51',
@@ -650,7 +652,7 @@ const LIBERIA_RESEARCH = [
     venue: 'Land Use Policy', venueShort: 'Land Use Policy', cite: '73, 353–362',
     published_on: '2018-04', when: 'Apr 2018', doi: '10.1016/j.landusepol.2017.12.034',
     summary: 'Combines three technology-acceptance theories in one model and tests it on a survey of 102 Liberian public servants: personal innovativeness, attitude and perceived control drive the intention to adopt a land information system.' },
-  { slug: 'kuehne-2016-ebola-mobile-phone-survey', img: 'connectivity', tag: 'Journal article',
+  { slug: 'kuehne-2016-ebola-mobile-phone-survey', pdf: true, licence: 'CC BY 4.0', img: 'connectivity', tag: 'Journal article',
     title: 'Mortality, Morbidity and Health-Seeking Behaviour during the Ebola Epidemic 2014–2015 in Monrovia: Results from a Mobile Phone Survey',
     authors: 'Annick Kuehne, Emily Lynch, Eleanor Marshall, Amanda Tiffany, Isaac Alley, Luke Bawo, Moses Massaquoi, Chiara Lodesani, Philippe Le Vaillant, Klaudia Porten, Etienne Gignoux',
     short: 'A. Kuehne et al.',
@@ -704,6 +706,7 @@ const featuredPapersScript = `
 // its neighbours angle away in 3D. Auto-advances, pauses on hover, arrows, and a See more link.
 // img keys point at the "reports" image collection, which is kept separate from the research
 // papers and the hero slider so no picture appears twice on the site.
+const reportSlug = (r) => updateSlug({ title: r.title });
 const NATIONAL_REPORTS = [
   { img: 'sector-performance', year: 2025, domains: ['market', 'access'],
     tag: 'Sector Report', title: 'Liberia ICT Sector Performance Report 2025', date: 'Q3 2025',
@@ -797,7 +800,7 @@ function nationalReports() {
     <div class="rc-thumb" style="${slotBg('reports', r.img, true)}"></div>
     <div class="rc-body">
       <span class="tag">${esc(r.tag)}</span>
-      <h3>${esc(r.title)}</h3>
+      <h3><a class="rc-link" href="/reports/${reportSlug(r)}">${esc(r.title)}</a></h3>
       <p>${esc(r.desc)}</p>
       <div class="rc-meta">${esc(r.date)}</div>
     </div>
@@ -861,7 +864,8 @@ const nationalReportsScript = `
       if(i===cur || !armed || Date.now()<lockUntil) return;
       stepTo(i);
     });
-    c.addEventListener('click', function(){ if(i!==cur) stepTo(i); });
+    // a card at the side slides in first; the one in front opens its report (and a drag opens nothing)
+    c.addEventListener('click', function(e){ if(dragged){ e.preventDefault(); return; } if(i!==cur){ e.preventDefault(); stepTo(i); } });
   });
   stage.addEventListener('mouseenter', stop); stage.addEventListener('mouseleave', play);
   // a finger drags the cards round with it; let go and they flow on to the nearest card, a quick
@@ -2596,7 +2600,7 @@ function rpCover(p) {
 // A paper published in a journal: the covers' own designs with its real photograph, its journal and year in
 // the foot, and no NIIS mark, since NIIS did not publish it.
 function rpJournalCover(p) {
-  const kind = ['photo', 'dark', 'lines'][(p.n || 0) % 3], year = String(p.published_on || '').slice(0, 4), src = paperPhoto(p);
+  const kind = ['photo', 'dark', 'lines'][(p.n || 0) % 3], year = String(p.published_on || '').slice(0, 4), src = p.cover || paperPhoto(p);
   const img = (cls) => `<img class="${cls}" src="${esc(src)}" alt="" loading="lazy" decoding="async">`;
   return `<div class="pc pc--${kind} pc--journal" aria-hidden="true">
       ${pcArt(kind, img, 101 + (p.n || 0) * 7)}
@@ -2739,7 +2743,7 @@ function researchAdminBody(papers, notice) {
 }
 
 exports.paper = (ctx, p, canManage = false) => shell(ctx, {
-  title: p.title, workspaceActive: 'research', body: `
+  title: p.title, workspaceActive: 'research', extraHead: PDF_HEAD, body: `
   <div class="wrap section narrow paper-page">
     <p class="kicker"><a href="/research">← Research papers</a></p>
     ${canManage ? `<div class="alert">${statusPill(p)} <span class="muted">Admin preview, this is how the paper reads. Manage it from the Research Papers list.</span></div>` : ''}
@@ -2753,14 +2757,68 @@ exports.paper = (ctx, p, canManage = false) => shell(ctx, {
       </div>
     </div>
     <h2>Abstract</h2><p class="muted">${esc(p.abstract)}</p>
+    ${pdfViewer({ url: '', title: p.title, note: 'The PDF of this paper is not on the platform yet.' })}
     ${p.body ? `<h2>Report</h2><p class="muted">${esc(p.body)}</p>` : ''}
   </div>`,
 });
 exports.LIBERIA_RESEARCH = LIBERIA_RESEARCH;
+// The PDF viewer under a paper or a report (public/pdfviewer.js, on PDF.js): the owner's pdf-viewer
+// component's toolbar (the page list, "Page n of N", rotate, zoom out and in, the zoom list, search) and the
+// pages, with a download besides. A document without its PDF on the platform shows the placeholder.
+const PDF_SOON = '/assets/docs/niis-pdf-coming-soon.pdf';
+const PDF_HEAD = `<script type="module" src="/assets/pdfviewer.js?v=${ASSET_V}"></script>`;
+const PV_ICONS = {   // Lucide's glyphs, as the component draws them
+  panel: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/>',
+  ccw: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+  cw: '<path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>',
+  out: '<circle cx="12" cy="12" r="10"/><path d="M8 12h8"/>',
+  in: '<circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/>',
+  find: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  down: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
+  load: '<path d="M21 12a9 9 0 1 1-6.219-8.56"/>',
+};
+const pvIcon = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${PV_ICONS[k]}</svg>`;
+function pdfViewer({ url, title, note = '' }) {
+  const src = `${url || PDF_SOON}?v=${ASSET_V}`;
+  const btn = (k, label) => `<button type="button" class="pv-btn" data-pv="${k}" aria-label="${label}" title="${label}">${pvIcon(k)}</button>`;
+  return `<section class="pv" data-pdf="${esc(src)}" data-v="${ASSET_V}" aria-label="${esc(title)}, the PDF">
+      <aside class="pv-side" aria-label="Pages"><div class="pv-thumbs"></div></aside>
+      <div class="pv-main">
+        <div class="pv-bar">
+          <div class="pv-grp">
+            <button type="button" class="pv-btn" data-pv="side" aria-pressed="true" aria-label="Show or hide the pages" title="Pages">${pvIcon('panel')}</button>
+            <span class="pv-count">Page <b data-pv-at>1</b> of <b data-pv-n>…</b></span>
+          </div>
+          <div class="pv-grp">
+            ${btn('ccw', 'Rotate to the left')}${btn('cw', 'Rotate to the right')}
+            <i class="pv-sep" aria-hidden="true"></i>
+            ${btn('out', 'Zoom out')}${btn('in', 'Zoom in')}
+            <select class="pv-zoom" data-pv-zoom aria-label="Zoom"><option value="fit">Fit width</option>${[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 4, 8].map((z) => `<option value="${z}">${z * 100}%</option>`).join('')}</select>
+            <i class="pv-sep" aria-hidden="true"></i>
+            <span class="pv-findwrap">
+              <button type="button" class="pv-btn" data-pv="find" aria-expanded="false" aria-label="Search the document" title="Search">${pvIcon('find')}</button>
+              <span class="pv-find" hidden><input type="search" data-pv-find placeholder="Search" aria-label="Search the document" autocomplete="off"><span class="pv-hits" data-pv-hits aria-live="polite"></span></span>
+            </span>
+            <a class="pv-btn" href="${esc(src)}" download aria-label="Download the PDF" title="Download">${pvIcon('down')}</a>
+          </div>
+        </div>
+        <div class="pv-scroll">
+          <div class="pv-pages"></div>
+          <p class="pv-load" role="status"><span class="pv-spin">${pvIcon('load')}</span>Opening the PDF</p>
+          <p class="pv-msg" hidden>This PDF could not be shown here. <a href="${esc(src)}" download>Download it</a> instead.</p>
+        </div>
+      </div>
+    </section>
+    ${note ? `<p class="pv-note">${note}</p>` : ''}`;
+}
 exports.journalPaper = (ctx, p) => {
   const cite = `${p.authors} (${String(p.published_on).slice(0, 4)}). ${p.title}. ${p.venue}${p.cite ? ', ' + p.cite : ''}. https://doi.org/${p.doi}`;
+  const lic = { 'CC BY 4.0': 'https://creativecommons.org/licenses/by/4.0/', 'CC BY 3.0': 'https://creativecommons.org/licenses/by/3.0/' }[p.licence];
+  const pdfNote = p.pdf
+    ? `The paper as published by ${esc(p.venue)}, shared under ${lic ? `the <a href="${lic}" target="_blank" rel="noopener noreferrer">${esc(p.licence)}</a>` : 'its'} licence, unchanged.`
+    : `The PDF of this paper is not on the platform yet. ${esc(p.venue)} publishes it: <a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">read it there</a>.`;
   return shell(ctx, {
-    title: p.title, workspaceActive: 'research', body: `
+    title: p.title, workspaceActive: 'research', extraHead: PDF_HEAD, body: `
   <div class="wrap section narrow paper-page">
     <p class="kicker"><a href="/research">← Research papers</a></p>
     <div class="paper-detail-head">
@@ -2773,9 +2831,10 @@ exports.journalPaper = (ctx, p) => {
         ${shareBar(ctx, '/research/p/' + p.slug, p.title)}
       </div>
     </div>
-    <h2>Summary</h2><p class="muted">${esc(p.summary)}</p>
+    <h2>Abstract</h2><p class="muted">${esc(p.summary)}</p>
+    ${pdfViewer({ url: p.pdf ? `/assets/docs/research/${p.slug}.pdf` : '', title: p.title, note: pdfNote })}
     <h2>Cite this paper</h2><p class="paper-cite">${esc(cite)}</p>
-    <p class="paper-note">Published in ${esc(p.venue)}, not by NIIS. The summary is ours; the paper itself, at its publisher, has the full method and findings.</p>
+    <p class="paper-note">Published in ${esc(p.venue)}, not by NIIS. The abstract above is NIIS’s short account of the paper; the authors’ own abstract opens the paper itself.</p>
   </div>`,
   });
 };
@@ -3147,44 +3206,60 @@ exports.partners = (ctx, { partners = [] }) => {
 };
 
 // ============ ICT REPORTS ============
-// Under the banner: the latest release as a feature, the counts, the library (type chips and a
-// search, cards that rearrange as they filter), and a publication timeline. Each report opens a
-// summary with the catalogue categories its subject draws on. There are no report files on the
-// platform yet, so the page offers no download. Logic: app.js, initReports.
+// Each report is a document: it opens on its own page (exports.reportPage) with its PDF in the viewer,
+// the placeholder until the report's file is on the platform.
 const REPORT_MONTH = { Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6, Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12, Q1: 3, Q2: 6, Q3: 9, Q4: 12 };
 const reportOrder = (r) => r.year * 100 + (REPORT_MONTH[String(r.date).split(' ')[0]] || 0);
 // ICT Reports in the same BBC News format as News & Updates: the latest report leads, the others
-// follow as rows; a report opens its summary in the dialog (app.js, initReports).
-exports.reports = (ctx, { indicators = [], domainLabels = {} } = {}) => {
-  const byDomain = {};
-  indicators.forEach((i) => (byDomain[i.domain] = byDomain[i.domain] || []).push(i));
-  const list = NATIONAL_REPORTS.map((r, i) => ({ ...r, i, bg: slotBg('reports', r.img, true), photo: imgs.url('reports', r.img) }));
-  const related = (r) => (r.domains || []).filter((d) => byDomain[d]).map((d) => ({ d, label: domainLabels[d] || d, n: byDomain[d].length, names: byDomain[d].slice(0, 5).map((x) => x.name) }));
+// follow as rows, each opening the report's own page.
+exports.reports = (ctx) => {
+  const list = NATIONAL_REPORTS.map((r, i) => ({ ...r, i, photo: imgs.url('reports', r.img) }));
   const ordered = list.slice().sort((a, b) => reportOrder(b) - reportOrder(a));
   const meta = (r) => `<span class="bbc-meta"><span>${esc(r.date)}</span><span class="bbc-sep" aria-hidden="true"></span><span>${esc(r.tag)}</span></span>`;
   const [first, ...rest] = ordered;
-  const lead = first ? { href: '/reports#report-' + first.i, open: first.i, img: first.photo, title: first.title, body: first.desc, meta: meta(first) } : null;
-  const rows = rest.map((r) => ({ id: 'report-' + r.i, href: '/reports#report-' + r.i, open: r.i, img: r.photo, title: r.title, meta: meta(r) }));
-  const state = list.map((r) => ({ title: r.title, tag: r.tag, date: r.date, desc: r.desc, bg: r.bg, related: related(r) }));
+  // each report opens on its own page (/reports/<slug>), with its PDF
+  const lead = first ? { href: '/reports/' + reportSlug(first), img: first.photo, title: first.title, body: first.desc, meta: meta(first) } : null;
+  const rows = rest.map((r) => ({ id: 'report-' + r.i, href: '/reports/' + reportSlug(r), img: r.photo, title: r.title, meta: meta(r) }));
   return shell(ctx, {
     title: 'ICT Reports', active: '/reports', workspaceActive: 'reports', body: `
   ${listHero({
     id: 'rpTitle', title: 'ICT Reports.', dim: 'Liberia’s digital sector, on the record.', slot: 'reports',
-    ctas: (first ? lhBtn(lead.href, 'Read the latest report', { open: first.i }) : '') + lhBtn('/data', 'Explore the data', { dark: true }),
+    ctas: (first ? lhBtn(lead.href, 'Read the latest report') : '') + lhBtn('/data', 'Explore the data', { dark: true }),
   })}
   ${bbcLayout({ h1: 'All ICT reports', lead, rows, tag: 'h2', id: 'rpList' })}
-  <dialog class="rx-modal" id="rx-modal" aria-labelledby="rx-m-title">
-    <div class="rx-m-img" id="rx-m-img"></div>
-    <button type="button" class="rx-m-x" data-close aria-label="Close">${icon('x')}</button>
-    <div class="rx-m-body">
-      <p class="rx-card-meta"><span class="rx-tag" id="rx-m-tag"></span><span id="rx-m-date"></span></p>
-      <h2 id="rx-m-title"></h2>
-      <p id="rx-m-desc"></p>
-      <div id="rx-m-rel"></div>
-      <div class="rx-actions"><a class="ui-btn ui-btn-primary" href="/data">Explore the data ${icon('arrow')}</a><button type="button" class="ui-btn" data-close>Close</button></div>
+  <script>window.__NICTD_PAGE__='reports';</script>`,
+  });
+};
+
+// One report on its own page, in the research papers' design: its cover and title, the share links, its
+// summary, the PDF (the placeholder until the report's file is on the platform), and the data behind it.
+exports.reportSlug = reportSlug;
+exports.reportPage = (ctx, { slug, indicators = [], domainLabels = {} }) => {
+  const i = NATIONAL_REPORTS.findIndex((r) => reportSlug(r) === slug);
+  if (i < 0) return null;
+  const r = NATIONAL_REPORTS[i], byDomain = {};
+  indicators.forEach((x) => (byDomain[x.domain] = byDomain[x.domain] || []).push(x));
+  const related = (r.domains || []).filter((d) => byDomain[d]);
+  const cover = rpJournalCover({ n: i, tag: r.tag, title: r.title, short: r.date, venueShort: 'ICT Report', published_on: String(r.year), cover: imgs.url('reports', r.img) });
+  return shell(ctx, {
+    title: r.title, active: '/reports', workspaceActive: 'reports', extraHead: PDF_HEAD, body: `
+  <div class="wrap section narrow paper-page">
+    <p class="kicker"><a href="/reports">← ICT Reports</a></p>
+    <div class="paper-detail-head">
+      <div class="paper-cover-lg">${cover}</div>
+      <div>
+        <h1>${esc(r.title)}</h1>
+        <p class="authors">${esc(r.tag)} · <span class="mono">${esc(r.date)}</span></p>
+        <a class="btn btn-teal" href="/data">Explore the data ${icon('arrow')}</a>
+        ${shareBar(ctx, '/reports/' + slug, r.title)}
+      </div>
     </div>
-  </dialog>
-  <script>window.__NICTD_PAGE__='reports';window.__REPORTS__=${JSON.stringify(state)};</script>`,
+    <h2>Abstract</h2><p class="muted">${esc(r.desc)}</p>
+    ${pdfViewer({ url: r.pdf || '', title: r.title, note: r.pdf ? '' : 'The PDF of this report is not on the platform yet.' })}
+    ${related.length ? `<h2>The data behind it</h2>
+    <div class="rp-rel">${related.map((d) => `<a class="rp-rel-cat" href="/data"><span><b>${esc(domainLabels[d] || d)}</b><em>${byDomain[d].length} indicators</em></span>
+      <small>${byDomain[d].slice(0, 5).map((x) => esc(x.name)).join(' · ')}${byDomain[d].length > 5 ? ' and more' : ''}</small></a>`).join('')}</div>` : ''}
+  </div>`,
   });
 };
 

@@ -513,35 +513,6 @@
   }
 
   // ============================================================
-  // PAGE: ICT Reports
-  // ============================================================
-  // ICT Reports: a report's headline opens its summary in the dialog
-  function initReports() {
-    var data = window.__REPORTS__, dlg = qs('#rx-modal'), lastBtn = null;
-    if (!data || !dlg) return;
-    function open(i, btn) {
-      var r = data[i];
-      if (!r) return;
-      lastBtn = btn;
-      qs('#rx-m-img').setAttribute('style', r.bg);
-      qs('#rx-m-tag').textContent = r.tag; qs('#rx-m-date').textContent = r.date;
-      qs('#rx-m-title').textContent = r.title; qs('#rx-m-desc').textContent = r.desc;
-      qs('#rx-m-rel').innerHTML = r.related.length ? '<p class="ui-k">The data behind it</p>' + r.related.map(function (x) {
-        return '<div class="rx-m-cat"><a href="/data"><span>' + esc(x.label) + '</span><b>' + x.n + ' indicators</b></a><p>' + x.names.map(esc).join(' · ') + (x.n > x.names.length ? ' and more' : '') + '</p></div>';
-      }).join('') : '';
-      if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
-      document.documentElement.classList.add('ui-locked');
-    }
-    function close() { if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); }
-    dlg.addEventListener('close', function () { document.documentElement.classList.remove('ui-locked'); if (lastBtn) lastBtn.focus({ preventScroll: true }); });
-    dlg.addEventListener('click', function (e) { if (e.target === dlg || e.target.closest('[data-close]')) close(); });
-    qsa('[data-open]').forEach(function (b) { b.addEventListener('click', function (e) { e.preventDefault(); open(Number(b.dataset.open), b); }); });
-    // a link to one report (/reports#report-3) opens its summary
-    var m = /^#report-(\d+)$/.exec(location.hash);
-    if (m) open(Number(m[1]), null);
-  }
-
-  // ============================================================
   // Research: the paper library's filter bar (search, year, type), with the Explorer's dropdowns
   // ============================================================
   function initResearchLib() {
@@ -1985,7 +1956,6 @@
     initAccordions('.faq-item', '.faq-q');
     if (page === 'home') { initHome(); if (window.__DASHBOARD_STATE__) initDashboardTopic(); }
     // the Data Explorer runs on its own engine, public/explorer.js
-    if (page === 'reports') initReports();
     if (page === 'team') initTeam();
     if (qs('#rsLib')) initResearchLib();
     if (qs('[data-kt]')) initKinetic();

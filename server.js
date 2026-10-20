@@ -353,7 +353,7 @@ function parseBulkCsv(text) {
 if (!REVIEW) setInterval(() => { setSetting('last_etl_sync', new Date().toISOString()).catch(() => {}); }, 5 * 60 * 1000).unref();
 
 // ---------- static files ----------
-const MIME = { '.css': 'text/css', '.js': 'application/javascript', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.mp4': 'video/mp4', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.woff2': 'font/woff2', '.woff': 'font/woff', '.otf': 'font/otf', '.ttf': 'font/ttf' };
+const MIME = { '.css': 'text/css', '.js': 'application/javascript', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.mp4': 'video/mp4', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.woff2': 'font/woff2', '.woff': 'font/woff', '.otf': 'font/otf', '.ttf': 'font/ttf', '.mjs': 'text/javascript', '.pdf': 'application/pdf' };
 function serveStatic(res, relPath) {
   const full = path.join(__dirname, 'public', path.normalize(relPath).replace(/^([.][.][\\/])+/, ''));
   if (!full.startsWith(path.join(__dirname, 'public'))) return send(res, 403, 'Forbidden');
@@ -658,6 +658,14 @@ async function handler(req, res) {
       if (p === '/reports') {
         logEvent('page_view', p, user);
         return send(res, 200, views.reports(ctx, { indicators: listIndicators(user), domainLabels: DOMAIN_LABELS }));
+      }
+      // one report on its own page, with its PDF
+      const repM = /^\/reports\/([a-z0-9-]+)$/.exec(p);
+      if (repM) {
+        const html = views.reportPage(ctx, { slug: repM[1], indicators: listIndicators(user), domainLabels: DOMAIN_LABELS });
+        if (!html) return send(res, 404, views.notFound(ctx));
+        logEvent('page_view', p, user);
+        return send(res, 200, html);
       }
       if (p === '/careers/programs') {
         logEvent('page_view', p, user);

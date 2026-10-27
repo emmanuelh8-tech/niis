@@ -1,4 +1,5 @@
-// views.js, HTML templates for NIIS (National ICT Intelligence System).
+// views.js, HTML templates for the NIIP site (National ICT Intelligence Program) and its data system, NIIS
+// (National ICT Intelligence System). The project is NIIP; NIIS is what it builds, so data is credited to NIIS.
 // Original design system; not a copy of any real organization's branding.
 'use strict';
 
@@ -93,65 +94,12 @@ function nodeMark(size = 30, cls = '') {
   </svg>`;
 }
 
-// ---------- official seal logo: circular badge, real Liberia national outline + circuit-node overlay ----------
-// Path traced from geoBoundaries' open Liberia ADM0 dataset (CC BY 3.0 IGO), simplified, not a real government seal.
+// ---------- the outline of Liberia ----------
+// Path traced from geoBoundaries' open Liberia ADM0 dataset (CC BY 3.0 IGO), simplified.
 const LIBERIA_EMBLEM_PATH = 'M-6.87,-45.84L-8.89,-44.47L-10.48,-44.82L-13.44,-43.23L-13.36,-44.88L-14.91,-45.61L-16.78,-44.42L-18.3,-44.68L-18.61,-41.3L-19.28,-40.13L-18.87,-38.21L-19.95,-37.18L-23.19,-37.09L-25.49,-34.79L-25.5,-28.97L-27.5,-28.16L-30.68,-24.03L-36.31,-20.56L-38.17,-17.72L-40.07,-17.24L-40.39,-16.32L-40.85,-16.61L-41.75,-15.09L-41.36,-13.69L-42.29,-13.55L-42.18,-12.4L-43.48,-11.37L-43.23,-10.7L-44.98,-10.37L-42.84,-8.72L-42.03,-6.7L-39.09,-7.21L-38.05,-5.58L-38.45,-4.82L-39.64,-5.14L-42.16,-6.88L-42.48,-6.26L-41.87,-5.48L-35.57,-2.62L-34.96,-2.87L-33.24,-1.79L-33.03,-2.18L-33.14,-1.5L-29.76,1.57L-28.46,0.94L-29.25,1.43L-29.12,2.03L-29.18,1.33L-29.69,1.62L-29.83,2.86L-28.18,3.02L-27.85,3.78L-29.55,3.38L-29.87,2.67L-29.61,3.49L-27.46,4.8L-20.93,6.73L-20.23,7.63L-17.23,8.97L-16.19,10.42L-13.74,11.87L-12.74,13.89L-3.44,21.46L-3.5,22.34L-1.53,23.39L0.01,25.74L3.18,28.09L2.95,28.54L8.5,31.61L8.64,32.26L12.25,33.39L15.64,36.06L19.98,37.65L25.79,41.23L32.3,42.58L34.89,43.75L34.97,44.57L37.13,45.76L41.58,45.86L40.66,44.98L41.26,44.22L40.68,43.75L40.52,40.95L41.06,40.35L40.47,39.41L40.79,36.6L40.08,36.19L39.99,34.05L41.53,33.64L40.82,32.4L41.23,31.85L40.81,30.01L42.42,29.15L42.63,25.78L43.93,25.27L43.82,26.17L44.98,24.56L44.81,23.34L44.27,23.81L43.23,22.39L43.85,22.41L44.64,18.92L42.87,13.55L42.32,13.94L41.71,13.05L41.09,13.56L40.47,12.2L38.71,11.82L38.62,11.02L38.11,12.13L36.47,10.98L35.77,10.19L36.22,9.18L35.71,8.11L34.5,8.21L34.64,5.73L35.09,5.61L33.35,3.68L32.12,3.69L31.11,2.91L27.43,3.83L23.77,1.7L22.63,2.2L22.19,1.85L22.8,1.56L22.54,0.17L21.59,-0.7L20.92,-0.11L17.98,-1.04L19.02,-2.55L19.5,-2.36L19.63,-3.51L20.02,-3.15L21.4,-4.14L23.77,-6.78L24.52,-8.98L23.91,-9.44L24.56,-10.07L24.14,-11.34L25.24,-12.11L24.57,-13.88L25.15,-16L23.21,-17.42L22.37,-22.21L19.94,-23.35L20.26,-24.78L19.09,-25.68L19.23,-27.35L16.55,-27.32L15.71,-25.98L15.82,-23.21L12.66,-19.61L13.03,-18.32L12.37,-17.62L11.55,-17.6L11.29,-18.47L7.15,-16.35L6.77,-17.98L5.16,-18.85L5.02,-20.47L3.29,-20.21L3.1,-21.26L1.86,-21.5L0.73,-20.48L0.28,-21.32L-1.04,-20.01L1.65,-25.52L1.19,-26.42L1.91,-28.47L0.06,-31.65L0.67,-34.99L-0.54,-34.91L-0.57,-37.74L-1.75,-38.03L-1.15,-39.8L-1.87,-40.86L-1.02,-41.71L-3.44,-43.22L-4.65,-42.59L-4.05,-43.85L-4.97,-44.82L-6.33,-43.57L-6.87,-45.84Z';
-function ringArcPoint(cx, cy, r, bearingDeg) {
-  const t = (bearingDeg * Math.PI) / 180;
-  return [Math.round((cx + r * Math.sin(t)) * 100) / 100, Math.round((cy - r * Math.cos(t)) * 100) / 100];
-}
-function ringArcPath(cx, cy, r, fromDeg, toDeg, sweep) {
-  const [x1, y1] = ringArcPoint(cx, cy, r, fromDeg);
-  const [x2, y2] = ringArcPoint(cx, cy, r, toDeg);
-  const large = Math.abs(toDeg - fromDeg) > 180 ? 1 : 0;
-  return `M${x1},${y1} A${r},${r} 0 ${large},${sweep} ${x2},${y2}`;
-}
-function starPath(cx, cy, r) {
-  let d = '';
-  for (let i = 0; i < 10; i++) {
-    const rad = i % 2 === 0 ? r : r * 0.42;
-    const a = (Math.PI / 5) * i - Math.PI / 2;
-    const x = Math.round((cx + rad * Math.cos(a)) * 100) / 100, y = Math.round((cy + rad * Math.sin(a)) * 100) / 100;
-    d += (i === 0 ? 'M' : 'L') + x + ',' + y;
-  }
-  return d + 'Z';
-}
-function sealLogo(size = 40, cls = '') {
-  const cx = 100, cy = 100, ringR = 84;
-  const topArc = ringArcPath(cx, cy, ringR, -100, 100, 1);       // navy, over the top
-  const rightGap = ringArcPath(cx, cy, ringR, 100, 125, 1);      // white, star
-  const bottomArc = ringArcPath(cx, cy, ringR, 235, 125, 0);     // red, under the bottom (left->right, upright text)
-  const leftGap = ringArcPath(cx, cy, ringR, 235, 260, 1);       // white, star
-  const [rgx, rgy] = ringArcPoint(cx, cy, ringR, 112.5);
-  const [lgx, lgy] = ringArcPoint(cx, cy, ringR, 247.5);
-  return `<svg class="seal-logo ${cls}" width="${size}" height="${size}" viewBox="0 0 200 200" aria-hidden="true">
-    <circle cx="${cx}" cy="${cy}" r="96" fill="#fff" stroke="#0B2C63" stroke-width="1.4"/>
-    <circle cx="${cx}" cy="${cy}" r="72" fill="none" stroke="#0B2C63" stroke-width="1"/>
-    <path id="sealRingTop" d="${topArc}" fill="none" stroke="#0B2C63" stroke-width="18"/>
-    <path d="${rightGap}" fill="none" stroke="#fff" stroke-width="18"/>
-    <path id="sealRingBottom" d="${bottomArc}" fill="none" stroke="#C8102E" stroke-width="18"/>
-    <path d="${leftGap}" fill="none" stroke="#fff" stroke-width="18"/>
-    <path d="${starPath(rgx, rgy, 8)}" fill="#0B2C63"/>
-    <path d="${starPath(lgx, lgy, 8)}" fill="#0B2C63"/>
-    <text font-family="Public Sans,Arial,sans-serif" font-size="13" font-weight="700" fill="#fff" letter-spacing="1.6">
-      <textPath href="#sealRingTop" startOffset="50%" text-anchor="middle">NATIONAL ICT DATABASE</textPath>
-    </text>
-    <text font-family="Public Sans,Arial,sans-serif" font-size="13" font-weight="700" fill="#fff" letter-spacing="2">
-      <textPath href="#sealRingBottom" startOffset="50%" text-anchor="middle">OF LIBERIA</textPath>
-    </text>
-    <circle cx="${cx}" cy="${cy}" r="66" fill="#fff"/>
-    <g transform="translate(100,100) scale(1.28)">
-      <path d="${LIBERIA_EMBLEM_PATH}" fill="#0B2C63"/>
-      <g stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round">
-        <path d="M-4,-2 L10,-14 M10,-14 L22,-8 M10,-14 L14,-28 M-4,-2 L-2,14 M-2,14 L10,24"/>
-      </g>
-      <g fill="#fff">
-        <circle cx="-4" cy="-2" r="3.2"/><circle cx="10" cy="-14" r="2.6"/><circle cx="22" cy="-8" r="2.6"/>
-        <circle cx="14" cy="-28" r="2.2"/><circle cx="-2" cy="14" r="2.6"/><circle cx="10" cy="24" r="2.6"/>
-      </g>
-    </g>
-  </svg>`;
-}
+// The project's logo: the owner's NIIP seal (brand/seal, redrawn as a clean vector from the owner's
+// original; the web sizes are in public/img/brand/niip-seal-*). Nothing in its design is changed.
+const sealImg = (size, cls = '') => `<img${cls ? ` class="${cls}"` : ''} src="/img/brand/niip-seal-256.webp?v=${ASSET_V}" alt="" width="${size}" height="${size}" decoding="async">`;
 
 // Category labels are set in Marvin Visions and bylines in Kazimir, both licensed faces: drop the
 // licensed files into public/fonts as marvin-visions.(woff2|woff|otf|ttf) and kazimir.(woff2|woff|otf|ttf)
@@ -167,7 +115,8 @@ const LOCAL_FONTS = (() => {
 const FONT_HEAD = `<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,400..900;1,400..700&family=Montserrat:wght@800&family=Public+Sans:ital,wght@0,300..900;1,400..700&family=Righteous&family=Source+Serif+4:opsz,wght@8..60,400..700&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">${LOCAL_FONTS}`;
-const FAVICON = `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(sealLogo(32))}">`;
+const FAVICON = `<link rel="icon" type="image/png" sizes="64x64" href="/img/brand/niip-seal-64.png?v=2">
+<link rel="apple-touch-icon" href="/img/brand/niip-seal-180.png?v=2">`;
 
 // ---------- shared shell pieces ----------
 // Liberia map silhouette lit up with a live ICT network (glowing, pulsing nodes + flowing links).
@@ -253,7 +202,7 @@ function mainNav(active, q) {
         </li>`;
   };
   return `<nav class="gov-nav" aria-label="Main"><div class="nav-shell">
-    <a class="gov-wordmark nav-mapblock" href="/" aria-label="NIIS home"><img class="nav-logo" src="/img/brand/niis-mark.webp?v=${ASSET_V}" alt="" width="852" height="341" decoding="async"></a>
+    <a class="gov-wordmark nav-mapblock" href="/" aria-label="NIIP home">${sealImg(256, 'nav-logo')}</a>
     <form class="nav-search" action="/data" method="get" role="search">
       <input type="search" name="q" aria-label="Search indicators" autocomplete="off" value="${esc(q || '')}">
       <button type="button" class="nav-search-x" aria-label="Clear the search"${q ? '' : ' hidden'}>${icon('x')}</button>
@@ -294,8 +243,8 @@ function footerDh() {
   return `<footer class="footer-dh">${seal}
     <div class="footer-grid">
       <div>
-        <h4 data-perch="final">About NIIS</h4>
-        <p>The National ICT Intelligence System (NIIS) is the official source of ICT statistics and digital-development data for Liberia, tracking connectivity, affordability, market structure and digital governance across all 15 counties.</p>
+        <h4 data-perch="final">About NIIP</h4>
+        <p>NIIP, the National ICT Intelligence Program, keeps one trusted record of Liberia’s digital development across all 15 counties. Its data system, NIIS, collects, processes and publishes the statistics, from connectivity and affordability to market structure and digital governance.</p>
         <!-- brand icons: Font Awesome Free 6.5.2 (CC BY 4.0), each on its own brand colour -->
         <div class="footer-social"><a class="s-fb" href="#" aria-label="Facebook"><svg viewBox="0 0 320 512" aria-hidden="true"><path d="M80 299.3V512H196V299.3h86.5l18-97.8H196V166.9c0-51.7 20.3-71.5 72.7-71.5c16.3 0 29.4 .4 37 1.2V7.9C291.4 4 256.4 0 236.2 0C129.3 0 80 50.5 80 159.4v42.1H14v97.8H80z"/></svg></a><a class="s-x" href="#" aria-label="X"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg></a><a class="s-li" href="#" aria-label="LinkedIn"><svg viewBox="0 0 448 512" aria-hidden="true"><path d="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z"/></svg></a><a class="s-ig" href="#" aria-label="Instagram"><svg viewBox="0 0 448 512" aria-hidden="true"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg></a></div>
       </div>
@@ -309,7 +258,7 @@ function footerDh() {
     </div>
     <div class="footer-bottom-strip"><div class="footer-bottom-inner">
       <nav><a href="/about">Contact</a><a href="/about">Privacy Notice</a><a href="/about">Accessibility</a></nav>
-      <span class="mono" style="font-size:.72rem;color:#6E8194">© 2026 NIIS</span>
+      <span class="mono" style="font-size:.72rem;color:#6E8194">© 2026 NIIP</span>
     </div></div>
   </footer>`;
 }
@@ -321,11 +270,11 @@ const SITE_HEAD = `<script type="importmap">{"imports":{"three":"https://cdn.jsd
 <script type="module" src="/assets/bird.js?v=${ASSET_V}"></script>`;
 // The close that Careers and About end on (their cs-outro), for every other public page: the name,
 // large, rising out of the page into the footer's navy. app.js lifts it in when it comes into view.
-const SITE_OUTRO = `<section class="site-outro" aria-hidden="true"><div class="site-word">NIIS</div></section>`;
+const SITE_OUTRO = `<section class="site-outro" aria-hidden="true"><div class="site-word">NIIP</div></section>`;
 function publicLayout(ctx, { title, active = '', body, extraHead = '', q = '' }) {
   return `<!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#ffffff">
-<title>${esc(title)} · NIIS</title>
+<title>${esc(title)} · NIIP</title>
 ${FONT_HEAD}
 <link rel="stylesheet" href="/assets/styles.css?v=${ASSET_V}">
 ${FAVICON}
@@ -350,7 +299,7 @@ function appLayout(ctx, { title, active = '', body, extraHead = '' }) {
   const initials = u.name.split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
   return `<!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#ffffff">
-<title>${esc(title)} · NIIS</title>
+<title>${esc(title)} · NIIP</title>
 ${FONT_HEAD}
 <link rel="stylesheet" href="/assets/styles.css?v=${ASSET_V}">
 ${FAVICON}
@@ -360,8 +309,8 @@ ${extraHead}
 </head><body>
 <div class="app">
   <aside class="sidebar">
-    <a class="sb-brand" href="/portal">${sealLogo(38)}
-      <span class="sb-brand-text"><strong>NIIS</strong><span>Liberia ICT Intelligence</span></span>
+    <a class="sb-brand" href="/portal">${sealImg(38, 'sb-seal')}
+      <span class="sb-brand-text"><strong>NIIP</strong><span>ICT Intelligence Program</span></span>
     </a>
     <nav class="sb-nav">
       <span class="sb-section-label">Workspace</span>
@@ -388,7 +337,7 @@ ${extraHead}
   </aside>
   <div class="content">
     <div class="content-topbar">
-      <span class="crumb">NIIS<strong>${esc(title)}</strong></span>
+      <span class="crumb">NIIP<strong>${esc(title)}</strong></span>
       <span class="topbar-actions"><span class="role-chip ${u.role === 'admin' ? 'admin' : ''}">${esc(roleLabel)}</span></span>
     </div>
     <div class="page-body">${body}</div>
@@ -431,7 +380,7 @@ function selectorRow(idPrefix = '') {
 
 // ============ HOME ============
 exports.home = (ctx, { headlines, papers, keyStats, dashboards, indicatorsForSearch, counties, lastUpdated, heroTitle, heroSub,
-  homeVideo = '', homeVideoTitle = 'About the National ICT Intelligence System', homeVideoCaption = '', homeVideoPlaylist = '' }) => {
+  homeVideo = '', homeVideoTitle = 'About the National ICT Intelligence Program', homeVideoCaption = '', homeVideoPlaylist = '' }) => {
   return shell(ctx, {
     title: 'Home', active: '/', body: `
   ${heroSlider()}
@@ -466,7 +415,7 @@ const HERO_SLIDES = [
     pos: 'center 22%',
     who: 'H.E. Joseph Nyuma Boakai, Sr.', role: 'President of the Republic of Liberia',
     meta: 'Liberia Technology Summit 2026, 21 July · emansion.gov.lr' },
-  { img: 'slide-2', title: 'National ICT\nIntelligence System', sub: 'Liberia’s Data, owned by Liberia.' },
+  { img: 'slide-2', title: 'National ICT\nIntelligence Program', sub: 'Liberia’s Data, owned by Liberia.' },
   { img: 'slide-3', quote: 'If we cannot measure the contribution of technology to GDP, we cannot monetize it.',
     pos: 'center 20%',
     who: 'Mr. Claver Gatete', role: 'UN Under-Secretary-General · Executive Secretary, UNECA',
@@ -1905,7 +1854,7 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
     ['How is NIIS data licensed?', 'All open data published through NIIS is available under an open licence for research, journalism and policy use, with attribution to the ICT Statistics & Policy Unit, Ministry of Posts and Telecommunications. Open by default is a design principle, not a concession.'],
     ['How often is the data updated?', 'Most indicators refresh annually following the national survey wave; a subset fed by operator data-sharing agreements refreshes biennially. Each indicator’s periodicity is shown in the Indicator Catalogue.'],
     ['How is this different from the data international agencies already publish on Liberia?', 'International datasets are indispensable and we use them. But where national returns are incomplete they are modelled or trend-projected, and they report Liberia as one national figure. NIIS collects observed values, disaggregates them to all 15 counties, and publishes the method alongside the number.'],
-    ['Is NIIS a government body or a private initiative?', 'NIIS is a private-sector-led initiative delivering a national public good, working with the Ministry of Posts and Telecommunications and contributing agencies under data-sharing cooperation. The platform is built to be handed to, and sustained by, Liberian institutions.'],
+    ['Is NIIP a government body or a private initiative?', 'NIIP is a private-sector-led initiative delivering a national public good, working with the Ministry of Posts and Telecommunications and contributing agencies under data-sharing cooperation. The platform is built to be handed to, and sustained by, Liberian institutions.'],
     ['What happens when donor funding ends?', 'The programme is designed for transition, not dependency: infrastructure hosted in-country, methodology documented and published, staff recruited and trained locally, and a services and licensing model intended to carry recurring costs after the establishment phase.'],
     ['How do you protect personal data?', 'NIIS publishes aggregate, anonymized statistics only. It collects no individual-level personal data beyond what is required to produce those aggregates, in line with Liberia’s Data Protection Act.'],
     ['How do I request a new indicator?', 'Registered users can reach the ICT Statistics & Policy Unit directly through the platform’s messaging system once logged in.'],
@@ -1928,28 +1877,28 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
       <div class="cs-wrap cs-hero-in">
         <h1 id="abTitle" class="cs-h1" aria-label="Liberia’s ICT data, collected and managed by Liberians.">${csDecode('Liberia’s ICT data,')}${csDecode('collected and managed by Liberians.', 'cs-dim')}</h1>
         <div class="cs-ctas">
-          ${csBtn('#about-niis', 'About NIIS')}
+          ${csBtn('#about-niip', 'About NIIP')}
           <a class="cs-btn cs-btn-dark" href="#what-we-do"><span>What we do</span></a>
         </div>
       </div>
     </section>
 
-    <section class="cs-mission ab-story" id="about-niis" data-star="mission" aria-labelledby="abAboutTitle">
+    <section class="cs-mission ab-story" id="about-niip" data-star="mission" aria-labelledby="abAboutTitle">
       <div class="cs-wrap">
-        <h2 id="abAboutTitle" class="ab-about-h">About NIIS</h2>
+        <h2 id="abAboutTitle" class="ab-about-h">About NIIP</h2>
         <span class="cs-mark" aria-hidden="true"></span>
         <h2 id="abStoryTitle" class="cs-h2" aria-label="Data sovereignty, made operational.">${csDecode('Data sovereignty, made operational.')}</h2>
         <figure class="cs-people cs-people--mid">
           <img src="/img/about/analysts.jpg?v=${ASSET_V}" alt="Liberian analysts at their screens, maps of the country open in front of them" loading="lazy" decoding="async">
         </figure>
         <dl class="cs-rows ab-rows">
-          <div class="cs-row"><dt><span class="cs-tag">The system</span></dt><dd data-fill><b>NIIS</b> is the acronym for the National ICT Intelligence System: a private-sector project, funded by the Government of Liberia, international agencies, private-sector stakeholders and institutions, to collect and continuously maintain Liberia’s ICT data, disaggregated across all 15 counties.</dd></div>
-          <div class="cs-row"><dt><span class="cs-tag">The software</span></dt><dd data-fill>The project runs on three tiers of software. Secured databases store the ICT data we collect; a data-analytics algorithm draws on them; and the platform it feeds gives the public, anywhere in the world, access to ICT data across ${indicatorCount || 168} indicators.</dd></div>
-          <div class="cs-row"><dt><span class="cs-tag">The research</span></dt><dd data-fill>NIIS is also an accelerator of ICT research. We have built a repository of all publicly available Liberian ICT research papers, we collect and host papers by Liberian ICT researchers, and we help researchers get published. We are also bringing together in one place, for the public, the ICT reports of government institutions, regulators and service providers.</dd></div>
+          <div class="cs-row"><dt><span class="cs-tag">The program</span></dt><dd data-fill><b>NIIP</b> is the acronym for the National ICT Intelligence Program: a private-sector project, funded by the Government of Liberia, international agencies, private-sector stakeholders and institutions, to collect and continuously maintain Liberia’s ICT data, disaggregated across all 15 counties.</dd></div>
+          <div class="cs-row"><dt><span class="cs-tag">The software</span></dt><dd data-fill>Its data system, <b>NIIS</b> (the National ICT Intelligence System), runs on three tiers of software. Secured databases store the ICT data we collect; a data-analytics algorithm draws on them; and the platform it feeds gives the public, anywhere in the world, access to ICT data across ${indicatorCount || 168} indicators.</dd></div>
+          <div class="cs-row"><dt><span class="cs-tag">The research</span></dt><dd data-fill>NIIP is also an accelerator of ICT research. We have built a repository of all publicly available Liberian ICT research papers, we collect and host papers by Liberian ICT researchers, and we help researchers get published. We are also bringing together in one place, for the public, the ICT reports of government institutions, regulators and service providers.</dd></div>
           <div class="cs-row"><dt><span class="cs-tag">The access</span></dt><dd data-fill>We provide training and boot camps in partnership with international and local universities. And anyone who wants more data, a particular dataset or a new indicator can open a secure account on the platform, to search and save papers and reports, submit their research, and search for a job.</dd></div>
           <div class="cs-row"><dt><span class="cs-tag">The reason</span></dt><dd data-fill>For Liberia’s national commitments, and to create jobs for young Liberians in tech.</dd></div>
         </dl>
-        ${stats.length ? `<div class="ab-stats" role="list" aria-label="NIIS in numbers">${stats.map(([n, l, s], i) => `
+        ${stats.length ? `<div class="ab-stats" role="list" aria-label="NIIP in numbers">${stats.map(([n, l, s], i) => `
           <div class="ab-stat" role="listitem"${rise(i)}>
             <p class="ab-stat-n" data-count="${n}">${n}</p>
             <p class="ab-stat-l">${esc(l)}</p>
@@ -1969,7 +1918,7 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
       </dl>
     </section>
 
-    <section class="ab-slides" id="what-we-do" data-star="quiet" aria-label="What NIIS does, and the commitments it serves" data-slides>
+    <section class="ab-slides" id="what-we-do" data-star="quiet" aria-label="What NIIP does, and the commitments it serves" data-slides>
       <ol class="sl" role="list">${SLIDES.map(([alt, href], i) => {
         const n = String(i + 1).padStart(2, '0'), v = `?v=${ASSET_V}`;
         const pic = `<picture><source media="(max-width: 760px)" srcset="/img/about/slides/flyer-${n}.webp${v}" width="1440" height="1800"><img src="/img/about/slides/slide-${n}.webp${v}" alt="${esc(alt)}" width="2400" height="1350" ${i ? 'loading="lazy" ' : ''}decoding="async"></picture>`;
@@ -2065,7 +2014,7 @@ exports.submitPaper = (ctx, { errors = [], values = {}, done = false } = {}) => 
     <div class="lg-brand sp-brand">
       <div class="lg-cells" aria-hidden="true">${'<i></i>'.repeat(96)}</div>
       <div class="lg-brand-in sp-brand-in">
-        <a class="lg-seal" href="/" aria-label="NIIS home"><span><span>National ICT Intelligence System</span></span></a>
+        <a class="lg-seal" href="/" aria-label="NIIP home"><span><span>National ICT Intelligence Program</span></span></a>
         <h2>Send your research to the NIIS library</h2>
       </div>
     </div>
@@ -2438,7 +2387,7 @@ function partnerBook(partners) {
       <div class="bk-copy wrap">
         <p class="bk-kicker">Partnership</p>
         <h1 class="bk-title">Our Partners</h1>
-        <p class="bk-sub">The institutions that build, supply and govern the National ICT Intelligence System.</p>
+        <p class="bk-sub">The institutions that build, supply and govern the National ICT Intelligence Program.</p>
       </div>
       <div class="bk-hint" id="bkHint">Scroll to turn the page</div>
       <div class="bk-progress"><i id="bkBar"></i></div>
@@ -2517,7 +2466,7 @@ const partnerBookScript = `
 
 // ============ RESEARCH / UPDATES (retained; reachable from footer &amp; homepage) ============
 // Public / all-account browse view + (for admins) a full management console.
-// A paper's cover page, laid out like a published report's: an A4 page with the NIIS logo, the
+// A paper's cover page, laid out like a published report's: an A4 page with the NIIP seal, the
 // series, the paper's own title, authors and year. Four designs, one per kind of paper: a photo cut
 // by diagonal bands (flagship reports), a network of nodes on navy (working papers and data notes),
 // flowing lines round a round photo (briefs), and a dark full-bleed photo (reports and articles).
@@ -2584,10 +2533,10 @@ function rpCover(p) {
   const id = Number(p.id) || 0, year = String(p.published_on || '').slice(0, 4);
   const kind = PC_KIND[p.tag] || ['photo', 'net', 'lines', 'dark'][id % 4];
   const pool = PC_PHOTOS[kind], photo = pool ? `/img/about/${pool[id % pool.length]}.jpg?v=${ASSET_V}` : '';
-  const logo = `<img class="pc-logo" src="/img/brand/niis-mark.webp?v=${ASSET_V}" alt="" width="852" height="341" loading="lazy" decoding="async">`;
+  const logo = `<img class="pc-logo" src="/img/brand/niip-seal-256.webp?v=${ASSET_V}" alt="" width="256" height="256" loading="lazy" decoding="async">`;
   const head = `<span class="pc-head">${logo}<span class="pc-kicker">${esc(p.tag || 'Paper')}</span></span>`;
   const words = `<span class="pc-words"><i class="pc-rule"></i><span class="pc-title">${esc(p.title)}</span><span class="pc-by">${esc(p.authors || '')}</span></span>`;
-  const foot = `<span class="pc-foot"><span>National ICT Intelligence System</span><b>${esc(year)}</b></span>`;
+  const foot = `<span class="pc-foot"><span>National ICT Intelligence Program</span><b>${esc(year)}</b></span>`;
   const img = (cls) => `<img class="${cls}" src="${photo}" alt="" loading="lazy" decoding="async">`;
   const art = pcArt(kind, img, id);
   return `<div class="pc pc--${kind}" aria-hidden="true">
@@ -2598,7 +2547,7 @@ function rpCover(p) {
     </div>`;
 }
 // A paper published in a journal: the covers' own designs with its real photograph, its journal and year in
-// the foot, and no NIIS mark, since NIIS did not publish it.
+// the foot, and no NIIP seal, since NIIP did not publish it.
 function rpJournalCover(p) {
   const kind = ['photo', 'dark', 'lines'][(p.n || 0) % 3], year = String(p.published_on || '').slice(0, 4), src = p.cover || paperPhoto(p);
   const img = (cls) => `<img class="${cls}" src="${esc(src)}" alt="" loading="lazy" decoding="async">`;
@@ -2834,7 +2783,7 @@ exports.journalPaper = (ctx, p) => {
     <h2>Abstract</h2><p class="muted">${esc(p.summary)}</p>
     ${pdfViewer({ url: p.pdf ? `/assets/docs/research/${p.slug}.pdf` : '', title: p.title, note: pdfNote })}
     <h2>Cite this paper</h2><p class="paper-cite">${esc(cite)}</p>
-    <p class="paper-note">Published in ${esc(p.venue)}, not by NIIS. The abstract above is NIIS’s short account of the paper; the authors’ own abstract opens the paper itself.</p>
+    <p class="paper-note">Published in ${esc(p.venue)}, not by NIIP. The abstract above is NIIP’s short account of the paper; the authors’ own abstract opens the paper itself.</p>
   </div>`,
   });
 };
@@ -2897,10 +2846,10 @@ const NEWS_ADS = {
     h: 'Smarter steels for people and planet', p: 'Our mining operations in Liberia prioritize safety.' },
   globalpharm: { name: 'Global Pharm', href: 'https://gpmlafrica.com/', site: 'gpmlafrica.com', img: 'globalpharm',
     h: 'Better Medicines for Better Healthcare.', p: 'Quality pharmaceutical products, made in Liberia.' },
-  'niis-a': { name: 'NIIS', href: '/about', site: 'Advertise with us', house: 'Your brand<br>here',
-    h: 'Advertise with NIIS', p: 'Put your brand beside Liberia’s ICT news and reports.' },
-  'niis-b': { name: 'NIIS', href: '/about', site: 'Advertise with us', house: 'This space<br>is yours',
-    h: 'Reach Liberia’s ICT readers', p: 'Advertise on the national ICT data platform. Contact the NIIS team.' },
+  'niis-a': { name: 'NIIP', href: '/about', site: 'Advertise with us', house: 'Your brand<br>here',
+    h: 'Advertise with NIIP', p: 'Put your brand beside Liberia’s ICT news and reports.' },
+  'niis-b': { name: 'NIIP', href: '/about', site: 'Advertise with us', house: 'This space<br>is yours',
+    h: 'Reach Liberia’s ICT readers', p: 'Advertise on the national ICT data platform. Contact the NIIP team.' },
 };
 // rails on wide screens; on narrower ones the same adverts come in pairs between the headlines
 const AD_LEFT = ['orange', 'arcelormittal', 'niis-a'];
@@ -3073,7 +3022,7 @@ exports.updates = (ctx, items) => {
   const lead = feed[0] ? { ...feed[0], meta: feed[0].ext || demo(newsFeed(items)[0].own) ? feed[0].meta : '' } : null;
   const rows = feed.slice(1);
   const hero = listHero({
-    id: 'nuTitle', title: 'News & Updates.', dim: 'What is new in NIIS and in Liberia’s ICT sector.', slot: 'updates',
+    id: 'nuTitle', title: 'News & Updates.', dim: 'What is new in NIIP and in Liberia’s ICT sector.', slot: 'updates',
     film: { src: '/media/mission.mp4', small: '/media/mission-720.mp4' },
     ctas: (lead ? lhBtn(lead.href, 'Read the latest update', { ext: !!lead.ext }) : '') + lhBtn(lead || rows.length ? '#nuList' : '/data', lead || rows.length ? 'See all updates' : 'Explore the data', { dark: true }),
   });
@@ -3135,7 +3084,7 @@ exports.updatePage = (ctx, { items, index }) => {
         ${demo ? `<p class="upd-demo" role="note">${icon('info')}<span><strong>Demonstration data.</strong> The figures in this update come from NIIS's demonstration dataset. Live Ministry feeds are not public yet, so they are not official statistics.</span></p>` : ''}
         <figure class="upd-figure">
           <img src="${esc(photo)}" alt="" width="1200" height="675" decoding="async">
-          <figcaption>Illustrative photo from the NIIS image library.</figcaption>
+          <figcaption>Illustrative photo from the NIIP image library.</figcaption>
         </figure>
         <section class="upd-record" aria-labelledby="updRecordTitle">
           <h2 id="updRecordTitle">The record</h2>
@@ -3432,18 +3381,18 @@ const TALENTS = [
 // Education and experience behind each sample profile (mock, as the profiles are), shown in the
 // details window that opens from a card. experience: [role, where, when]
 const PERSON_MORE = {
-  'Musu Kollie': { edu: ['MSc Development Statistics, University of Liberia', 'BSc Economics, Cuttington University'], exp: [['Survey / Project Director', 'NIIS data mining phase', '2026 to now'], ['Survey manager', 'National household survey programme', '2019 to 2025'], ['Statistician', 'County planning office, Bong', '2014 to 2019']] },
-  'Emmanuel Kpadeh': { edu: ['BSc Computer Science, University of Liberia', 'Certificate in Data Engineering'], exp: [['Data Team Lead', 'NIIS', '2026 to now'], ['Database administrator', 'Ministry IT unit', '2018 to 2025']] },
-  'Comfort Wesseh': { edu: ['MSc Applied Statistics, University of Ghana', 'BSc Mathematics, University of Liberia'], exp: [['Sampling Statistician', 'NIIS', '2026 to now'], ['Research statistician', 'Health survey programme', '2021 to 2025']] },
-  'Prince Flomo': { edu: ['BSc Software Engineering, Stella Maris Polytechnic'], exp: [['Database / CAPI Engineer', 'NIIS', '2026 to now'], ['Mobile developer', 'Software studio, Monrovia', '2022 to 2025']] },
-  'Siafa Kamara': { edu: ['BSc Information Technology, African Methodist Episcopal University'], exp: [['Database / CAPI Engineer', 'NIIS', '2026 to now'], ['Systems administrator', 'Bank IT department', '2020 to 2025']] },
-  'Hawa Kromah': { edu: ['BSc Geography, University of Liberia', 'Diploma in GIS'], exp: [['GIS / Mapping Analyst', 'NIIS', '2026 to now'], ['GIS officer', 'County land-use mapping project', '2019 to 2025']] },
-  'Jartu Dolo': { edu: ['BSc Statistics, University of Liberia'], exp: [['Data Quality Analyst', 'NIIS', '2026 to now'], ['Monitoring and evaluation officer', 'Education programme', '2018 to 2025']] },
-  'Saye Zuo': { edu: ['BA Economics, Cuttington University'], exp: [['Data Quality Analyst', 'NIIS', '2026 to now'], ['Field data supervisor', 'Agriculture census', '2016 to 2025']] },
-  'Korto Nyumah': { edu: ['Associate Degree in Computer Science, Grand Bassa Community College'], exp: [['Data Processing Clerk', 'NIIS', '2026 to now'], ['Data entry officer', 'County health office', '2023 to 2025']] },
-  'Momo Konneh': { edu: ['MA Sociology, University of Liberia', 'BA Sociology, Cuttington University'], exp: [['County Research Lead, Bong', 'NIIS', '2026 to now'], ['Researcher', 'Community research programme, Bong', '2017 to 2025']] },
-  'Decontee Tarpeh': { edu: ['BSc Public Health, Mother Patern College of Health Sciences'], exp: [['Field Supervisor, Nimba', 'NIIS', '2026 to now'], ['Enumerator team lead', 'Demographic survey', '2021 to 2025']] },
-  'Varney Kanneh': { edu: ['Certificate in Information Technology, Booker Washington Institute'], exp: [['Field Enumerator, Montserrado', 'NIIS', '2026 to now'], ['Mobile money agent', 'Paynesville', '2022 to 2025']] },
+  'Musu Kollie': { edu: ['MSc Development Statistics, University of Liberia', 'BSc Economics, Cuttington University'], exp: [['Survey / Project Director', 'NIIP data mining phase', '2026 to now'], ['Survey manager', 'National household survey programme', '2019 to 2025'], ['Statistician', 'County planning office, Bong', '2014 to 2019']] },
+  'Emmanuel Kpadeh': { edu: ['BSc Computer Science, University of Liberia', 'Certificate in Data Engineering'], exp: [['Data Team Lead', 'NIIP', '2026 to now'], ['Database administrator', 'Ministry IT unit', '2018 to 2025']] },
+  'Comfort Wesseh': { edu: ['MSc Applied Statistics, University of Ghana', 'BSc Mathematics, University of Liberia'], exp: [['Sampling Statistician', 'NIIP', '2026 to now'], ['Research statistician', 'Health survey programme', '2021 to 2025']] },
+  'Prince Flomo': { edu: ['BSc Software Engineering, Stella Maris Polytechnic'], exp: [['Database / CAPI Engineer', 'NIIP', '2026 to now'], ['Mobile developer', 'Software studio, Monrovia', '2022 to 2025']] },
+  'Siafa Kamara': { edu: ['BSc Information Technology, African Methodist Episcopal University'], exp: [['Database / CAPI Engineer', 'NIIP', '2026 to now'], ['Systems administrator', 'Bank IT department', '2020 to 2025']] },
+  'Hawa Kromah': { edu: ['BSc Geography, University of Liberia', 'Diploma in GIS'], exp: [['GIS / Mapping Analyst', 'NIIP', '2026 to now'], ['GIS officer', 'County land-use mapping project', '2019 to 2025']] },
+  'Jartu Dolo': { edu: ['BSc Statistics, University of Liberia'], exp: [['Data Quality Analyst', 'NIIP', '2026 to now'], ['Monitoring and evaluation officer', 'Education programme', '2018 to 2025']] },
+  'Saye Zuo': { edu: ['BA Economics, Cuttington University'], exp: [['Data Quality Analyst', 'NIIP', '2026 to now'], ['Field data supervisor', 'Agriculture census', '2016 to 2025']] },
+  'Korto Nyumah': { edu: ['Associate Degree in Computer Science, Grand Bassa Community College'], exp: [['Data Processing Clerk', 'NIIP', '2026 to now'], ['Data entry officer', 'County health office', '2023 to 2025']] },
+  'Momo Konneh': { edu: ['MA Sociology, University of Liberia', 'BA Sociology, Cuttington University'], exp: [['County Research Lead, Bong', 'NIIP', '2026 to now'], ['Researcher', 'Community research programme, Bong', '2017 to 2025']] },
+  'Decontee Tarpeh': { edu: ['BSc Public Health, Mother Patern College of Health Sciences'], exp: [['Field Supervisor, Nimba', 'NIIP', '2026 to now'], ['Enumerator team lead', 'Demographic survey', '2021 to 2025']] },
+  'Varney Kanneh': { edu: ['Certificate in Information Technology, Booker Washington Institute'], exp: [['Field Enumerator, Montserrado', 'NIIP', '2026 to now'], ['Mobile money agent', 'Paynesville', '2022 to 2025']] },
   'Blessing Gbessay': { edu: ['BSc Computer Science (in progress), Stella Maris Polytechnic'], exp: [['Flutter developer, freelance', 'Monrovia', '2024 to now'], ['Volunteer coding coach', 'Community tech hub', '2023 to now']] },
   'Abraham Tamba': { edu: ['BSc Statistics, University of Liberia'], exp: [['Data analyst', 'Development research programme', '2023 to now'], ['Research intern', 'Margibi County planning office', '2022']] },
   'Patience Sumo': { edu: ['BA Mass Communication, Cuttington University'], exp: [['UX designer, freelance', 'Gbarnga', '2024 to now'], ['Design fellow', 'Inclusive tech programme', '2023']] },
@@ -3508,19 +3457,19 @@ const PATRONS = [
   { name: 'Dr. Fatumata Jalloh', img: 'fatumata-jalloh', role: 'Patron, Digital Health',
     bio: 'Advocates for digital patient records in county hospitals.',
     edu: ['MD, A.M. Dogliotti College of Medicine', 'MPH, University of Liberia'],
-    exp: [['Patron, Digital Health', 'NIIS', '2026 to now'], ['Physician', 'County referral hospital', '2008 to now']] },
+    exp: [['Patron, Digital Health', 'NIIP', '2026 to now'], ['Physician', 'County referral hospital', '2008 to now']] },
   { name: 'Thomas Gweh', img: 'thomas-gweh', role: 'Patron, Coding Clubs',
     bio: 'Sponsors after-school coding clubs in Montserrado and Bong.',
     edu: ['BSc Electrical Engineering, University of Liberia'],
-    exp: [['Patron, Coding Clubs', 'NIIS', '2026 to now'], ['Chief executive', 'Engineering services company', '2005 to now']] },
+    exp: [['Patron, Coding Clubs', 'NIIP', '2026 to now'], ['Chief executive', 'Engineering services company', '2005 to now']] },
   { name: 'Christiana Nimely', img: 'christiana-nimely', role: 'Patron, Women in Tech',
     bio: 'Mentors young women starting careers in ICT.',
     edu: ['BSc Computer Science, Cuttington University', 'Certificate in Entrepreneurship'],
-    exp: [['Patron, Women in Tech', 'NIIS', '2026 to now'], ['Founder', 'Software studio, Monrovia', '2016 to now']] },
+    exp: [['Patron, Women in Tech', 'NIIP', '2026 to now'], ['Founder', 'Software studio, Monrovia', '2016 to now']] },
   { name: 'Joseph Gbeh', img: 'joseph-gbeh', role: 'Patron, Open Data',
     bio: 'Supports open public access to Liberia’s ICT statistics.',
     edu: ['MA Public Administration, University of Liberia'],
-    exp: [['Patron, Open Data', 'NIIS', '2026 to now'], ['Civil servant', 'Public administration', '1985 to 2022']] },
+    exp: [['Patron, Open Data', 'NIIP', '2026 to now'], ['Civil servant', 'Public administration', '1985 to 2022']] },
 ];
 // a medal in its own colours: gold, on a ribbon in the flag's red and blue
 const MEDAL = `<svg class="tc-laptop" viewBox="0 0 40 40" aria-hidden="true">
@@ -3652,7 +3601,7 @@ exports.team = (ctx) => {
           </button></li>`;
   };
   const teamWheel = `<section class="tw wrap" id="team" aria-labelledby="tw-h">
-      <h2 id="tw-h" class="sr-only">The people behind NIIS</h2>
+      <h2 id="tw-h" class="sr-only">The people behind NIIP</h2>
       <div class="tw-panel">
         <div class="tw-stage" data-wheel role="group" aria-label="Team members, ${TEAM_MEMBERS.length} in all. Use the arrow keys or drag to turn the wheel.">
           <div class="tw-hub">
@@ -3745,7 +3694,7 @@ const PROGRAM_EVENTS = [
   { d: 18, m: 'Nov', y: 2026, kind: 'Workshop', title: 'Data journalism workshop', place: 'Monrovia', time: 'Two days', img: '/img/about/man-phone.jpg',
     body: 'Finding, checking and telling stories with Liberia’s ICT figures, with the people who collect them.' },
   { d: 3, m: 'Dec', y: 2026, kind: 'Bootcamp', title: 'Girls in ICT coding day', place: 'Kakata', time: '09:00 to 16:00', img: '/img/about/analyst-sq.jpg',
-    body: 'A first day of coding for secondary-school girls, with mentors from the NIIS team and its patrons.' },
+    body: 'A first day of coding for secondary-school girls, with mentors from the NIIP team and its patrons.' },
   { d: 14, m: 'Jan', y: 2027, kind: 'Forum', title: 'County data validation forum', place: 'Ganta', time: 'One day', img: '/img/about/colleagues.jpg',
     body: 'County officials review the first estimates for their counties before they are published.' },
   { d: 6, m: 'Mar', y: 2027, kind: 'Community', title: 'Open Data Day Monrovia', place: 'Monrovia', time: 'All day', img: '/img/programs/coding-class.jpg',
@@ -3757,7 +3706,7 @@ const PROGRAM_TRAININGS = [
   { title: 'Field supervisor training', kind: 'Training', len: 1, unit: 'week', where: 'In each county, before its wave', who: 'Field supervisors', status: 'Open', href: '/careers',
     body: 'Leading an enumerator team: spot checks, back-checks and clearing the daily uploads.' },
   { title: 'Data quality bootcamp', kind: 'Bootcamp', len: 2, unit: 'weeks', where: 'Monrovia', who: 'Graduates in statistics or IT', status: 'Opening soon',
-    body: 'Validation rules, cleaning and outlier review on real survey data, alongside the NIIS data team.' },
+    body: 'Validation rules, cleaning and outlier review on real survey data, alongside the NIIP data team.' },
   { title: 'GIS and mapping bootcamp', kind: 'Bootcamp', len: 1, unit: 'week', where: 'Monrovia', who: 'Geography and IT students', status: 'Opening soon',
     body: 'Enumeration-area frames, geocoding and county maps with open tools.' },
   { title: 'Data journalism workshop', kind: 'Workshop', len: 2, unit: 'days', where: 'Monrovia', who: 'Reporters and editors', status: 'By invitation',
@@ -3818,7 +3767,7 @@ function eventTicket(e, i) {
           <div class="tk-main">
             <span class="tk-photo" style="background-image:url('${e.img}?v=${ASSET_V}')" aria-hidden="true"></span>
             <div class="tk-content">
-              <p class="tk-top"><span class="tk-org">NIIS Programmes</span><span class="tk-kind">${esc(e.kind)}</span></p>
+              <p class="tk-top"><span class="tk-org">NIIP Programmes</span><span class="tk-kind">${esc(e.kind)}</span></p>
               <h3 class="tk-title">${esc(e.title)}</h3>
               <p class="tk-body">${esc(e.body)}</p>
               <dl class="tk-info">
@@ -3934,7 +3883,7 @@ exports.careers = (ctx) => {
       </video>
       <div class="cs-film-scrim" aria-hidden="true"></div>
       <div class="cs-wrap cs-hero-in">
-        <h1 id="csTitle" class="cs-h1" aria-label="Careers at NIIS. Built and run by Liberians.">${csDecode('Careers at NIIS.')}${csDecode('Built and run by Liberians.', 'cs-dim')}</h1>
+        <h1 id="csTitle" class="cs-h1" aria-label="Careers at NIIP. Built and run by Liberians.">${csDecode('Careers at NIIP.')}${csDecode('Built and run by Liberians.', 'cs-dim')}</h1>
         <div class="cs-ctas">
           ${csBtn('#csRoles', 'See open roles')}
           <a class="cs-btn cs-btn-dark" href="#csJoin"><span>How to join</span></a>
@@ -3952,7 +3901,7 @@ exports.careers = (ctx) => {
         </figure>
         <dl class="cs-rows">
           <div class="cs-row"><dt><span class="cs-tag">The mission</span></dt><dd data-fill>Creating jobs and opportunities for young Liberians is part of what this programme is for.</dd></div>
-          <div class="cs-row"><dt><span class="cs-tag">The work</span></dt><dd data-fill>The National ICT Intelligence System is built and run by Liberians. Every phase, from field collection to data engineering and the platform itself, is staffed and skilled locally.</dd></div>
+          <div class="cs-row"><dt><span class="cs-tag">The work</span></dt><dd data-fill>The National ICT Intelligence Program is built and run by Liberians. Every phase, from field collection to data engineering and the platform itself, is staffed and skilled locally.</dd></div>
           <div class="cs-row"><dt><span class="cs-tag">The path</span></dt><dd data-fill>Training is provided for field roles, and the experience carries forward into ICT research, statistics and data careers well beyond this programme.</dd></div>
         </dl>
       </div>
@@ -3995,16 +3944,16 @@ exports.careers = (ctx) => {
       </div>
     </section>
 
-    <section class="cs-outro" data-star="outro" aria-hidden="true"><div class="cs-word">NIIS</div></section>
+    <section class="cs-outro" data-star="outro" aria-hidden="true"><div class="cs-word">NIIP</div></section>
   </div>`,
   });
 };
 
 // ============ APPLICATION SENT ============
 // The end of the process: a drawn check, a burst of the page's blue squares, the headline, and
-// the reference the applicant keeps. The reference carries the date it was sent (NIIS-YYMMDD-XXXX).
+// the reference the applicant keeps. The reference carries the date it was sent (NIIP-YYMMDD-XXXX; older ones NIIS- or NICTD-).
 function careerSent(ctx, role, reference) {
-  const m = /^(?:NIIS|NICTD)-(\d{2})(\d{2})(\d{2})-/.exec(reference || '');
+  const m = /^(?:NIIP|NIIS|NICTD)-(\d{2})(\d{2})(\d{2})-/.exec(reference || '');
   const sentOn = m ? `${+m[3]} ${UPD_MONTHS[+m[2] - 1]} 20${m[1]}` : '';
   const field = role.unit === 'Data Collection';
   const burst = Array.from({ length: 14 }, (_, i) => `<i style="--a:${Math.round(i * (360 / 14) + (i % 2) * 9)}deg;--d:${i % 3 === 0 ? 7.4 : i % 3 === 1 ? 5.6 : 6.4}rem;--s:${i % 2 ? 5 : 7}px;--t:${(i % 4) * 40}ms"></i>`).join('');
@@ -4095,7 +4044,7 @@ exports.careerApply = (ctx, { role, counties = [], errors = [], values = {}, fai
               <textarea name="cover_note" rows="4" maxlength="2000" data-count${invalid('cover_note')}>${val('cover_note')}</textarea>
               <span class="cs-hint"><span data-count-out>${(values.cover_note || '').length}</span> of 2000 characters</span>${errText('cover_note')}</label>
             <label class="cs-consent"><input type="checkbox" name="consent" value="yes" required${values.consent ? ' checked' : ''}${invalid('consent')}>
-              <span>NIIS may keep my application and CV to assess me for this role.</span></label>${errText('consent')}
+              <span>NIIP may keep my application and CV to assess me for this role.</span></label>${errText('consent')}
           </fieldset>
           <div class="cs-hp" aria-hidden="true"><label>Leave this empty <input name="website" tabindex="-1" autocomplete="off"></label></div>
           <button type="submit" class="cs-btn cs-btn-submit"><span data-submit-label>Send application</span><i aria-hidden="true">${icon('arrow')}</i></button>
@@ -4146,8 +4095,8 @@ exports.login = (ctx, { error }) => publicLayout(ctx, {
       <div class="lg-cells" aria-hidden="true">${'<i></i>'.repeat(96)}</div>
       <div class="lg-brand-in">
         <a class="lg-seal" href="/">
-          ${imgs.exists('brand', 'seal') ? `<img src="${esc(imgs.url('brand', 'seal'))}" alt="" width="54" height="58" decoding="async">` : sealLogo(54)}
-          <span><strong>NIIS</strong><span>National ICT Intelligence System</span></span>
+          ${sealImg(54)}
+          <span><strong>NIIP</strong><span>National ICT Intelligence Program</span></span>
         </a>
         <h2>A secured system for Liberia’s ICT Data</h2>
       </div>
@@ -4188,8 +4137,8 @@ exports.register = (ctx, { error, success, form = {} }) => publicLayout(ctx, {
       <div class="lg-cells" aria-hidden="true">${'<i></i>'.repeat(96)}</div>
       <div class="lg-brand-in">
         <a class="lg-seal" href="/">
-          ${imgs.exists('brand', 'seal') ? `<img src="${esc(imgs.url('brand', 'seal'))}" alt="" width="54" height="58" decoding="async">` : sealLogo(54)}
-          <span><strong>NIIS</strong><span>National ICT Intelligence System</span></span>
+          ${sealImg(54)}
+          <span><strong>NIIP</strong><span>National ICT Intelligence Program</span></span>
         </a>
         <h2>Request access to Liberia’s ICT Data</h2>
       </div>
@@ -4449,7 +4398,7 @@ exports.admin = (ctx, { users, pending, reviewed, indicators, counties, settings
       <label>Key numbers strip, exactly 4 indicator codes, comma-separated<input name="key_numbers" class="mono" value="${esc(siteContent.key_numbers || '')}" placeholder="mobile_subscriptions,internet_penetration,…"></label>
       <label>Homepage video, YouTube link/ID, or an on-platform path
         <input name="home_video" class="mono" value="${esc(siteContent.home_video || '')}" placeholder="https://youtu.be/XXXXXXXX  ·  or  /media/generated/hero.mp4"></label>
-      <label>Video section title<input name="home_video_title" maxlength="140" value="${esc(siteContent.home_video_title || '')}" placeholder="About the National ICT Intelligence System"></label>
+      <label>Video section title<input name="home_video_title" maxlength="140" value="${esc(siteContent.home_video_title || '')}" placeholder="About the National ICT Intelligence Program"></label>
       <label>Video caption (optional)<textarea name="home_video_caption" rows="2" maxlength="600">${esc(siteContent.home_video_caption || '')}</textarea></label>
       <label>Video playlist, one per line as <code>Title | YouTube link or /path.mp4</code>, or
         <code>Title | Channel | link</code> to credit a third-party channel (first line is the main player)

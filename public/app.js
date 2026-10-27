@@ -626,7 +626,7 @@
     if (!wrap || !pm || !P) return null;
     var tpl = qs('#pmSocial'), cur = null, from = null, hideT = 0;
     var KIND = {
-      team: function () { return 'NIIS team'; },
+      team: function () { return 'NIIP team'; },
       patron: function () { return 'National ICT System Patron'; },
       talent: function (p) { return 'ICT talent · ' + p.field + ' · ' + p.county; },
     };
@@ -1268,7 +1268,7 @@
       if (!meta) return;
       var desc = qs('#dash-description'); if (desc) desc.textContent = meta.description || '';
       var narr = qs('#dash-narrative'); if (narr) narr.textContent = meta.narrative || '';
-      if (document.title && meta.label) document.title = meta.label + ' · NIIS';
+      if (document.title && meta.label) document.title = meta.label + ' · NIIP';
     }
     function load() {
       var county = countyFilter ? countyFilter.value : '';

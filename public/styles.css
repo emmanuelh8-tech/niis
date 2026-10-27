@@ -1,4 +1,4 @@
-/* NIIS — National ICT Intelligence System
+/* NIIP — National ICT Intelligence Program, and its data system NIIS (National ICT Intelligence System)
    A government statistics / data-hub portal. Original design system —
    not a copy of any organization's actual branding, palette values only.
    Liberian-flag identity (blue · red · white):
@@ -122,7 +122,7 @@ ul.plain, ol.plain { list-style: none; }
 /* logo */
 .nav-mapblock { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; padding: .1rem .5rem .1rem 0; }
 .nav-mapblock:hover { text-decoration: none; filter: brightness(1.05); }
-.nav-logo { display: block; width: auto; height: 34px; }
+.nav-logo { display: block; width: 58px; height: 58px; }   /* the NIIP seal */
 .liberia-map { display: block; }
 .lmk-land { fill: #E7EFFA; opacity: 1; }
 .lmk-outline { fill: none; stroke: #0B2C63; stroke-width: 1.6; }
@@ -220,7 +220,7 @@ ul.plain, ol.plain { list-style: none; }
   .nav-search, .gov-navlinks.dock, .nav-cta { display: none; }
   .nav-mapblock { gap: .6rem; margin: 0; padding: 0; }
   .nav-mapblock .liberia-flag { width: 34px; height: auto; }
-  .nav-logo { height: 28px; }
+  .nav-logo { width: 44px; height: 44px; }
   .nav-brand { display: inline; color: #0B2C63; font: 800 1.02rem/1 var(--sans); letter-spacing: .06em; }
   .nav-icon-btn { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 12px;
     background: transparent; color: #0B2C63; cursor: pointer; }
@@ -1112,6 +1112,7 @@ tr.unread td { background: var(--gold-soft); }
 .sb-brand { display: flex; align-items: center; gap: .7rem; padding: 1rem 1.1rem; border-bottom: 1px solid rgba(180,205,245,.12); color: #fff; }
 .sb-brand:hover { text-decoration: none; }
 .sb-brand .mark { color: #C8102E; }
+.sb-seal { flex: none; width: 38px; height: 38px; }
 .sb-brand-text { line-height: 1.15; }
 .sb-brand-text strong { display: block; font-size: .86rem; color: #fff; font-family: var(--serif); }
 .sb-brand-text span { font-size: .75rem; letter-spacing: .12em; color: #8FA7CE; font-weight: 700; text-transform: uppercase; }
@@ -5464,7 +5465,7 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
 .sp2-wrap.sp-page { max-width: none; padding: 0; }
 .sp-brand { align-items: flex-start; padding-top: clamp(14rem, 34vh, 21rem); }
 .sp-brand::before { inset: 0 0 auto 0; height: min(640px, 74vh);
-  background: url('/img/brand/seal-large.webp') center top 2.6rem / auto min(330px, 36vh) no-repeat; filter: drop-shadow(0 18px 30px rgba(3,12,32,.45)); }
+  background: url('/img/brand/niip-seal-512.png') center top 2.6rem / auto min(330px, 36vh) no-repeat; filter: drop-shadow(0 18px 30px rgba(3,12,32,.45)); }
 .sp-brand .lg-cells { bottom: auto; height: min(900px, 100%); }
 .sp-brand-in { position: sticky; top: calc(var(--nav-h, 76px) + 1.6rem); }
 .sp-rail { position: static; padding: 0; border: 0; border-radius: 0; background: none; text-shadow: none; }
@@ -5499,7 +5500,7 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
 .sp2-send.pearl .sp2-spin { width: 14px; height: 14px; }
 @media (max-width: 900px) {
   .sp-brand { min-height: 230px; padding-top: 1.4rem; align-items: flex-end; }
-  .sp-brand::before { inset: 0; height: auto; background: url('/img/brand/seal-large.webp') right 7% center / auto 74% no-repeat; }
+  .sp-brand::before { inset: 0; height: auto; background: url('/img/brand/niip-seal-512.png') right 7% center / auto 74% no-repeat; }
   .sp-brand-in { position: static; }
   .sp-side { padding: 2rem 1.2rem 6rem; }
 }
@@ -5655,7 +5656,7 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 .ad--arcelormittal::after { background: linear-gradient(90deg, transparent, rgba(243,112,33,.16), transparent); }
 .ad--globalpharm { --bg: #0B3E8C; --ink: #fff; --acc: #E8336D; --soft: rgba(255,255,255,.78); }
 .ad--globalpharm .ad-cta { color: #fff; }
-/* the NIIS boxes: an open space for an advertiser, its words slowly lit */
+/* the NIIP boxes: an open space for an advertiser, its words slowly lit */
 .ad--house { --bg: #0B2C63; --ink: #fff; --acc: #FFCC00; --soft: rgba(255,255,255,.76); }
 .ad--house.is-alt { --bg: #10141C; --acc: #C8102E; }
 .ad--house.is-alt .ad-cta { color: #fff; }
@@ -5689,10 +5690,10 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 .ad-box, .ad { min-width: 0; width: 100%; }
 
 /* Submit a Paper: the form reads from the left (title, labels, help lines, the fine print); the
-   large seal above the panel's words stands in for the small one beside "NIIS" */
+   large NIIP seal above the panel's words stands in for the small one beside "NIIP" */
 .lg-card.sp-card, .sp-card h1, .sp-card .lg-sub, .sp-lg .sp2-field > label, .sp-lg .sp2-help, .sp-lg .sp2-err, .sp2-fine { text-align: left; }
 .sp-lg .sp2-under { justify-content: space-between; text-align: left; }
-/* the seal, "National ICT Intelligence System" and the line share the panel's centre */
+/* the seal, "National ICT Intelligence Program" and the line share the panel's centre */
 .sp-brand { justify-content: center; }
 .sp-brand-in { justify-items: center; text-align: center; }
 .sp-brand .lg-seal { justify-content: center; }
@@ -5700,7 +5701,7 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 .sp-brand-in h2 { text-align: center; text-wrap: balance; }
 @media (max-width: 900px) {
   .sp-brand { min-height: 0; padding-top: calc(min(170px, 42vw) + 2rem); align-items: center; }
-  .sp-brand::before { background: url('/img/brand/seal-large.webp') center top 1.2rem / auto min(170px, 42vw) no-repeat; }
+  .sp-brand::before { background: url('/img/brand/niip-seal-512.png') center top 1.2rem / auto min(170px, 42vw) no-repeat; }
   .sp-brand .lg-brand-in h2 { display: block; font-size: 1.45rem; }
 }
 
@@ -5892,7 +5893,7 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 .pc .pc-art, .pc .pc-photo, .pc .pc-shade { position: absolute; inset: 0; width: 100%; height: 100%; }
 .pc .pc-photo { display: block; object-fit: cover; }
 .pc-head { display: flex; align-items: center; justify-content: space-between; gap: 4cqi; padding: 7cqi 7cqi 0; }
-.pc-logo { flex: 0 0 auto; width: 25cqi; height: auto; }
+.pc-logo { flex: 0 0 auto; width: 15cqi; height: auto; }   /* the NIIP seal */
 .pc-kicker { font: 700 3.2cqi/1.2 var(--sans); letter-spacing: .16em; text-transform: uppercase; color: #C8102E; text-align: right; }
 .pc-words { display: flex; flex-direction: column; align-items: flex-start; gap: 2.6cqi; margin-top: auto; padding: 0 7cqi; }
 .pc-rule { width: 12cqi; height: 1.1cqi; background: #C8102E; }
@@ -5923,7 +5924,6 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 .pc--dark .pc-kicker { color: #FFCC00; }
 .pc--dark .pc-title { font-family: var(--serif); font-weight: 600; font-size: 9cqi; letter-spacing: -.01em; line-height: 1.06; }
 /* the light words on the two dark covers, and a white logo */
-:is(.pc--net, .pc--dark) .pc-logo { filter: brightness(0) invert(1); }
 :is(.pc--net, .pc--dark) .pc-by { color: rgb(255 255 255 / .74); }
 :is(.pc--net, .pc--dark) .pc-foot { color: rgb(255 255 255 / .6); }
 :is(.pc--net, .pc--dark) .pc-foot b { color: #fff; }
@@ -6008,11 +6008,11 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 }
 @media (prefers-reduced-motion: reduce) { .rv-shade, .rv-dlg { transition: none; } }
 
-/* ---- About: the About NIIS section (the hero's first button leads here) and its words over the numbers.
+/* ---- About: the About NIIP section (the hero's first button leads here) and its words over the numbers.
    The anchors land just under the bar; the page glides to them. */
-html:has(#about-niis) { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) { html:has(#about-niis) { scroll-behavior: auto; } }
-#about-niis, #what-we-do { scroll-margin-top: var(--nav-real, var(--nav-h)); }   /* the bar's own height (app.js) */
+html:has(#about-niip) { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html:has(#about-niip) { scroll-behavior: auto; } }
+#about-niip, #what-we-do { scroll-margin-top: var(--nav-real, var(--nav-h)); }   /* the bar's own height (app.js) */
 .ab-about-h { margin: 0 0 clamp(2rem, 5vh, 3rem); text-align: center; font: 600 clamp(2.1rem, 1.4rem + 2.6vw, 3.4rem)/1.05 var(--sans); letter-spacing: -.02em; color: var(--cs-ink); }
 /* the photo band shows the middle of its picture (the analysts), not the top; the rows sit over the numbers */
 .cs-people--mid img { top: 50%; transform: translateY(-50%); }

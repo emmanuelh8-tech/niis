@@ -492,10 +492,10 @@ const heroSliderScript = `
   var lastScrollIdx=-1, autoT=null;
   var reduceHero=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function restartAuto(){ if(reduceHero||n<2) return; clearInterval(autoT);
-    autoT=setInterval(function(){ setActive((cur+1)%n); }, 4000); }
+    autoT=setInterval(function(){ setActive((cur+1)%n); }, 5000); }   // each slide stays 5 s (the owner's call)
   function progress(){ var total=sec.offsetHeight-window.innerHeight; if(total<=0) return 0;
     return Math.min(1,Math.max(0,-sec.getBoundingClientRect().top/total)); }
-  // each slide's shot (5-6 s, longer than the 4 s a slide stays) plays from its start as the slide
+  // each slide's shot (6 s, longer than the 5 s a slide stays) plays from its start as the slide
   // arrives, so the camera is still moving through the cross-fade; the outgoing shot keeps playing
   // until the fade is done. The next shot is fetched ahead and shown as soon as its first frame is
   // ready, so a fade never lands on the still. With reduced motion the stills stay.

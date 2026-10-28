@@ -30,6 +30,7 @@ const COLLECTIONS = {
       { key: 'slide-4', label: 'Slide 4', hint: 'President John Mahama, Ghana', def: '/img/hero/slide-4.jpg' },
       { key: 'slide-5', label: 'Slide 5', hint: 'President William Ruto, Kenya', def: '/img/hero/slide-5.jpg' },
       { key: 'slide-6', label: 'Slide 6', hint: 'Amb. Philip Thigo quote', def: '/img/hero/slide-6.png' },
+      { key: 'slide-7', label: 'Slide 7', hint: 'Hon. Lahoucine Rahmouni, Morocco (shown third)', def: '/img/hero/slide-7.jpg' },
     ],
   },
   papers: {

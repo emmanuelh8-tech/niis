@@ -325,7 +325,7 @@ ul.plain, ol.plain { list-style: none; }
 .selector-card { position: relative; z-index: 2; }
 
 /* ===== Scroll-triggered image slider hero (beneath the nav) ===== */
-.hero-slider { position: relative; height: 400vh; background: #08131f; }
+.hero-slider { position: relative; height: 450vh; background: #08131f; }   /* seven slides, about half a screen of scroll each */
 .hs-sticky { position: sticky; top: var(--nav-h); height: calc(100vh - var(--nav-h)); overflow: hidden; display: flex; align-items: flex-end; }
 .hs-stage { position: absolute; inset: 0; z-index: 0; }
 /* cover = fills the whole hero edge-to-edge; the band sits below the nav so nothing is cut under it */
@@ -372,7 +372,7 @@ ul.plain, ol.plain { list-style: none; }
   .hv-cue { display: none; }
 }
 @media (max-width: 720px) {
-  .hero-slider { height: 340vh; }
+  .hero-slider { height: 380vh; }
   .hs-content { padding-bottom: 8vh; }
 }
 
@@ -3973,7 +3973,7 @@ html { -webkit-text-size-adjust: 100%; }
 .to-top:focus-visible { outline: 2px solid #C8102E; outline-offset: 3px; }
 .to-top-ring { position: absolute; inset: -3px; width: calc(100% + 6px); height: calc(100% + 6px); transform: rotate(-90deg); }
 .to-top-ring circle { fill: none; stroke: rgba(255,255,255,.9); stroke-width: 3; }
-.to-top-ring .to-top-fill { stroke: #C8102E; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; }
+.to-top-ring .to-top-fill { stroke: #8A94A3; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; }
 .to-top-arrow { position: relative; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 @media (prefers-reduced-motion: reduce) { .to-top, .to-top.is-on { transition: none; } }
 @media print { .to-top { display: none; } }

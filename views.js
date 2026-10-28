@@ -403,11 +403,13 @@ exports.home = (ctx, { headlines, papers, keyStats, dashboards, indicatorsForSea
   });
 };
 
-// Scroll-triggered image slider hero. Six slides cross-fade as the visitor scrolls through a tall
-// sticky band, opening with the President and closing with Kenya. Each carries either the NIIS intro
-// or one verified quotation. Images live at /img/hero/slide-{1..6}, numbered in display order, and are
-// overridable per slot from the image admin screen. The search selector stays persistent below.
+// Scroll-triggered image slider hero. Seven slides cross-fade as the visitor scrolls through a tall
+// sticky band, opening with the program's name over its building, then the President, and closing with
+// Kenya. Each carries either the NIIP intro or one quotation (verified against its source, except where a
+// note says the owner supplied it). Images live at /img/hero/slide-{1..7}, named by slot rather than by
+// place in the order, and are overridable per slot from the image admin screen.
 const HERO_SLIDES = [
+  { img: 'slide-2', title: 'National ICT\nIntelligence Program', sub: 'Liberia’s Data, owned by Liberia.' },
   // His infrastructure pledge at the Liberia Technology Summit. The Executive Mansion release
   // reports it rather than quoting it, so it carries no quotation marks.
   { img: 'slide-1', reported: true,
@@ -415,7 +417,11 @@ const HERO_SLIDES = [
     pos: 'center 22%',
     who: 'H.E. Joseph Nyuma Boakai, Sr.', role: 'President of the Republic of Liberia',
     meta: 'Liberia Technology Summit 2026, 21 July · emansion.gov.lr' },
-  { img: 'slide-2', title: 'National ICT\nIntelligence Program', sub: 'Liberia’s Data, owned by Liberia.' },
+  // Supplied by the owner (28 October 2026), spelling corrected and the words unchanged; no published
+  // source was found, so it carries no source line. His title is the one on his patron card.
+  { img: 'slide-7', pos: '57% 24%',
+    quote: 'As Africans, if we prioritize taking ownership, that is when full sovereignty will be achieved.',
+    who: 'Hon. Lahoucine Rahmouni', role: 'Chargé d’Affaires, Embassy of the Kingdom of Morocco in Liberia' },
   { img: 'slide-3', quote: 'If we cannot measure the contribution of technology to GDP, we cannot monetize it.',
     pos: 'center 20%',
     who: 'Mr. Claver Gatete', role: 'UN Under-Secretary-General · Executive Secretary, UNECA',

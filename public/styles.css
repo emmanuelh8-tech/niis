@@ -4866,8 +4866,8 @@ button.skip:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px;
 /* ============ THE CLOSE ABOVE THE FOOTER ============
    The Careers and About ending (.cs-outro) for every other public page: the name, large, rising
    out of the page into the footer's navy. It takes over the footer's top margin. */
-.site-outro { position: relative; overflow: hidden; height: clamp(12rem, 27vw, 25rem); margin-top: 3rem;
-  background: linear-gradient(180deg, rgb(255 255 255 / 0) 0%, #B5C9E6 34%, #3D69B8 70%, var(--navy-800) 100%); }
+.site-outro { position: relative; overflow: hidden; height: clamp(10rem, 21vw, 19rem); margin-top: 1rem;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0) 0%, #C4D4EC 20%, #3D69B8 64%, var(--navy-800) 100%); }
 .site-outro + .footer-dh { margin-top: 0; }
 .site-word { position: absolute; left: 50%; bottom: -.16em; transform: translateX(-50%); color: rgb(255 255 255 / .92); white-space: nowrap;
   font: 500 clamp(8rem, 27vw, 26rem)/.8 var(--sans); letter-spacing: -.06em; user-select: none;
@@ -6201,3 +6201,18 @@ html:has(#paper-pdf) { scroll-behavior: smooth; }
 .rp-rel-cat small { font-size: .84rem; line-height: 1.5; color: #5A6575; }
 .rc-link { color: inherit; }
 .rc-link:hover { text-decoration: underline; }
+
+/* ---- home: a tighter rhythm between the sections (the owner found the white space too wide and the page
+   empty). About 40-55px of white between one section's last line and the next section's heading. */
+#featuredPapers { padding-top: 1.75rem; padding-bottom: 1rem; }      /* its hint row already gives room under the cards */
+#natReports { padding-bottom: 1rem; }
+.rc-stage { height: 414px; }                                          /* the tallest report card, and its shadow */
+#homeVideo { padding-top: 1.5rem; padding-bottom: 2.5rem; }      /* the news section under it has no top padding of its own */
+#latestUpdates { padding-bottom: 1.5rem; }
+@media (max-width: 760px) {
+  #featuredPapers { padding-top: 1.5rem; padding-bottom: .75rem; }
+  #natReports { padding-bottom: 1rem; }
+  #homeVideo { padding-top: 1.25rem; padding-bottom: 2.25rem; }
+  #latestUpdates { padding-bottom: 1.25rem; }
+}
+@media (max-width: 720px) { .rc-stage { height: 436px; } }

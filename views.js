@@ -1036,15 +1036,6 @@ function updCategory(c) {
   const t = String(c || 'news').replace(/_/g, ' ');
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
-// The update's opening sentence, so title and sentence read as one short paragraph.
-// A full stop only ends the sentence when a space follows it, so "33.6%" stays whole.
-function firstSentence(text, max = 200) {
-  const t = String(text || '').trim();
-  const m = /^.+?[.!?](?=\s|$)/.exec(t);
-  let out = m ? m[0] : t;
-  if (out.length > max) out = out.slice(0, max).replace(/\s+\S*$/, '') + '…';
-  return out;
-}
 const SQ_BACK = '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M9.6 2.6 5.1 7.1h9.1v1.8H5.1l4.5 4.5-1.2 1.2-6-6L1.8 8l.6-.6 6-6 1.2 1.2Z"/></svg>';
 const SQ_NEXT = '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M6.4 2.6l4.5 4.5H1.8v1.8h9.1l-4.5 4.5 1.2 1.2 6-6 .6-.6-.6-.6-6-6-1.2 1.2Z"/></svg>';
 const SQ_GO = '<svg width="6" height="9" viewBox="0 0 6 9" fill="none" aria-hidden="true"><path d="M1.2 1 4.7 4.5 1.2 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -1058,8 +1049,8 @@ function latestUpdates(headlines) {
   // NIIS's own updates and the news reported elsewhere, newest first; the carousel shows the latest eight.
   // Every one opens on its page here, never at another site.
   const slides = newsFeed(headlines || []).slice(0, 8).map((x) => (x.ext
-    ? { title: x.ext.title, desc: x.ext.sum, img: extNewsImg(x.ext), cat: x.ext.source, date: updDate(x.ext.date), href: extNewsHref(x.ext), news: true }
-    : { title: String(x.own.title || '').trim(), desc: firstSentence(x.own.body), img: updPhoto(headlines, x.k),
+    ? { title: x.ext.title, img: extNewsImg(x.ext), cat: x.ext.source, date: updDate(x.ext.date), href: extNewsHref(x.ext), news: true }
+    : { title: String(x.own.title || '').trim(), img: updPhoto(headlines, x.k),
       cat: updCategory(x.own.category), date: updDate(x.own.published_on), href: '/updates/' + updateSlug(x.own) }));
   if (!slides.length) return '';
   const n = slides.length;
@@ -1068,8 +1059,8 @@ function latestUpdates(headlines) {
   const strip = n > 1
     ? Array.from({ length: visible }, (_, place) => sqCard(slides[place % n], place % n, place)).join('')
     : sqCard(slides[0], 0, 0);
+  // under the strip, only the way into the open story (the owner took the summary line out)
   const copy = slides.map((s, i) => `<div class="sq-slide${i === 0 ? ' is-open' : ''}" aria-hidden="${i !== 0}">
-        <p>${esc(s.desc)}</p>
         <a class="sq-go" href="${esc(s.href)}" tabindex="${i === 0 ? 0 : -1}">${s.news ? 'Read the story' : 'Read update'} ${SQ_GO}</a>
       </div>`).join('');
   const data = JSON.stringify(slides.map(({ title, img, cat, date, href }) => ({ title, img, cat, date, href }))).replace(/</g, '\\u003c');

@@ -519,10 +519,20 @@
     var lib = qs('#rsLib'), S = window.__RS__ || { years: [], types: [] };
     var items = qsa('[data-rs-item]', lib), q = qs('#rs-q'), n = qs('[data-rs-n]'), empty = qs('.rs-empty');
     var adRows = qsa('.bbc-adrow', lib), year = '', type = '';
+    var rs = qs('#paper-search'), cmd = qs('.rs-cmd', rs), col = qs('.bbc', lib);
+    // "no paper matches" stands in the list's own column, under the bar, not below the advert rails
+    if (col && empty) col.appendChild(empty);
+    // the bar is held right under the nav as drawn (taller than --nav-h on wide screens), so no part of it slides beneath
+    var nav = qs('.gov-nav');
+    function pin() { if (nav) cmd.style.top = Math.round(nav.getBoundingClientRect().height) + 'px'; }
+    pin(); window.addEventListener('resize', pin);
     function opts(all, list) { return [{ value: '', label: all }].concat(list.map(function (x) { return { value: String(x), label: String(x) }; })); }
     var dY = initDropdown(qs('#dd-rs-year'), { items: opts('All years', S.years), placeholder: 'All years', selected: '', onChange: function (v) { year = v; apply(); } });
     var dT = initDropdown(qs('#dd-rs-type'), { items: opts('All types', S.types), placeholder: 'All types', selected: '', onChange: function (v) { type = v; apply(); } });
     function apply() {
+      // while the bar is held under the nav, the narrowed list starts right under it: the page is put
+      // back to where the bar is held, so neither the bar nor the page jumps as the list shortens
+      var cs = getComputedStyle(cmd), held = cs.position === 'sticky' && rs.getBoundingClientRect().top < parseFloat(cs.top);
       var words = q.value.trim().toLowerCase().split(/\s+/).filter(Boolean), shown = 0;
       items.forEach(function (it) {
         var ok = (!year || it.dataset.year === year) && (!type || it.dataset.tag === type) &&
@@ -533,6 +543,7 @@
       adRows.forEach(function (r) { r.classList.toggle('is-filtered', !!(year || type || words.length)); });
       n.textContent = shown;
       empty.hidden = shown > 0;
+      if (held) window.scrollTo({ top: rs.getBoundingClientRect().top + window.scrollY - parseFloat(cs.top), behavior: 'instant' });
     }
     q.addEventListener('input', apply);
     qs('[data-rs-reset]').addEventListener('click', function () { year = ''; type = ''; q.value = ''; dY.setSelected(''); dT.setSelected(''); apply(); q.focus(); });

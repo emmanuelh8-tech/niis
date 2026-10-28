@@ -621,12 +621,18 @@ async function handler(req, res) {
         logEvent('page_view', p, user);
         return send(res, 200, views.updates(ctx, notSeeded('updates', await sdb.sel('updates?select=*&order=published_on.desc'))));
       }
-      // one update on its own page; the slug is the title, as the homepage carousel links it
+      // one update on its own page; the slug is the title, as the homepage carousel links it. A story
+      // reported elsewhere (views EXT_NEWS) has its page at the same kind of address.
       const updMatch = /^\/updates\/([a-z0-9-]+)$/.exec(p);
       if (updMatch) {
         const rows = notSeeded('updates', await sdb.sel('updates?select=*&order=published_on.desc'));
         const index = rows.findIndex((u) => views.updateSlug(u) === updMatch[1]);
-        if (index < 0) return send(res, 404, views.notFound(ctx));
+        if (index < 0) {
+          const story = views.extNewsIndex(updMatch[1]);
+          if (story < 0) return send(res, 404, views.notFound(ctx));
+          logEvent('page_view', p, user);
+          return send(res, 200, views.newsStory(ctx, story));
+        }
         logEvent('page_view', p, user);
         return send(res, 200, views.updatePage(ctx, { items: rows, index }));
       }

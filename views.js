@@ -1056,9 +1056,9 @@ function sqCard(s, i, col, place = col) {
 }
 function latestUpdates(headlines) {
   // NIIS's own updates and the news reported elsewhere, newest first; the carousel shows the latest eight.
-  // A story from elsewhere opens at its source, in a new tab.
+  // Every one opens on its page here, never at another site.
   const slides = newsFeed(headlines || []).slice(0, 8).map((x) => (x.ext
-    ? { title: x.ext.title, desc: x.ext.sum, img: extNewsImg(x.ext), cat: x.ext.source, date: updDate(x.ext.date), href: x.ext.href, ext: true }
+    ? { title: x.ext.title, desc: x.ext.sum, img: extNewsImg(x.ext), cat: x.ext.source, date: updDate(x.ext.date), href: extNewsHref(x.ext), news: true }
     : { title: String(x.own.title || '').trim(), desc: firstSentence(x.own.body), img: updPhoto(headlines, x.k),
       cat: updCategory(x.own.category), date: updDate(x.own.published_on), href: '/updates/' + updateSlug(x.own) }));
   if (!slides.length) return '';
@@ -1070,9 +1070,9 @@ function latestUpdates(headlines) {
     : sqCard(slides[0], 0, 0);
   const copy = slides.map((s, i) => `<div class="sq-slide${i === 0 ? ' is-open' : ''}" aria-hidden="${i !== 0}">
         <p>${esc(s.desc)}</p>
-        <a class="sq-go" href="${esc(s.href)}" tabindex="${i === 0 ? 0 : -1}"${s.ext ? ' target="_blank" rel="noopener noreferrer"' : ''}>${s.ext ? 'Read at ' + esc(s.cat) : 'Read update'} ${SQ_GO}</a>
+        <a class="sq-go" href="${esc(s.href)}" tabindex="${i === 0 ? 0 : -1}">${s.news ? 'Read the story' : 'Read update'} ${SQ_GO}</a>
       </div>`).join('');
-  const data = JSON.stringify(slides.map(({ title, img, cat, date, href, ext }) => ({ title, img, cat, date, href, ext: !!ext }))).replace(/</g, '\\u003c');
+  const data = JSON.stringify(slides.map(({ title, img, cat, date, href }) => ({ title, img, cat, date, href }))).replace(/</g, '\\u003c');
   return `<section class="wrap section reveal" id="latestUpdates" style="padding-top:0">
     <div class="sec-head-dh">
       <h2 id="sqTrendsTitle" data-perch>ICT News &amp; Updates</h2>
@@ -1183,10 +1183,12 @@ const latestUpdatesScript = `
     arm();
   }
 
+  // the first click on a card brings it into focus (it opens on the strip); a click on the open card
+  // reads its story, on its page here
   strip.addEventListener('click',function(e){
     var b=e.target.closest('.sq-card'); if(!b) return;
     var col=+b.getAttribute('data-col');
-    if(col===0||(col>0&&col<=3&&e.target.closest('[data-go]'))){ var d=data[+b.getAttribute('data-slide')]; if(d&&d.href){ if(d.ext) window.open(d.href,'_blank','noopener'); else location.href=d.href; } return; }
+    if(col===0){ var d=data[+b.getAttribute('data-slide')]; if(d&&d.href) location.href=d.href; return; }
     if(col>0) step(col);
   });
   strip.addEventListener('mousemove',function(e){
@@ -2953,8 +2955,10 @@ const listHero = ({ id, title, dim, sub, ctas, slot, film }) => {
 // a hero button to a page or an anchor; data-open asks the page to open that report in place
 const lhBtn = (href, label, { dark = false, open = null, ext = false } = {}) => `<a class="cs-btn${dark ? ' cs-btn-dark' : ''}" href="${esc(href)}"${open != null ? ` data-open="${open}"` : ''}${ext ? ' target="_blank" rel="noopener noreferrer"' : ''}><span>${esc(label)}</span>${dark ? '' : `<i aria-hidden="true">${icon('arrow')}</i>`}</a>`;
 const bbcMeta = (iso, label, extra = '') => `<span class="bbc-meta"><time datetime="${esc(iso)}">${esc(updAgo(iso))}</time><span class="bbc-sep" aria-hidden="true"></span><span>${esc(label)}</span>${extra ? `<span class="bbc-sep" aria-hidden="true"></span><span>${extra}</span>` : ''}</span>`;
-// ICT news from Liberia reported elsewhere: each row names its source and opens the article there
-// (headline, date and photo as published; photos downloaded with the owner's approval).
+// ICT news from Liberia reported elsewhere: each row names its source and opens the story here, on its
+// own page (headline, date and photo as published; photos downloaded with the owner's approval), with
+// the original one link away. Where the source ran only a stock picture, the photo comes from coverage
+// of the same Liberian programme; 'credit' names who published it and 'caption' says what it shows.
 const EXT_NEWS = [
   { date: '2026-10-15', source: 'LTA', img: 'lta-pricing',
     title: 'LTA Seeks Greater Transparency in Mobile Pricing and Promotional Offers',
@@ -3000,37 +3004,110 @@ const EXT_NEWS = [
     title: 'Liberia Advances Regional Fiber Optic Expansion Strategy Through TRANSCO CLSG Partnership',
     sum: 'Liberia is advancing a regional fibre-optic expansion strategy through a partnership with TRANSCO CLSG.',
     href: 'https://techafricanews.com/2026/06/16/liberia-advances-regional-fiber-optic-expansion-strategy-through-transco-clsg-partnership/' },
-  { date: '2026-02-03', source: 'Ecofin Agency', img: 'ecofin-strategy',
+  { date: '2026-02-03', source: 'Ecofin Agency', img: 'ecofin-strategy', credit: 'ITWeb',
+    caption: 'Sekou M. Kromah, Minister of Posts and Telecommunications, in February 2026. Photo: ITWeb.',
     title: 'Liberia outlines national digital transformation plan for 2025–2029',
     sum: 'The government set out a digital roadmap to 2029, eight focus areas under four pillars, aimed at growth, better public services, jobs and a narrower gap for rural communities.',
     href: 'https://www.ecofinagency.com/news-digital/0302-52542-liberia-outlines-national-digital-transformation-plan-for-2025-2029' },
-  { date: '2025-07-23', source: 'Ecofin Agency', img: 'ecofin-cable',
+  { date: '2025-07-23', source: 'Ecofin Agency', img: 'ecofin-cable', credit: 'ECOWAS',
+    caption: 'The workshop that reviewed the cable’s feasibility study, held in Monrovia on 22–24 October 2025. Photo: ECOWAS.',
     title: 'Liberia, ECOWAS & World Bank collaborate on second West Africa submarine cable plan',
     sum: 'The Ministry of Posts and Telecommunications, ECOWAS and the World Bank are backing a second submarine cable for Liberia, Sierra Leone, Guinea, Guinea-Bissau and The Gambia, to land at Buchanan as a backup to the ACE cable.',
     href: 'https://www.ecofinagency.com/news-digital/2307-47813-liberia-ecowas-world-bank-collaborate-on-second-west-africa-submarine-cable-plan' },
 ];
-// NIIS's own updates (each with a page here) and the news above (each opening at its source), as one
-// list, newest first; 'k' keeps an update's place among NIIS's own, which its photo depends on
+// Each story told in NIIS's own words, from its source (read 2026-10-21; nothing copied, no quotes),
+// keyed by the story's photo. Only what the source reports; the story page links the original.
+const EXT_STORY = {
+  'lta-pricing': [
+    'The Liberia Telecommunications Authority has proposed tighter rules on how mobile operators set and advertise their prices. At a day-long consultation on 13 October 2026, it presented draft Tariff Guidelines for regulated voice, text message and data services.',
+    'LTA Board Chairman Clarence K. Massaquoi warned that promotions left running for long periods can lead customers to mistake a temporary discount for the normal price, especially when an offer is changed or withdrawn. The draft sets clearer requirements for submitting and approving tariffs, for billing and charging, for promotions and for publishing the terms of a service. It follows a market study by Salience Consulting and an LTA review that found frequent price changes and long promotions with unclear conditions.',
+    'Mobile operators, consumer groups and technology students reviewed the draft. Their comments will shape the final guidelines before the LTA applies and enforces them among its licensees.',
+  ],
+  'lta-infra-rules': [
+    'The LTA held its first public consultation on draft regulations for telecommunications infrastructure on 9 October 2026, at the RLJ Resort in Paynesville. Mobile network operators, internet service providers and other stakeholders reviewed rules for how infrastructure is put up, shared and taken down.',
+    'The draft encourages operators to share infrastructure rather than duplicate it, and brings Liberia in line with International Telecommunication Union recommendations. It also addresses public health, safety, aviation and the environment. Licensing and Regulation Commissioner Ben A. Fofana called it a first proposal that still has to be reviewed and validated, and stressed coordination with the Liberia Telecommunications Corporation, the Liberia Electricity Corporation, the Environmental Protection Agency and the Ministry of Public Works.',
+    'Commissioner Patrick Honnah asked participants to point out unclear provisions and to propose changes that protect consumers. The licensees present offered to help tighten the definitions and wording before the regulations are finalised.',
+  ],
+  'lta-mru': [
+    'At the third annual Mano River Union Internet Governance Forum, held in Paynesville, LTA Board Chairperson Clarence K. Massaquoi urged Liberia, Sierra Leone, Guinea and Côte d’Ivoire to align their policies and build connected infrastructure, so that internet access across the four countries becomes more affordable and reliable.',
+    'He named cybersecurity, data protection, consumer protection, innovation and digital inclusion as shared priorities, and argued that because data moves freely across borders, regulation has to look ahead and regional cooperation has to lead.',
+    'Estelle Akofio-Sowah, West Africa Regional Director of CSquared, called for stronger land networks and a digital corridor joining the four countries, in place of separate national networks. Deputy Minister for Energy Charles Umehai added that connectivity depends on reliable and affordable electricity.',
+  ],
+  'lta-lr-governance': [
+    'The LTA brought together members of its Multi-Stakeholder Advisory Council to report progress on reclaiming and redelegating .lr, Liberia’s country-code top-level domain, and to hear their views. The work, with partners from technology, government, telecommunications and finance, aims to give the domain a reliable framework managed in Liberia.',
+    'Under the plan, the domain’s technical infrastructure would be hosted at the Cable Consortium of Liberia facility on Lynch Street, with a qualified local team running it day to day. Commissioner Angela Cassel Bush, head of International Gateway Services and Internet Governance, chaired the meeting, and the LTA’s ccTLD consultant, Olu Olutola, joined online.',
+    'Participants from government, civil society, academia and the private sector welcomed the progress and confirmed their support.',
+  ],
+  'lta-buchanan': [
+    'The LTA opened its first Consumer Support Center outside Monrovia in Buchanan, Grand Bassa County, on 4 September 2026. Residents can now report unresolved complaints about their mobile operators, such as poor network quality, internet outages and billing disputes, and learn about their rights without travelling to the capital.',
+    'LTA Chairman Clarence K. Massaquoi presented the centre as part of the government’s drive to bring services closer to citizens. He said the LTA hopes to open a permanent regional office in Grand Bassa, and plans more centres this year in Bong and River Gee counties. Commissioner Patrick R. Honnah encouraged residents to use it whenever they have a problem with a provider.',
+    'County Superintendent Karyou Johnson said the centre will save residents long journeys and could create jobs. Robert Barrolle, speaking for Grand Bassa’s disabled community, asked operators to do more to detect and stop scams.',
+  ],
+  'lta-satellite': [
+    'The LTA has signed and adopted Satellite Communications Guidelines, a new framework for licensing and overseeing satellite networks, operators and services in Liberia. Commissioner for Engineering and Technology J. Emmanuel Payegar said it moves from licensing by technology to licensing by service, covers both the space and ground segments, and makes the licensing process simpler and more transparent.',
+    'The guidelines follow a regulatory impact assessment, benchmarking and consultation with regional and international regulators. Existing satellite providers have 12 months to comply. Chairperson Clarence K. Massaquoi said satellite can bring connectivity to rural and underserved areas and keep people connected when submarine cables or land networks fail, and he invited international operators and investors to Liberia, provided they obtain authorisation.',
+    'Sekou Kromah, Minister of Posts and Telecommunications, welcomed the framework, saying satellite services can support education, health care, government services, business, public safety and disaster response.',
+  ],
+  'lta-lr-control': [
+    'After a week of consultations led by its ccTLD consultant, Olu Olutola, the LTA Board of Commissioners was briefed on the proposed framework for governing and operating .lr, and on what Liberia must submit to the Internet Assigned Numbers Authority, through ICANN, to have the domain redelegated.',
+    'Under the proposal, the Ministry of Posts and Telecommunications and the LTA would oversee policy, the Liberian Internet Domain Registry would run the technical operations, and a Multi-Stakeholder Advisory Council would support policy development. The priorities are a .lr policy framework, a registry operator, secure DNS infrastructure, accredited registrars and registration data services.',
+    'The LTA will circulate the draft policy framework for review and settle the remaining policy, legal and regulatory questions before its Board adopts the recommendations.',
+  ],
+  'ca-licensing': [
+    'The LTA has introduced an automated system for applying for and renewing telecommunications licences, in place of paper-based processes. Applicants can apply online instead of making repeated visits to the Authority’s headquarters, which the regulator expects to cut costs and processing times.',
+    'LTA staff are being trained to manage applications on the new platform. Applicants who need help, or prefer to deal with the Authority in person, can still do so, so that the move online does not shut out people with limited internet access.',
+  ],
+  'lta-atu': [
+    'Liberia has secured a waiver of US$361,151.36 in arrears owed to the African Telecommunications Union, some dating back to 1982, restoring its full voting rights and financial standing in the continental body. An LTA delegation led by Chairman Clarence K. Massaquoi negotiated the waiver, and arranged payment of Liberia’s current dues, at the 7th Ordinary Session of the ATU Conference of Plenipotentiaries in Abuja, Nigeria.',
+    'With its vote restored, Liberia took part in adopting the 2026 Abuja Declaration on Meaningful Connectivity, which commits members to affordable broadband, cybersecurity, digital literacy and investment in digital infrastructure. Liberia also deposited its ratification of the ATU Constitution and Convention.',
+    'On the sidelines, the delegation met the ATU Secretariat, the International Telecommunication Union, regional regulators and development partners.',
+  ],
+  'lta-reforms': [
+    'In an interview with FrontPage Africa, LTA Board Chairman Clarence Massaquoi set out a reform agenda and confirmed that the Authority has revoked Star Cell’s licence. The company was licensed in March 2020 but never began operating, stayed away from meetings and did not meet its licence terms. The LTA says operators cannot hold spectrum indefinitely without serving the public.',
+    'The planned reforms would separate infrastructure providers from service providers, ending the single licence for both that has applied since the 2007 Telecommunications Act, with incentives for investors who serve rural areas that are not commercially attractive. They also include rules on tower ownership, network sharing and co-location, Liberia’s first satellite regulations, and an IMEI system to block stolen and counterfeit phones.',
+    'Massaquoi also pointed to new consumer protection regulations, under which Orange Liberia was fined four million Liberian dollars over a wrongly reassigned SIM card, and said the LTA was overseeing Starlink internet in 156 public schools, about 90 of them already installed.',
+  ],
+  'transco-fibre': [
+    'At a workshop in Abidjan, Côte d’Ivoire, Liberia joined Sierra Leone, Guinea, TRANSCO CLSG and the consultancy TACTIS in agreeing how to sell the spare fibre-optic capacity along the TRANSCO CLSG power transmission network.',
+    'Liberia stressed that it relies on a single international route, the ACE submarine cable landing in Monrovia, and wants land links through Côte d’Ivoire and Guinea as a backup. The line also runs through several Liberian counties, so it could carry broadband to schools, clinics and businesses beyond the capital. Liberia presented its plan for a special purpose vehicle bringing together licensed operators and government.',
+    'The countries agreed to form a regional consortium of designated licensed operators, and set a roadmap to put the capacity to use before the end of 2026: ministries name their consortium members, a technical working group drafts the consortium agreement, and TRANSCO CLSG signs commercial terms with the operators.',
+  ],
+  'ecofin-strategy': [
+    'Liberia has launched a national roadmap for its digital transformation to 2029. It sets eight priority areas under four strategic pillars, among them universal connectivity, digital inclusion, a national digital addressing system with postal reform, cybersecurity and data sovereignty, e-government and ICT-driven innovation.',
+    'In a statement on 2 February 2026, the Ministry of Posts and Telecommunications said the roadmap is meant to support economic growth, better public services and job creation, and to narrow the digital divide for rural and underserved communities. The launch followed talks with a World Bank Group delegation on digital cooperation.',
+    'Ecofin notes the size of the task: Liberia ranked 47th of 54 African countries in the UN’s 2024 e-government development index, and the ITU put internet penetration at 23.5% in 2023.',
+  ],
+  'ecofin-cable': [
+    'The Ministry of Posts and Telecommunications announced on 14 July 2025 that it is working with the ECOWAS Commission, through its Project Preparation and Development Unit, and with the World Bank on a second submarine cable for Liberia, Sierra Leone, Guinea, Guinea-Bissau and The Gambia. In Liberia, the cable is expected to land at Buchanan, Grand Bassa County.',
+    'ECOWAS engaged the consultancy TACTIS for a feasibility study from 14 to 18 July, meeting government agencies, operators and others in Liberia’s ICT sector to inform the cable’s design, financing and implementation plan.',
+    'The cable would back up the Africa Coast to Europe (ACE) system the region relies on today, whose outage in March 2024 disrupted internet services in 17 countries.',
+  ],
+};
+// NIIS's own updates and the news above, each with its page here, as one list, newest first;
+// 'k' keeps an update's place among NIIS's own, which its photo depends on
 const updDay = (d) => (/^(\d{4}-\d{2}-\d{2})/.exec(String(d || '')) || [])[1] || '';
 const newsFeed = (items) => items.map((u, k) => ({ day: updDay(u.published_on), own: u, k }))
   .concat(EXT_NEWS.map((n) => ({ day: n.date, ext: n })))
   .sort((x, y) => y.day.localeCompare(x.day));
 const extNewsImg = (n) => `/img/news/ext/${n.img}.webp?v=${ASSET_V}`;
+// a story from elsewhere has its page under /updates too, by its title, like NIIS's own updates
+const extNewsHref = (n) => '/updates/' + updateSlug(n);
+exports.extNewsIndex = (slug) => EXT_NEWS.findIndex((n) => updateSlug(n) === slug);
 exports.updates = (ctx, items) => {
   const iso = (u) => (/^(\d{4}-\d{2}-\d{2})/.exec(String(u.published_on || '')) || [])[1] || '';
   const demo = (u) => STAT_FIGURE.test(String(u.title || '') + ' ' + String(u.body || ''));
   const meta = (u) => bbcMeta(iso(u), updCategory(u.category), demo(u) ? '<span title="Demonstration figures">Demo data</span>' : '');
   const row = (x) => (x.ext
-    ? { href: x.ext.href, ext: x.ext.source, img: extNewsImg(x.ext), title: x.ext.title, body: x.ext.sum, meta: bbcMeta(x.ext.date, x.ext.source) }
+    ? { href: extNewsHref(x.ext), news: true, img: extNewsImg(x.ext), title: x.ext.title, body: x.ext.sum, meta: bbcMeta(x.ext.date, x.ext.source, x.ext.credit ? 'Photo: ' + esc(x.ext.credit) : '') }
     : { id: updateAnchor(x.own), href: '/updates/' + updateSlug(x.own), img: updPhoto(items, x.k), title: String(x.own.title || ''), body: String(x.own.body || ''), meta: meta(x.own) });
   const feed = newsFeed(items).map(row);
   // the lead shows its summary; NIIS's own update carries its date line only when it states demonstration figures
-  const lead = feed[0] ? { ...feed[0], meta: feed[0].ext || demo(newsFeed(items)[0].own) ? feed[0].meta : '' } : null;
+  const lead = feed[0] ? { ...feed[0], meta: feed[0].news || demo(newsFeed(items)[0].own) ? feed[0].meta : '' } : null;
   const rows = feed.slice(1);
   const hero = listHero({
     id: 'nuTitle', title: 'News & Updates.', dim: 'What is new in NIIP and in Liberia’s ICT sector.', slot: 'updates',
     film: { src: '/media/mission.mp4', small: '/media/mission-720.mp4' },
-    ctas: (lead ? lhBtn(lead.href, 'Read the latest update', { ext: !!lead.ext }) : '') + lhBtn(lead || rows.length ? '#nuList' : '/data', lead || rows.length ? 'See all updates' : 'Explore the data', { dark: true }),
+    ctas: (lead ? lhBtn(lead.href, 'Read the latest update') : '') + lhBtn(lead || rows.length ? '#nuList' : '/data', lead || rows.length ? 'See all updates' : 'Explore the data', { dark: true }),
   });
   return shell(ctx, {
     title: 'News & Updates', active: '/updates', body: hero + (lead || rows.length
@@ -3097,6 +3174,50 @@ exports.updatePage = (ctx, { items, index }) => {
           <ol class="upd-list">${record}</ol>
           <a class="upd-all" href="/updates">All updates ${icon('arrow')}</a>
         </section>
+      </div>
+    </div>
+  </article>`,
+  });
+};
+// ============ ONE STORY FROM ELSEWHERE ============
+// A story reported by another publisher, read here in the update page's design: its date in the rail
+// with who first reported it, a link back to News & Updates over the headline, its photo, the story in
+// NIIS's words (EXT_STORY), and a line naming the report it comes from with the original one link away.
+exports.newsStory = (ctx, index) => {
+  const n = EXT_NEWS[index], title = n.title;
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(n.date);
+  const site = n.href.replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
+  // the news runs newest first, so the earlier story is the next one and the later the one before
+  const step = (x, dir, rel) => x ? `<a href="${esc(extNewsHref(x))}" rel="${rel}"><span class="upd-step-dir">${dir}</span><span class="upd-step-title">${esc(x.title)}</span></a>` : '';
+  const steps = step(EXT_NEWS[index + 1], 'Earlier', 'prev') + step(EXT_NEWS[index - 1], 'Later', 'next');
+  return shell(ctx, {
+    title,
+    body: `
+  <article class="upd wrap" aria-labelledby="updTitle">
+    <nav class="upd-crumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a><span aria-hidden="true">/</span><a href="/updates">News &amp; Updates</a><span aria-hidden="true">/</span><span aria-current="page">${esc(title)}</span>
+    </nav>
+    <div class="upd-grid">
+      <aside class="upd-rail" aria-label="About this story">
+        <time class="upd-date" datetime="${esc(n.date)}"><span class="upd-day">${esc(String(+m[3]))}</span> <span class="upd-my">${esc(`${UPD_MONTHS[+m[2] - 1]} ${m[1]}`)}</span></time>
+        <dl class="upd-facts">
+          <div><dt>Reported by</dt><dd>${esc(n.source)}</dd></div>
+          ${n.credit ? `<div><dt>Photo</dt><dd>${esc(n.credit)}</dd></div>` : ''}
+        </dl>
+        ${steps ? `<nav class="upd-step" aria-label="Neighbouring stories">${steps}</nav>` : ''}
+      </aside>
+      <div class="upd-main">
+        <a class="upd-back" href="/updates">${icon('arrow', 'icn ui-flip')} Back to News &amp; Updates</a>
+        <h1 id="updTitle" aria-label="${esc(title)}"><span aria-hidden="true">${riseWords(title)}</span></h1>
+        <p class="upd-lead">${esc(n.sum)}</p>
+        ${shareBar(ctx, extNewsHref(n), title)}
+        <figure class="upd-figure">
+          <img src="${esc(extNewsImg(n))}" alt="" width="1200" height="675" decoding="async">
+          <figcaption>${esc(n.caption || 'Photo: ' + n.source + '.')}</figcaption>
+        </figure>
+        <div class="upd-story">${(EXT_STORY[n.img] || []).map((p) => `<p>${esc(p)}</p>`).join('')}</div>
+        <p class="upd-source">First reported by ${esc(n.source)} on ${esc(updDate(n.date))}. This is NIIP’s summary of that report.</p>
+        <a class="upd-all upd-orig" href="${esc(n.href)}" target="_blank" rel="noopener noreferrer">Read the original at ${esc(site)}<span class="sr-only"> (opens in a new tab)</span> ${icon('arrow')}</a>
       </div>
     </div>
   </article>`,

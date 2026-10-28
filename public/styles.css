@@ -543,8 +543,9 @@ ul.plain, ol.plain { list-style: none; }
 .sq-over-in { color: #fff; font: 500 14px/1.2 var(--sans); letter-spacing: .005em; white-space: nowrap; font-variant-numeric: tabular-nums; }
 /* Every panel names its update. The open one sets the title under its date at a fixed measure,
    so it never re-wraps while the panel widens; a narrowing panel sets it as a spine, read bottom
-   to top, whose length is the panel's height and so never changes as the width does. Either
-   title opens the update; it is only clickable while it shows. */
+   to top, whose length is the panel's height and so never changes as the width does. A click on
+   a narrower panel only brings it into focus; the open panel's title opens the story, so only it
+   underlines like a link. */
 .sq-cap { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; width: min(31rem, calc(var(--sq-hero) - 44px)); }
 .sq-title { color: #fff; font: 600 clamp(19px, 2.05cqi, 25px)/1.16 var(--serif); letter-spacing: -.01em; text-align: left; text-wrap: balance;
   text-decoration: underline 1px transparent; text-underline-offset: 4px; transition: text-decoration-color .25s ease; }
@@ -556,11 +557,9 @@ ul.plain, ol.plain { list-style: none; }
 .sq-card[data-kind="panel"] .sq-spine { opacity: 1; }
 /* max-height is the spine's line length (its inline size, in vertical text); the lines it wraps
    into stack across the panel, and a panel too narrow for them hides the spine (below) */
-.sq-spine-in { position: absolute; left: 14px; bottom: 16px; max-height: calc(100% - 32px); writing-mode: vertical-rl; transform: rotate(180deg);
+.sq-spine-in { position: absolute; left: 14px; bottom: 16px; max-height: calc(100% - 32px); writing-mode: vertical-rl; text-orientation: sideways; transform: rotate(180deg);   /* sideways: quote marks turn with the letters */
   color: #fff; font: 600 16px/1.22 var(--serif); letter-spacing: -.005em; text-align: start; text-wrap: balance;
   text-decoration: underline 1px transparent; text-underline-offset: 4px; transition: text-decoration-color .25s ease; }
-.sq-card[data-kind="panel"] .sq-spine-in { pointer-events: auto; cursor: pointer; }
-.sq-card[data-kind="panel"] .sq-spine-in:hover { text-decoration-color: rgb(255 255 255 / .85); }
 @container spine (max-width: 44px) { .sq-spine-in { display: none; } }   /* a sliver too thin to carry a word */
 
 .sq-copy { display: grid; margin-top: 24px; }
@@ -711,7 +710,8 @@ ul.plain, ol.plain { list-style: none; }
 .upd-crumbs [aria-current] { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .upd-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 2rem; align-items: start; }
 .upd-rail { grid-column: 1 / span 3; position: sticky; top: calc(var(--nav-h) + 2rem); padding-right: 1rem; }
-.upd-main { grid-column: 4 / span 9; min-width: 0; }
+/* one measure for the whole entry: the headline, the text and the photo end on the same line */
+.upd-main { grid-column: 4 / span 9; min-width: 0; max-width: 44rem; }
 
 .upd-date { display: block; color: var(--navy); }
 .upd-day { display: block; font-family: var(--serif); font-weight: 500; font-size: clamp(4.5rem, 7.5vw, 6.25rem);
@@ -729,11 +729,11 @@ ul.plain, ol.plain { list-style: none; }
 .upd-step-title { display: block; font-size: .9rem; font-weight: 500; line-height: 1.38; }
 .upd-step a:hover .upd-step-title { color: var(--teal-dark); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
 
-.upd-main h1 { font-size: clamp(2rem, 3.5vw, 2.9rem); line-height: 1.1; letter-spacing: -.015em; max-width: 21em;
+.upd-main h1 { font-size: clamp(2rem, 3.5vw, 2.9rem); line-height: 1.1; letter-spacing: -.015em;
   text-wrap: balance; margin: -.2rem 0 1.4rem; }
-.upd-lead { font-size: clamp(1.12rem, 1.5vw, 1.28rem); line-height: 1.6; color: var(--ink); max-width: 38rem; text-wrap: pretty; margin-bottom: 0; }
+.upd-lead { font-size: clamp(1.12rem, 1.5vw, 1.28rem); line-height: 1.6; color: var(--ink); text-wrap: pretty; margin-bottom: 0; }
 /* a ruled note, not a box: the red belongs to the rule, the icon and the label */
-.upd-demo { display: flex; gap: .7rem; align-items: flex-start; max-width: 38rem; margin: 1.5rem 0 0; padding: .8rem 0 0;
+.upd-demo { display: flex; gap: .7rem; align-items: flex-start; margin: 1.5rem 0 0; padding: .8rem 0 0;
   border-top: 1px solid rgba(200, 16, 46, .32); font-size: .9rem; line-height: 1.55; color: var(--ink); }
 .upd-demo .icn { flex: none; margin-top: .18rem; color: var(--red); font-size: 1.05rem; }
 .upd-demo strong { color: #A50D26; font-weight: 700; }
@@ -751,13 +751,25 @@ ul.plain, ol.plain { list-style: none; }
   .upd-figure img { animation: nn-fade .3s ease-out both; }
 }
 
+/* a story from elsewhere: its paragraphs under the photo in the lead's measure, then a ruled line
+   naming the report it comes from, and the way to the original */
+.upd-story { margin-top: 2rem; }
+.upd-story p { font-size: 1.05rem; line-height: 1.7; color: var(--ink); margin: 0 0 1.1rem; text-wrap: pretty; }
+/* the lead and the story read flush left: justified on a phone, a long word like Telecommunications opens wide gaps */
+.upd-lead, .upd-story p { text-align: left; hyphens: manual; }
+.upd-source { margin: 1.6rem 0 0; padding-top: .9rem; border-top: 1px solid var(--line); font-size: .9rem; line-height: 1.55; color: var(--muted); }
+.upd-orig { margin-top: .6rem; }
+/* the way back to the list, over the headline */
+.upd-back { display: inline-flex; align-items: center; gap: .45rem; margin-bottom: 1.1rem; font-size: .92rem; font-weight: 600; color: var(--teal-dark); }
+.upd-back .icn { width: 1em; height: 1em; }
+.upd-back:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
 .upd-record { margin-top: 4rem; }
 .upd-record h2 { font-size: 1.35rem; margin-bottom: 1rem; }
 .upd-list { list-style: none; border-top: 1px solid var(--line); }
 .upd-list li { border-bottom: 1px solid var(--line); }
 .upd-row { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr) 11rem; column-gap: 1.5rem; align-items: baseline; padding: 1rem 0; color: var(--ink); }
 .upd-row time { font-size: .86rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.upd-row-title { font-size: 1rem; font-weight: 500; line-height: 1.4; }
+.upd-row-title { font-size: 1rem; font-weight: 500; line-height: 1.4; text-align: left; }   /* a short title justified opens wide gaps */
 .upd-row-cat { font-size: .82rem; color: var(--muted); text-align: right; }
 a.upd-row:hover { text-decoration: none; }
 a.upd-row:hover .upd-row-title { color: var(--teal-dark); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
@@ -769,6 +781,7 @@ a.upd-row:hover .upd-row-title { color: var(--teal-dark); text-decoration: under
 
 @media (max-width: 860px) {
   .upd-grid { display: block; }
+  .upd-main { max-width: none; }
   /* the rail folds above the headline, still led by the date set large */
   .upd-rail { position: static; padding: 0; margin-bottom: 1.6rem; }
   .upd-date { display: flex; align-items: baseline; gap: .7rem; }
@@ -4708,7 +4721,8 @@ button.skip:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px;
 #rcStage .rc-card { border: 1px solid #111; }
 
 /* Our Team's banner: taller, and framed on the two faces, with the title at the foot */
-.page-header.ph-team { min-height: clamp(280px, 32vw, 470px); align-items: flex-end; background-position: center 16%; }
+/* a slim band: the rope crosses its upper part and the title sits on the empty navy under it */
+.page-header.ph-team { min-height: clamp(220px, 22vw, 340px); align-items: flex-end; background-position: center 48%; }
 .ph-team .ph-scrim { background: linear-gradient(180deg, rgba(6,18,44,.04) 0%, rgba(6,18,44,.12) 50%, rgba(6,18,44,.78) 100%); }
 @media (max-width: 1100px) { .tp-track { grid-auto-columns: calc((100% - 2 * var(--tp-gap)) / 3); } }
 /* phones: the team stays two rows of four and the talent pool four rows of four, so each card is
@@ -4735,7 +4749,7 @@ button.skip:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px;
   .tp-body { padding: .35rem .35rem .4rem; }
   .tp-name { font-family: var(--sans); font-size: .54rem; font-weight: 700; line-height: 1.2; letter-spacing: .03em; text-transform: uppercase; }
   .tp-card::after { background: linear-gradient(180deg, rgba(10,12,16,0) 50%, rgba(10,12,16,.85) 100%); }
-  .page-header.ph-team { min-height: 250px; background-position: center 14%; }
+  .page-header.ph-team { min-height: 230px; background-position: center 14%; }
 }
 @media (prefers-reduced-motion: reduce) {
   .tc-card, .tc-photo, .tc-bio, .tc-avatar, .tc-info, .tp-card, .tp-photo, .tp-more, .tp-note, .tp-skills, .tp-card::before, .tp-card::after { transition: none !important; }
@@ -5507,14 +5521,14 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
 
 /* ============ RESEARCH: THE PROMO SECTION ============
    The two buttons are lettered in the label face. The section alone wears the carved masks of the
-   About page, very blurred, on white (in place of the binary canvas). The search and the year
+   About page in faint grey on white (in place of the binary canvas). The search and the year
    filter sit further down, after the flagship paper, across the shelf. */
 .rp-btn { font-family: var(--font-label); font-weight: 400; letter-spacing: .05em; }
 section.rp { position: relative; isolation: isolate; overflow: hidden; background: #fff; }
-/* the masks, very blurred: the line work softened into its own tile (mask-pattern-soft.webp,
-   blurred with wrap-around so it repeats without seams) */
+/* the masks in light grey: the line work itself (black on clear, mask-lines.webp), let through at a
+   low opacity so the faces read without competing with the headline */
 section.rp::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background: url("/img/brand/mask-pattern-soft.webp") 0 0 / 185px auto repeat; }
+  background: url("/img/brand/mask-lines.webp") 0 0 / 185px auto repeat; opacity: .14; }
 .rp-shelf .rp-search-row { grid-column: 1 / -1; scroll-margin-top: calc(var(--nav-h, 76px) + 1.2rem); }
 .rp-shelf .rp-search-row .fbar { margin: 0; }
 /* the consent line stays a sentence beside its checkbox (it is a label too, so it opts out) */
@@ -5764,10 +5778,17 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
    black caret), held under the nav while the library is in view; then the news-page format, a
    paper's cover standing in for the photograph. */
 .rs { position: relative; padding-bottom: 1rem; background: #fff; }
-.rs-cmd.dx-cmd { position: sticky; top: var(--nav-h, 76px); z-index: 30; border-top: 1px solid #000; border-bottom: 1px solid #000;
+.rs-cmd.dx-cmd { position: sticky; top: var(--nav-h, 76px); z-index: 30;
   background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }   /* solid: a blur here re-renders the animated page under it every frame */
+/* the bar is as wide as the library under it (the news column, and on wide screens its two advert
+   rails), so it stops short of the screen's edges and leaves a margin either side; ruled on all four
+   sides, its edges line up with the edges of the adverts and the fields sit inside them */
 .rs-cmd-in { display: grid; grid-template-columns: minmax(0, 2fr) minmax(150px, 1fr) minmax(170px, 1fr) auto; align-items: end; gap: .85rem 1.1rem;
-  max-width: 1340px; margin: 0 auto; padding: .85rem 1.4rem; }
+  width: calc(100% - 30px); max-width: 840px; margin: 0 auto; padding: .85rem 1.1rem; border: 1px solid #000; }
+@media (min-width: 1260px) { .rs-cmd-in { width: calc(100% - 52px); max-width: calc(840px + 2 * (190px + 26px)); } }   /* the rails keep a 26px gap from the edge */
+@media (min-width: 1360px) { .rs-cmd-in { max-width: calc(840px + 2 * (215px + 26px)); } }
+/* the list never folds up under the bar while a filter narrows it, so the page holds still */
+#rsLib { min-height: calc(100vh - var(--nav-h, 76px)); }
 .rs-cmd .selector-field { margin: 0; min-width: 0; }
 .rs-cmd .selector-field label { display: block; margin: 0 0 .4rem; font-family: var(--font-label); font-weight: 400; font-size: .75rem; letter-spacing: .17em; text-transform: uppercase; color: #5A6A85; }
 .rs-q-box { position: relative; }
@@ -5776,7 +5797,7 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
   font: 500 .92rem var(--sans); color: #1E2430; box-shadow: none; }
 .rs-q-box input:hover { border-color: #7F8794; }
 .rs-q-box input:focus { outline: none; border-color: #1E2430; box-shadow: 0 0 0 3px rgba(255,204,0,.5); }
-.rs-count { margin: 0 0 .55rem; font: 500 .82rem/1 var(--sans); color: #5A6273; white-space: nowrap; }
+.rs-count { min-width: 8.4em; margin: 0 0 .55rem; font: 500 .82rem/1 var(--sans); color: #5A6273; white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; }   /* a fixed width, so "1 of 11" and "11 of 11" never shift the fields */
 .rs-count b { font-family: var(--num); font-weight: 400; color: #0B2C63; }
 .rs .bbc-page { padding-top: 1.6rem; }
 .rs-empty { display: grid; justify-items: center; gap: .8rem; max-width: 840px; margin: 0 auto 2.4rem; padding: 2.4rem 15px; text-align: center; color: #545658; }
@@ -5789,9 +5810,9 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 .bbc-row:hover .bbc-cover .pc, .bbc-lead:hover .bbc-cover .pc { transform: rotateY(-12deg) translateY(-4px); }
 .bbc-cover { perspective: 900px; }
 @media (max-width: 900px) {
-  .rs-cmd-in { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: .75rem 15px; }
+  .rs-cmd-in { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: .75rem 12px; }
   .rs-q { grid-column: 1 / -1; }
-  .rs-count { grid-column: 1 / -1; margin: 0; }
+  .rs-count { grid-column: 1 / -1; margin: 0; text-align: left; }
   .rs-cmd.dx-cmd { position: static; }
 }
 @media (prefers-reduced-motion: reduce) { .bbc-cover .pc { transition: none; } .bbc-row:hover .bbc-cover .pc, .bbc-lead:hover .bbc-cover .pc { transform: none; } }

@@ -521,6 +521,10 @@ ul.plain, ol.plain { list-style: none; }
 /* a finger on the strip moves it directly; a swipe then plays out quicker than the autoplay */
 .sq.is-dragging .sq-strip { transition: none; }
 .sq.is-quick .sq-body { --sq-ms: 560ms; }
+/* dragging through the cards: each one turns over fast, and nothing on the strip is selected */
+.sq.is-scrub .sq-body { --sq-ms: 260ms; }
+.sq-window { user-select: none; -webkit-user-select: none; }
+.sq.is-scrubbing, .sq.is-scrubbing .sq-card { cursor: grabbing; }
 .sq-card { position: relative; flex: 0 0 auto; height: 100%; width: var(--sq-slat); margin: 0 0 0 var(--sq-gap); padding: 0;
   border: 0; border-radius: calc(var(--sq-slat) / 2); overflow: hidden; isolation: isolate; cursor: pointer; background: var(--cream);
   transition: width var(--sq-ms) var(--sq-ease), margin-left var(--sq-ms) var(--sq-ease), border-radius var(--sq-ms) var(--sq-ease); }
@@ -6237,3 +6241,10 @@ html:has(#paper-pdf) { scroll-behavior: smooth; }
   #latestUpdates { padding-bottom: 1.25rem; }
 }
 @media (max-width: 720px) { .rc-stage { height: 436px; } }
+
+/* ---- home on a phone: the carousels' arrows on the right. The heading takes the first line and the
+   buttons wrap to the next; that line spans the column, the "All" link on the left, the arrows on the right. */
+@media (max-width: 760px) {
+  .fp-nav, .rc-nav, .sq-nav { flex: 1 0 100%; }
+  .fp-nav .more, .rc-nav .more, .sq-nav .more { margin-right: auto !important; }
+}

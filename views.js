@@ -1157,13 +1157,15 @@ const latestUpdatesScript = `
   // the finger's offset while it drags the strip (px); released together with the step it commits
   function setDrag(px){ strip.style.setProperty('--sq-drag',px+'px'); }
   function release(){ root.classList.remove('is-dragging'); setDrag(0); }
-  // quick: a swipe plays out in about half the time the autoplay takes
+  // quick: a flick plays out in about half the time the autoplay takes; 'scrub': a card turned while
+  // the reader drags through them goes over in a quarter of a second
   function step(by,auto,quick){
     if(!by) return;
     settle();
-    if(panel) panel.setAttribute('aria-live',auto?'off':'polite');
-    root.classList.toggle('is-quick',!!quick);
-    var ms=reduce.matches?0:quick?560:1000, k;
+    if(panel) panel.setAttribute('aria-live',auto||quick==='scrub'?'off':'polite');
+    root.classList.toggle('is-quick',quick===true);
+    root.classList.toggle('is-scrub',quick==='scrub');
+    var ms=reduce.matches?0:quick==='scrub'?260:quick?560:1000, k;
     if(by>0){
       instant(function(){
         for(k=0;k<by;k++){ var s=wrap(cards[cards.length-1].slide+1), el=make(s); strip.appendChild(el); cards.push({el:el,slide:s}); }
@@ -1214,39 +1216,48 @@ const latestUpdatesScript = `
     if(reduce.matches||hovering||focused||!seen||document.hidden) return;
     timer=setTimeout(function(){ step(1,true); },2000);
   }
-  // a finger swipes it: left for the next update, right for the one before. The strip follows the
-  // finger while it drags; a short drag or a flick is enough to send it on, and anything less
-  // springs back. A mostly vertical move is left to the page, so scrolling past still works.
-  var sx=null, sy=0, swiping=false, eatClick=false, trail=[];
+  // press and drag, with the mouse or a finger, flips through the updates: every short stretch of drag
+  // turns one card over, leftward to the next update and rightward back to the one before, so a reader
+  // can run fast through them all and back again while still holding on. Letting go leaves the card
+  // that was reached open; a quick flick with no full stretch still turns one card. A mostly vertical
+  // move of a finger is left to the page, so scrolling past still works.
+  var sx=null, sy=0, swiping=false, eatClick=false, trail=[], base=0, turned=0;
+  function stretch(){ return Math.max(36, Math.min(72, root.clientWidth*.06)); }
   root.addEventListener('pointerdown',function(e){
-    if(e.pointerType==='mouse'||e.button) return;
-    sx=e.clientX; sy=e.clientY; swiping=false; trail=[[e.clientX,e.timeStamp]];
+    if(e.pointerType==='mouse'&&e.button!==0) return;
+    sx=e.clientX; sy=e.clientY; base=e.clientX; turned=0; swiping=false; trail=[[e.clientX,e.timeStamp]];
   });
   root.addEventListener('pointermove',function(e){
     if(sx===null) return;
     var dx=e.clientX-sx, dy=e.clientY-sy;
     if(!swiping){
-      if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){ sx=null; return; }
+      if(e.pointerType!=='mouse'&&Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){ sx=null; return; }
       if(Math.abs(dx)<6||Math.abs(dx)<Math.abs(dy)) return;
-      swiping=true; clearTimeout(timer); settle(); root.classList.add('is-dragging');
+      swiping=true; clearTimeout(timer); root.classList.add('is-scrubbing');
       try{ root.setPointerCapture(e.pointerId); }catch(err){}
     }
+    e.preventDefault();
     trail.push([e.clientX,e.timeStamp]); if(trail.length>6) trail.shift();
-    // close to the finger at first, then a little give the further it goes
-    var w=root.clientWidth*.5, a=Math.abs(dx), d=a<w?a:w+(a-w)*.35;
-    setDrag((dx<0?-1:1)*d*.92);
+    var span=stretch(), moved=e.clientX-base;
+    while(Math.abs(moved)>=span){
+      var by=moved<0?1:-1;
+      step(by,false,'scrub'); turned+=by;
+      base+=moved<0?-span:span; moved=e.clientX-base;
+    }
   });
   function endSwipe(e,cancelled){
     if(sx===null) return;
-    var dx=e.clientX-sx; sx=null;
+    sx=null; root.classList.remove('is-scrubbing');
     if(!swiping){ arm(); return; }
-    eatClick=true;
+    // the click a drag ends in is not a choice of card; if none comes, the next real click is not eaten
+    eatClick=true; setTimeout(function(){ eatClick=false; },120);
     var a=trail[0], b=trail[trail.length-1], v=b&&a&&b[1]>a[1]?(b[0]-a[0])/(b[1]-a[1]):0;
-    if(!cancelled&&(Math.abs(dx)>22||Math.abs(v)>.3)) step((Math.abs(v)>.3?v:dx)<0?1:-1,false,true);
-    else { release(); arm(); }
+    if(!cancelled&&!turned&&Math.abs(v)>.3) step(v<0?1:-1,false,true);
+    else arm();
   }
   root.addEventListener('pointerup',function(e){ endSwipe(e,false); });
   root.addEventListener('pointercancel',function(e){ endSwipe(e,true); });
+  root.addEventListener('dragstart',function(e){ e.preventDefault(); });
   root.addEventListener('click',function(e){ if(eatClick){ e.preventDefault(); e.stopPropagation(); eatClick=false; } },true);
   root.addEventListener('mouseenter',function(){ hovering=true; arm(); });
   root.addEventListener('mouseleave',function(){ hovering=false; arm(); });

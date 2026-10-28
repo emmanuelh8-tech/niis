@@ -1784,7 +1784,8 @@
   }
 
   // ---- Home: the featured papers on a 3D cylinder of cards (after the owner's 3d-carousel, in plain
-  // JavaScript). It drifts slowly; a drag spins it and it coasts, then settles on a card; the arrows step a
+  // JavaScript). On its own it glides one card to the front and rests there square-on, so that card reads
+  // sharp, then glides to the next; a drag spins it and it coasts, then settles on a card; the arrows step a
   // card at a time; a card reached by keyboard turns to the front. Choosing a card opens it large, with the
   // paper's details and a link to it. The cards round the back fade away.
   function initPaperRing() {
@@ -1793,9 +1794,13 @@
     var stage = qs('.pr-stage', box), ring = qs('.pr-ring', box), all = qsa('.pr-face', box), D = JSON.parse(src.textContent);
     var faces = all, n = all.length, step = 360 / n, rot = 0, vel = 0, aim = null, drag = null, hover = false, raf = 0, last = 0, seen = false, lastW = -1;
     var AUTO = REDUCE ? 0 : -5, SENS = 0.32, view = null, from = null;   // AUTO: degrees a second
+    var AR = .68, radius = 0;   // a card's width to its height: a little taller than 3:4 (the owner's call)
+    var REST = 2600, next = 0, slow = false, wake = 0;   // the rest at each card (ms), when the next glide is due
     // the ring is sized to the section it stands in. Wide, it holds every paper twice, its sides reaching the
     // section's edges. On a phone it is a six-sided drum of the papers once, small enough to stay whole on
-    // the screen, so it is seen to turn rather than slide off the sides.
+    // the screen, so it is seen to turn rather than slide off the sides. The ring stands back by its radius,
+    // so the card at the front is drawn at its own size, 1:1, and its words stay sharp (a card brought
+    // forward by the perspective is an enlarged picture of itself, and blurs).
     function measure() {
       var W = box.clientWidth;
       if (W === lastW) return;
@@ -1805,18 +1810,35 @@
       all.forEach(function (f, k) { f.style.display = few && k >= copies ? 'none' : ''; f._b = undefined; });
       n = faces.length; step = 360 / n;
       faces.forEach(function (f, k) { f.style.setProperty('--a', (k * step) + 'deg'); });
-      var R = few ? (W / 2 - 10) * Math.cos(Math.PI / n) : W * .47;
-      var fw = 2 * R * Math.tan(Math.PI / n), persp = R * (few ? 5 : 5.5), grow = persp / (persp - R), pad = few ? 5 : 8;
+      // how far the ring reaches to either side, for a radius of 1 and at any turn: the radius that makes it
+      // reach the section's edges follows
+      var c = few ? 5 : 5.5, tanH = Math.tan(Math.PI / n), reach = 0;
+      for (var o = 0; o < step; o += step / 8) {
+        for (var k = 0; k < n; k++) {
+          var t = (k * step + o) * Math.PI / 180;
+          if (Math.cos(t) < -.035) continue;              // the cards round the back are hidden
+          for (var e = -1; e <= 1; e += 2) {
+            var x = Math.sin(t) + e * tanH * Math.cos(t), z = Math.cos(t) - 1 - e * tanH * Math.sin(t);
+            reach = Math.max(reach, Math.abs(x) * c / (c - z));
+          }
+        }
+      }
+      var R = (few ? W / 2 - 6 : W / 2 * .97) / reach;
+      var fw = 2 * R * tanH, pad = few ? 5 : 8, cardH = (fw - 2 * pad) / AR, room = few ? 4 : 6, foot = few ? 34 : 40;
+      radius = R;
       box.style.setProperty('--cw', Math.round(2 * R) + 'px');
       box.style.setProperty('--fw', fw.toFixed(1) + 'px');
       box.style.setProperty('--rad', R.toFixed(1) + 'px');
-      stage.style.perspective = Math.round(persp) + 'px';
-      box.style.height = Math.round((fw * 4 / 3 + pad * 2) * grow + (few ? 60 : 84)) + 'px';
+      box.style.setProperty('--pr-ar', AR);
+      box.style.setProperty('--pr-foot', foot + 'px');
+      stage.style.perspective = Math.round(R * c) + 'px';
+      // the front card, a little room above and below it, and the hint under it, with space for its shadow
+      box.style.height = Math.round(cardH + 2 * pad + 2 * room + foot) + 'px';
       rot = Math.round(rot / step) * step; aim = null;
     }
     function nearest(a) { return a + Math.round((rot - a) / 360) * 360; }
     function draw() {
-      ring.style.transform = 'rotateY(' + rot.toFixed(2) + 'deg)';
+      ring.style.transform = 'translateZ(' + (-radius).toFixed(1) + 'px) rotateY(' + rot.toFixed(2) + 'deg)';
       faces.forEach(function (f, k) {      // which cards face away
         var a = ((k * step + rot) % 360 + 540) % 360 - 180, back = Math.abs(a) > 92;
         if (f._b !== back) { f._b = back; f.classList.toggle('is-back', back); }
@@ -1828,13 +1850,15 @@
       var dt = last ? Math.min(.05, (now - last) / 1000) : 1 / 60, busy = false; last = now;
       if (!drag) {
         if (aim !== null) {
-          var d = aim - rot; rot += d * Math.min(1, dt * 7);
-          if (Math.abs(d) < .05) { rot = aim; aim = null; } busy = true;
+          var d = aim - rot; rot += d * Math.min(1, dt * (slow ? 2.6 : 7));
+          if (Math.abs(d) < .05) { rot = aim; aim = null; slow = false; next = now + REST; } busy = true;
         } else if (Math.abs(vel) > 6) {   // a spin coasts down, then settles on the nearest card
           rot += vel * dt; vel *= Math.pow(.04, dt); busy = true;
           if (Math.abs(vel) <= 6) { vel = 0; aim = Math.round(rot / step) * step; }
         } else if (AUTO && !hover && !open() && !document.documentElement.classList.contains('ui-locked')) {
-          rot += AUTO * dt; busy = true;
+          if (!next) next = now + REST;
+          if (now >= next) { aim = (Math.round(rot / step) + (AUTO < 0 ? -1 : 1)) * step; slow = true; busy = true; }
+          else { clearTimeout(wake); wake = setTimeout(run, next - now + 20); }   // asleep until the next glide
         }
       }
       draw();
@@ -1882,7 +1906,12 @@
     });
     stage.addEventListener('pointerdown', function () { stage.classList.remove('was-drag'); }, true);
     stage.addEventListener('pointermove', function () { if (drag && drag.moved) stage.classList.add('was-drag'); });
-    stage.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { hover = true; } });
+    // the mouse over it holds it, settled square on the nearest card, so that card reads at its sharpest
+    stage.addEventListener('pointerenter', function (e) {
+      if (e.pointerType !== 'mouse') return;
+      hover = true;
+      if (!drag && Math.abs(vel) <= 6) { vel = 0; aim = Math.round(rot / step) * step; run(); }
+    });
     stage.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') { hover = false; run(); } });
     // the keyboard: a card taking focus turns to the front
     box.addEventListener('focusin', function (e) {

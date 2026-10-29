@@ -2606,6 +2606,9 @@ const rgPanel = (k) => [['e-up', RG_G.up], ['e-left', RG_G.left], ['e-ok', 'OK']
   ['e-next', RG_G.right], ['e-play', RG_G.play], ['e-pause', RG_G.pause], ['e-plus', RG_G.plus], ['e-minus', RG_G.minus]].map(([c, l]) => k(c, l)).join('\n          ');
 const rgFaqKey = `<span class="m-key-3" aria-hidden="true"><span class="m-key-3__cap"><span class="m-key-3__dent"></span></span><span class="m-key-3__label"><svg class="is-plus" viewBox="0 0 24 24"><path d="M11 5h2v14h-2zM5 11h14v2H5z"/></svg><svg class="is-minus" viewBox="0 0 24 24"><path d="M5 11h14v2H5z"/></svg></span></span>`;
 const rgOff = `<span class="quiet__off" aria-hidden="true" data-8b-motion="contour"><span class="m-tick"><span class="m-tick__label">Off</span><span class="m-tick__line" aria-hidden="true"></span></span><span class="m-key is-on"><span class="m-key__cap"><span class="m-key__dent"></span></span><span class="m-key__label"></span></span></span>`;
+// The NIIP seal pressed faintly into the page, three times (the owner's call): debossed like the template's
+// headings, in graphite on the light grey and in chalk on the graphite band (public/img/research-group/seal-wm-*).
+const rgSeal = (where, ink, eager = false) => `<div class="rg-wm rg-wm--${where}" aria-hidden="true"><img src="/img/research-group/seal-wm-${ink}.webp?v=${ASSET_V}" alt="" width="1200" height="1200"${eager ? '' : ' loading="lazy"'} decoding="async"></div>`;
 const rgMini = `<svg class="chords__mini" viewBox="0 0 20 20" aria-hidden="true" data-8b-motion="contour"><path d="M 5.4 9 C 5.5 11 5.3 11.2 4.4 12 A 3.6 3.6 0 1 0 10 16.2 C 10.5 15 10.7 14.7 12.6 14.2 A 5.8 5.8 0 1 0 5.4 9 Z"/><circle cx="11.2" cy="8.6" r="4.6"/><circle cx="6.73" cy="14.74" r="2.6"/></svg>`;
 
 exports.researchGroup = () => {
@@ -2671,6 +2674,7 @@ ${FAVICON}
 <main id="main">
 <!-- hero: headline, two buttons, the key panel drawn in HTML/CSS, its pad lettered with research areas -->
 <section id="hero" class="hero" data-8b-section="hero" aria-labelledby="hero-title">
+  ${rgSeal('hero', 'light', true)}
   <div class="hero__inner wrap">
     <div class="hero__copy">
       <h1 id="hero-title" class="m-text-2 hero__title"><span class="hero__line">Six areas.</span> <span class="hero__line">One research</span> <span class="hero__line">hub.</span></h1>
@@ -2792,6 +2796,7 @@ ${FAVICON}
 
 <!-- quiet: short statement -->
 <section id="quiet" class="quiet" data-8b-section="quiet" aria-labelledby="quiet-title">
+  ${rgSeal('quiet', 'light')}
   <div class="quiet__inner wrap">
     <div class="quiet__lines">
       <h2 id="quiet-title" class="m-text-2 quiet__line"><span data-8b-motion="deboss">No borrowed numbers.</span>${rgOff}</h2>
@@ -2901,7 +2906,7 @@ ${FAVICON}
 
 <!-- faq: questions and answers (native <details>) -->
 <section id="faq" class="faq" data-8b-section="faq" aria-labelledby="faq-title">
-  <div class="faq__flood" aria-hidden="true"></div>
+  <div class="faq__flood" aria-hidden="true">${rgSeal('faq', 'dark')}</div>
   <div class="faq__inner wrap">
     <header class="faq__head">
       <h2 id="faq-title" class="m-text-6" data-8b-motion="deboss">Before you press join.</h2>

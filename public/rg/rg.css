@@ -527,3 +527,26 @@ select.m-field { background-image: linear-gradient(45deg, transparent 50%, var(-
 #states .m-key-2__label { hyphens: manual; }
 #editions .editions__price { letter-spacing: .005em; }
 #contact .contact__details dd { overflow-wrap: anywhere; }
+
+/* ---- NIIP: the program's seal as a watermark, three times down the page, pressed faintly into the
+   surface the way the template stamps its headings. Each sits behind its section's content, large and
+   cropped by the section's edge; the third rides inside the FAQ's graphite flood, so it arrives with it. */
+.rg-wm { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; user-select: none; }
+.rg-wm img { position: absolute; inline-size: var(--wm-size); block-size: auto; max-inline-size: none; }
+#hero, #quiet { isolation: isolate; }
+#hero .rg-wm--hero { --wm-size: clamp(420px, 54vw, 820px); }
+#hero .rg-wm--hero img { left: calc(var(--wm-size) * -.24); top: 50%; transform: translateY(-44%); opacity: .68; }   /* the hero's top is the darkest grey, so its seal is set lighter still */
+#quiet .rg-wm--quiet { --wm-size: clamp(380px, 44vw, 680px); }
+#quiet .rg-wm--quiet img { right: calc(var(--wm-size) * -.2); top: 50%; transform: translateY(-50%); opacity: .82; }
+#faq .faq__flood { overflow: hidden; }
+#faq .rg-wm--faq { z-index: 0; --wm-size: clamp(340px, 34vw, 520px); }
+/* kept inside the band: the contact section below is the same graphite, so a seal cut at the FAQ's foot would show a hard line */
+#faq .rg-wm--faq img { left: calc(var(--wm-size) * -.22); bottom: 28px; }
+@media (max-width: 899px) {
+  #hero .rg-wm--hero { --wm-size: 128vw; }
+  #hero .rg-wm--hero img { left: -40vw; top: 64px; transform: none; }
+  #quiet .rg-wm--quiet { --wm-size: 118vw; }
+  #quiet .rg-wm--quiet img { right: -46vw; top: 50%; transform: translateY(-50%); }
+  #faq .rg-wm--faq { --wm-size: 112vw; }
+  #faq .rg-wm--faq img { left: auto; right: -42vw; bottom: auto; top: calc(var(--faq-reach, 0px) + 96px); }
+}

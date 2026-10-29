@@ -516,6 +516,21 @@ select.m-field { background-image: linear-gradient(45deg, transparent 50%, var(-
 #footer :focus-visible { outline-color: var(--color-1); }
 }
 
+/* ---- NIIP: navy in the palette (the owner's call, 29 Oct 2026). The template's nine tokens keep their
+   jobs and take the site's navy (#0B2C63): the stamped headings, the key labels and the small text are
+   navy ink; the graphite bands (the FAQ flood, the sign-up, the footer, the dark keys and buttons) are
+   navy; the grey surface cools a shade toward it, and every shadow, mixed from the ink, is navy-tinted. */
+:root {
+  --color-1: #e3e6ec;   /* page and key faces, the grey cooled toward the navy */
+  --color-2: #13203d;   /* body text and the ink every shadow is mixed from */
+  --color-4: #8a93a7;   /* hairlines and contours */
+  --color-5: #0b2c63;   /* stamped headings, key labels, small text: the site's navy */
+  --color-6: #b1b9c9;   /* the hero's upper edge */
+  --color-7: #0b2c63;   /* the bands that were graphite */
+  --color-8: #aebbd9;   /* muted text on navy */
+  --color-9: #04102a;   /* the deep shade under navy keys and buttons */
+}
+
 /* ---- NIIP: the bar's wordmark carries the program's seal; each way in on the pad carries its link;
    text labels on the drawn keys sit a touch smaller than the glyphs they replace */
 #nav .nav__brand { display: inline-flex; align-items: center; gap: 11px; }

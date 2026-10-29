@@ -516,20 +516,34 @@ select.m-field { background-image: linear-gradient(45deg, transparent 50%, var(-
 #footer :focus-visible { outline-color: var(--color-1); }
 }
 
-/* ---- NIIP: navy in the palette (the owner's call, 29 Oct 2026). The template's nine tokens keep their
-   jobs and take the site's navy (#0B2C63): the stamped headings, the key labels and the small text are
-   navy ink; the graphite bands (the FAQ flood, the sign-up, the footer, the dark keys and buttons) are
-   navy; the grey surface cools a shade toward it, and every shadow, mixed from the ink, is navy-tinted. */
+/* ---- NIIP: UN blue in the palette (the owner's call, 29 Oct 2026): the United Nations' own blue,
+   #009EDB, in the bands that were graphite (the FAQ flood, the sign-up, the footer, the dark panel and
+   keys). White on UN blue reaches only 3:1, enough for display type, short of the 4.5:1 WCAG AA asks of
+   body text, so on the bands the big headings and the wordmark stay white and everything else is a deep
+   UN-blue ink. On the grey, the stamped headings, key labels and small text are UN blue deepened to
+   pass AA (#00608F), and the grey and every shadow cool toward it. */
 :root {
-  --color-1: #e3e6ec;   /* page and key faces, the grey cooled toward the navy */
-  --color-2: #13203d;   /* body text and the ink every shadow is mixed from */
-  --color-4: #8a93a7;   /* hairlines and contours */
-  --color-5: #0b2c63;   /* stamped headings, key labels, small text: the site's navy */
-  --color-6: #b1b9c9;   /* the hero's upper edge */
-  --color-7: #0b2c63;   /* the bands that were graphite */
-  --color-8: #aebbd9;   /* muted text on navy */
-  --color-9: #04102a;   /* the deep shade under navy keys and buttons */
+  --color-1: #e2e8ee;   /* page and key faces, the grey cooled toward UN blue */
+  --color-2: #0c2236;   /* body text and the ink every shadow is mixed from */
+  --color-4: #8796a5;   /* hairlines and contours */
+  --color-5: #00608f;   /* stamped headings, key labels, small text: UN blue deepened for AA (5.5:1) */
+  --color-6: #b0c4d4;   /* the hero's upper edge */
+  --color-7: #009edb;   /* UN blue: the bands that were graphite */
+  --color-8: #072f4b;   /* muted text on UN blue (4.6:1) */
+  --color-9: #003a5c;   /* the deep shade under the blue keys and buttons */
+  --ink-on-blue: #04263d;   /* body text on UN blue (5.1:1) */
 }
+#faq, #contact, #footer { color: var(--ink-on-blue); }
+#faq .faq__item summary { color: var(--ink-on-blue); }
+/* display type on the bands in pure white: the template's pale grey would give 2.4:1, white gives 3:1 */
+#faq .m-text-6, #contact .m-text-6, #footer .m-text-6 { color: #fff; }
+#contact .m-field { color: var(--ink-on-blue); }
+#faq :focus-visible, #contact :focus-visible, #footer :focus-visible { outline-color: var(--ink-on-blue); }
+/* the dark button on a UN blue band: a deep UN blue, so its white label passes AA */
+.m-btn-2 { background: linear-gradient(180deg, #0a77ab, #005b8e 72%); }
+.m-btn-2__dent { background: linear-gradient(180deg, #004a74, #005b8e); }
+.ra-step { color: var(--ink-on-blue); }
+.ra-step b { color: #fff; text-shadow: var(--shadow-7); }
 
 /* ---- NIIP: the bar's wordmark carries the program's seal; each way in on the pad carries its link;
    text labels on the drawn keys sit a touch smaller than the glyphs they replace */

@@ -2582,7 +2582,249 @@ const rsMeta = (p) => `<span class="bbc-meta"><time datetime="${esc(p.published_
 // The photos are slots in the Image Library (researchGroup). The site keeps no sign-up list yet, so the
 // form writes the request out as an email to the program.
 const RG_CONTACT = { email: 'info@niip.org', phones: ['0888 771 973', '0777 129 261'], office: 'Monrovia, Liberia' };
-const RG_AREAS = ['Artificial intelligence', 'Data science', 'Cybersecurity', 'Connectivity', 'Digital finance', 'Emerging tech'];
+// The six research areas (from the program deck), each with its own page. The GROUPS AND MEMBERS ARE
+// SAMPLES, written at the owner's request (29 October 2026) to show the page until the first real groups
+// form; the page says so. The rest follows international practice and is real: each group is classed by
+// the OECD Fields of Research and Development (Frascati Manual 2015) and a UN SDG target; each member's
+// contribution uses CRediT, the Contributor Roles Taxonomy (ANSI/NISO Z39.104-2022); each area lists the
+// published international standards its research works to. Members are named without institutions, so
+// no real university is tied to a sample person.
+const RG_CREDIT = { con: 'Conceptualization', dat: 'Data curation', for: 'Formal analysis', fun: 'Funding acquisition', inv: 'Investigation',
+  met: 'Methodology', pro: 'Project administration', res: 'Resources', sof: 'Software', sup: 'Supervision', val: 'Validation',
+  vis: 'Visualization', wri: 'Writing – original draft', rev: 'Writing – review & editing' };
+const RG_FORD = { '1.1': 'Mathematics', '1.2': 'Computer and information sciences', '1.5': 'Earth and related environmental sciences',
+  '2.2': 'Electrical, electronic and information engineering', '2.11': 'Other engineering and technologies', '4.1': 'Agriculture, forestry and fisheries',
+  '5.2': 'Economics and business', '5.3': 'Educational sciences', '5.5': 'Law', '5.6': 'Political science', '6.2': 'Languages and literature' };
+const RG_SDG = { '1.4': 'Equal rights to economic resources, including financial services', '2.3': 'Productivity and incomes of small-scale food producers',
+  '4.4': 'Relevant skills, including ICT skills, for youth and adults', '6.1': 'Safe and affordable drinking water for all',
+  '8.10': 'Access to banking, insurance and financial services for all', '9.1': 'Quality, reliable, sustainable and resilient infrastructure',
+  '9.c': 'Universal and affordable access to the Internet', '10.2': 'Social, economic and political inclusion of all',
+  '11.3': 'Inclusive, sustainable urbanization and participatory planning', '16.6': 'Effective, accountable and transparent institutions',
+  '16.9': 'Legal identity for all', '16.10': 'Public access to information and fundamental freedoms', '16.a': 'National capacity to prevent violence and combat crime',
+  '17.18': 'High-quality, timely and reliable data' };
+// a member: [name, role, expertise, country (and "visiting" for a visiting researcher), CRediT roles]
+const RG_AREAS = [
+  { slug: 'ai', name: 'Artificial intelligence', key: 'AI',
+    lede: 'Machine learning, language technology and responsible AI, built on Liberian data and Liberian questions.',
+    standards: [
+      ['ISO/IEC 42001:2023', 'Artificial intelligence management systems', 'Requirements for running AI responsibly inside an organisation, from risk to oversight.'],
+      ['ISO/IEC 22989:2022', 'AI concepts and terminology', 'The shared vocabulary for describing AI systems and their life cycle.'],
+      ['UNESCO, 2021', 'Recommendation on the Ethics of Artificial Intelligence', 'The global framework adopted by UNESCO’s 193 member states.'],
+      ['OECD, 2019 (updated 2024)', 'OECD AI Principles', 'Trustworthy AI that respects human rights and democratic values.'],
+    ],
+    groups: [
+      { slug: 'liberian-languages-nlp', name: 'Liberian Languages NLP Group', status: 'Recruiting',
+        topic: 'Speech and text tools for Kpelle, Bassa and Liberian English',
+        sum: 'Building open datasets and models so that digital services can listen and answer in the languages Liberians speak.',
+        tags: ['Natural language processing', 'Speech recognition', 'Low-resource languages'], ford: ['1.2', '6.2'], sdg: '10.2', std: 'UNESCO AI Ethics · FAIR data',
+        people: [['Dr. Garmai Kollie', 'Principal Investigator', 'Computational linguistics', 'Liberia', 'con sup fun'],
+          ['Dr. Kwame Owusu-Ansah', 'Co-Investigator', 'Speech recognition', 'Ghana, visiting', 'met sof'],
+          ['Siatta Flomo', 'Doctoral Researcher', 'Kpelle text corpora', 'Liberia', 'dat inv'],
+          ['Varney Kpoto', 'Research Software Engineer', 'Model training pipelines', 'Liberia', 'sof val'],
+          ['Yassah Gbatu', 'Research Assistant', 'Bassa transcription', 'Liberia', 'dat inv']] },
+      { slug: 'responsible-ai-public-services', name: 'Responsible AI & Public Services', status: 'Active',
+        topic: 'Where can AI help Liberia’s ministries, and under what safeguards?',
+        sum: 'Testing small, explainable AI tools against real public-service tasks, with a risk assessment before any of them is used.',
+        tags: ['AI governance', 'Public sector', 'Risk assessment'], ford: ['1.2', '5.6'], sdg: '16.6', std: 'ISO/IEC 42001 · OECD AI Principles',
+        people: [['Dr. Augustine Sumo', 'Principal Investigator', 'AI governance', 'Liberia', 'con sup pro'],
+          ['Dr. Wanjiru Kamau', 'Co-Investigator', 'Algorithmic risk assessment', 'Kenya, visiting', 'met for'],
+          ['Patience Togba', 'Research Fellow', 'Public administration', 'Liberia', 'inv wri'],
+          ['Moses Zinnah', 'Doctoral Researcher', 'Explainable models', 'Liberia', 'sof for'],
+          ['Hawa Kanneh', 'Research Assistant', 'Stakeholder interviews', 'Liberia', 'inv']] },
+      { slug: 'agri-vision-lab', name: 'Agri-Vision Lab', status: 'Active',
+        topic: 'Crop disease detection from smartphone photos for smallholder farmers',
+        sum: 'Training vision models on photos taken with farmers in the field, small enough to run offline on an ordinary phone.',
+        tags: ['Computer vision', 'Agriculture', 'Edge AI'], ford: ['1.2', '4.1'], sdg: '2.3', std: 'ISO/IEC 22989 · FAIR data',
+        people: [['Dr. Comfort Wesseh', 'Principal Investigator', 'Computer vision', 'Liberia', 'con sup fun'],
+          ['Dr. Tunde Adeyemi', 'Co-Investigator', 'Edge AI on smartphones', 'Nigeria, visiting', 'sof met'],
+          ['Prince Kerkula', 'Doctoral Researcher', 'Crop disease datasets', 'Liberia', 'dat inv'],
+          ['Musu Dolo', 'Research Assistant', 'Field photography with farmers', 'Liberia', 'inv res']] },
+    ] },
+  { slug: 'data-science', name: 'Data science', key: 'Data',
+    lede: 'Statistics, surveys and methods that turn the national ICT record into figures people can trust.',
+    standards: [
+      ['UN Statistical Commission, 1994', 'Fundamental Principles of Official Statistics', 'Ten principles for impartial, professional official statistics, endorsed by the UN General Assembly in 2014.'],
+      ['Wilkinson et al., 2016', 'FAIR Guiding Principles', 'Data that are findable, accessible, interoperable and reusable.'],
+      ['ISO 17369:2013', 'SDMX, Statistical Data and Metadata eXchange', 'The international format for sharing statistics and their metadata.'],
+      ['DDI Alliance', 'Data Documentation Initiative', 'The metadata standard for documenting surveys and their data.'],
+    ],
+    groups: [
+      { slug: 'survey-methods-unit', name: 'Survey Methods Unit', status: 'Active',
+        topic: 'Small-area estimates of internet use for all 15 counties',
+        sum: 'Combining household surveys with administrative data to give every county a reliable figure, with its margin of error beside it.',
+        tags: ['Survey sampling', 'Small-area estimation', 'Official statistics'], ford: ['1.1'], sdg: '17.18', std: 'UN Fundamental Principles · DDI',
+        people: [['Prof. Samuel Tarr', 'Principal Investigator', 'Survey statistics', 'Liberia', 'con met sup'],
+          ['Dr. Fatmata Sesay', 'Co-Investigator', 'Small-area estimation', 'Sierra Leone, visiting', 'met for'],
+          ['Korto Mulbah', 'Research Fellow', 'Sampling frames', 'Liberia', 'dat val'],
+          ['Isaac Gono', 'Doctoral Researcher', 'Bayesian models', 'Liberia', 'for sof'],
+          ['Oretha Saah', 'Research Assistant', 'Field supervision', 'Liberia', 'inv']] },
+      { slug: 'open-data-fair-practice', name: 'Open Data & FAIR Practice', status: 'Active',
+        topic: 'Making NIIS indicators findable, accessible, interoperable and reusable',
+        sum: 'Writing the metadata, identifiers and open licences that let anyone reuse the national indicators with confidence.',
+        tags: ['Metadata', 'SDMX', 'Open data'], ford: ['1.2'], sdg: '17.18', std: 'FAIR · ISO 17369 (SDMX)',
+        people: [['Dr. Martha Karpeh', 'Principal Investigator', 'Research data management', 'Liberia', 'con dat sup'],
+          ['Jean-Paul Habimana', 'Visiting Researcher', 'SDMX and metadata', 'Rwanda, visiting', 'met sof'],
+          ['Arthur Kromah', 'Data Steward', 'Indicator metadata', 'Liberia', 'dat val'],
+          ['Elfreda Jallah', 'Research Assistant', 'Open licensing', 'Liberia', 'res rev']] },
+      { slug: 'data-literacy-lab', name: 'Data Literacy Lab', status: 'Recruiting',
+        topic: 'Helping county officers read and use ICT indicators',
+        sum: 'Designing short courses and plain charts, then measuring whether officers use the figures in their own planning.',
+        tags: ['Data literacy', 'Visualization', 'Capacity building'], ford: ['5.3'], sdg: '4.4', std: 'UN Fundamental Principles',
+        people: [['Dr. Benedict Tokpa', 'Principal Investigator', 'Statistics education', 'Liberia', 'con sup'],
+          ['Esther Gbollie', 'Research Fellow', 'Visualization design', 'Liberia', 'vis wri'],
+          ['Abena Boateng', 'Visiting Researcher', 'Learning evaluation', 'Ghana, visiting', 'met for'],
+          ['Lawrence Wleh', 'Research Assistant', 'County workshops', 'Liberia', 'inv pro']] },
+    ] },
+  { slug: 'cybersecurity', name: 'Cybersecurity', key: 'Cyber',
+    lede: 'Protecting networks, services and personal data as more of Liberia’s life moves online.',
+    standards: [
+      ['ISO/IEC 27001:2022', 'Information security management systems', 'Requirements for managing information security risk.'],
+      ['NIST, 2024', 'Cybersecurity Framework 2.0', 'Govern, identify, protect, detect, respond and recover.'],
+      ['ITU-T X.1205', 'Overview of cybersecurity', 'The ITU recommendation defining cybersecurity, its threats and its measures.'],
+      ['African Union, 2014', 'Malabo Convention', 'The AU Convention on Cyber Security and Personal Data Protection.'],
+    ],
+    groups: [
+      { slug: 'threat-intelligence-group', name: 'Threat Intelligence Group', status: 'Active',
+        topic: 'Mapping phishing and mobile-money fraud patterns in Liberia',
+        sum: 'Collecting reported incidents into one anonymised dataset, so patterns can be seen and warnings given early.',
+        tags: ['Threat intelligence', 'Fraud', 'Incident data'], ford: ['1.2'], sdg: '16.a', std: 'NIST CSF 2.0 · ITU-T X.1205',
+        people: [['Dr. Jerome Kamara', 'Principal Investigator', 'Threat intelligence', 'Liberia', 'con sup pro'],
+          ['Dr. Chiamaka Okafor', 'Co-Investigator', 'Fraud analytics', 'Nigeria, visiting', 'for met'],
+          ['Kebeh Tweh', 'Doctoral Researcher', 'Phishing detection', 'Liberia', 'sof inv'],
+          ['Stephen Sackie', 'Research Assistant', 'Incident data collection', 'Liberia', 'dat inv']] },
+      { slug: 'critical-infrastructure-security', name: 'Critical Infrastructure Security', status: 'Active',
+        topic: 'How resilient are the networks and data centres Liberia depends on?',
+        sum: 'Assessing single points of failure and recovery plans, and setting out what a minimum standard should be.',
+        tags: ['Critical infrastructure', 'Resilience', 'Risk assessment'], ford: ['2.2'], sdg: '9.1', std: 'ISO/IEC 27001 · NIST CSF 2.0',
+        people: [['Prof. Alfred Nimely', 'Principal Investigator', 'Network resilience', 'Liberia', 'con sup fun'],
+          ['Dr. Ibrahim Kargbo', 'Co-Investigator', 'Industrial control systems', 'Sierra Leone, visiting', 'met val'],
+          ['Mercy Paye', 'Research Fellow', 'Information security risk', 'Liberia', 'inv wri'],
+          ['Daniel Kpadeh', 'Research Software Engineer', 'Monitoring tools', 'Liberia', 'sof'],
+          ['Princess Teah', 'Research Assistant', 'Asset inventories', 'Liberia', 'dat']] },
+      { slug: 'privacy-data-protection-clinic', name: 'Privacy & Data Protection Clinic', status: 'Recruiting',
+        topic: 'Putting data protection into practice for Liberia’s small businesses',
+        sum: 'Plain guidance and simple checklists, tested with real shops, schools and clinics that keep customer data.',
+        tags: ['Privacy', 'Compliance', 'Personal data'], ford: ['5.5'], sdg: '16.10', std: 'Malabo Convention · ISO/IEC 27001',
+        people: [['Dr. Teta Zubah', 'Principal Investigator', 'Data protection law', 'Liberia', 'con sup wri'],
+          ['Aminata Diallo', 'Visiting Researcher', 'Privacy engineering', 'Senegal, visiting', 'met rev'],
+          ['Edwin Karmo', 'Doctoral Researcher', 'Compliance for small firms', 'Liberia', 'inv for'],
+          ['Fatu Konneh', 'Research Assistant', 'Case studies', 'Liberia', 'inv']] },
+    ] },
+  { slug: 'connectivity', name: 'Connectivity', key: 'Net',
+    lede: 'Coverage, quality, price and use: who is online in Liberia, how well, and at what cost.',
+    standards: [
+      ['ITU, 2020', 'Manual for Measuring ICT Access and Use by Households and Individuals', 'The international method for household ICT surveys.'],
+      ['ITU, 2020', 'Handbook for the Collection of Administrative Data on Telecommunications/ICT', 'How operator and regulator data become comparable indicators.'],
+      ['ITU-T E.800', 'Definitions of terms related to quality of service', 'The shared language for measuring network quality.'],
+      ['UN Broadband Commission, 2018', '“1 for 2” affordability target', '1 GB of mobile data for no more than 2% of average monthly income.'],
+    ],
+    groups: [
+      { slug: 'broadband-quality-observatory', name: 'Broadband Quality Observatory', status: 'Active',
+        topic: 'Measuring mobile broadband speed and latency county by county',
+        sum: 'Pairing drive tests with measurements from volunteers’ phones to map real network quality across the 15 counties.',
+        tags: ['Quality of service', 'Network measurement', 'Crowdsourced data'], ford: ['2.2'], sdg: '9.c', std: 'ITU-T E.800 · ITU Handbook',
+        people: [['Dr. Christopher Gaye', 'Principal Investigator', 'Network measurement', 'Liberia', 'con met sup'],
+          ['Otieno Ochieng', 'Visiting Researcher', 'Crowdsourced QoS data', 'Kenya, visiting', 'sof for'],
+          ['Kula Siaffa', 'Doctoral Researcher', 'Speed and latency analysis', 'Liberia', 'for vis'],
+          ['Momo Kiazolu', 'Research Software Engineer', 'Measurement app', 'Liberia', 'sof'],
+          ['Mamie Dunbar', 'Research Assistant', 'County drive tests', 'Liberia', 'inv dat']] },
+      { slug: 'affordability-access', name: 'Affordability & Access', status: 'Active',
+        topic: 'What does 1 GB cost a Liberian household, and who is priced out?',
+        sum: 'Tracking data prices against household budgets, measured against the “1 for 2” target.',
+        tags: ['Affordability', 'Pricing', 'Household budgets'], ford: ['5.2'], sdg: '9.c', std: '“1 for 2” target · ITU Manual',
+        people: [['Dr. Elizabeth Nyan', 'Principal Investigator', 'Telecom economics', 'Liberia', 'con sup fun'],
+          ['Dr. Kofi Mensah', 'Co-Investigator', 'Price benchmarking', 'Ghana, visiting', 'met for'],
+          ['Joseph Dahn', 'Research Fellow', 'Household budgets', 'Liberia', 'inv for'],
+          ['Massa Gweh', 'Research Assistant', 'Price collection', 'Liberia', 'dat']] },
+      { slug: 'rural-connectivity-models', name: 'Rural Connectivity Models', status: 'Recruiting',
+        topic: 'Community networks and satellite backhaul for unconnected towns',
+        sum: 'Costing the ways a town without coverage could get online, and who would run and pay for each.',
+        tags: ['Community networks', 'Satellite', 'Last mile'], ford: ['2.2'], sdg: '9.c', std: 'ITU Manual · ITU Handbook',
+        people: [['Dr. Peter Kun', 'Principal Investigator', 'Last-mile networks', 'Liberia', 'con sup'],
+          ['Thandiwe Nkosi', 'Visiting Researcher', 'Community networks', 'South Africa, visiting', 'met res'],
+          ['Saye Dweh', 'Doctoral Researcher', 'Satellite backhaul costs', 'Liberia', 'for inv'],
+          ['Ruth Wreh', 'Research Assistant', 'Town surveys', 'Liberia', 'inv']] },
+    ] },
+  { slug: 'digital-finance', name: 'Digital finance', key: 'Fin',
+    lede: 'Mobile money, digital payments and the inclusion they bring, or leave out.',
+    standards: [
+      ['ISO 20022', 'Universal financial industry message scheme', 'The common language for payment and banking messages.'],
+      ['G20, 2016', 'High-Level Principles for Digital Financial Inclusion', 'Eight principles for expanding financial services through digital means.'],
+      ['FATF', 'The FATF Recommendations', 'The international standard against money laundering and terrorist financing.'],
+      ['CPMI–IOSCO, 2012', 'Principles for Financial Market Infrastructures', 'Standards for payment systems and other financial market infrastructures.'],
+    ],
+    groups: [
+      { slug: 'mobile-money-inclusion', name: 'Mobile Money Inclusion Group', status: 'Active',
+        topic: 'Who uses mobile money in Liberia, and who is left out?',
+        sum: 'Survey and agent interviews on use, trust and cost, broken down by gender, age and county.',
+        tags: ['Financial inclusion', 'Gender gap', 'Surveys'], ford: ['5.2'], sdg: '8.10', std: 'G20 Principles · DDI',
+        people: [['Dr. Yatta Morris', 'Principal Investigator', 'Financial inclusion', 'Liberia', 'con sup fun'],
+          ['Dr. Akosua Asare', 'Co-Investigator', 'Gender and finance', 'Ghana, visiting', 'met wri'],
+          ['Abraham Juah', 'Doctoral Researcher', 'Survey analysis', 'Liberia', 'for vis'],
+          ['Rebecca Kpaan', 'Research Assistant', 'Agent interviews', 'Liberia', 'inv']] },
+      { slug: 'payments-interoperability', name: 'Payments Interoperability', status: 'Active',
+        topic: 'Linking mobile wallets and bank accounts on ISO 20022 messaging',
+        sum: 'A working prototype of a switch, and the rules it would need, so money moves between any wallet and any bank.',
+        tags: ['Interoperability', 'ISO 20022', 'Payments'], ford: ['5.2', '1.2'], sdg: '8.10', std: 'ISO 20022 · CPMI–IOSCO PFMI',
+        people: [['Dr. Francis Varney', 'Principal Investigator', 'Payment systems', 'Liberia', 'con sup'],
+          ['Aline Uwase', 'Visiting Researcher', 'ISO 20022 messaging', 'Rwanda, visiting', 'met sof'],
+          ['George Kulah', 'Research Software Engineer', 'Switch prototype', 'Liberia', 'sof val'],
+          ['Sarah Gbozee', 'Research Fellow', 'Payments regulation', 'Liberia', 'inv wri'],
+          ['Matthew Sayeh', 'Research Assistant', 'Transaction data', 'Liberia', 'dat']] },
+      { slug: 'digital-credit-consumer-protection', name: 'Digital Credit & Consumer Protection', status: 'Forming',
+        topic: 'Fair rules for app-based loans',
+        sum: 'What borrowers are told, what they pay and what happens when they fall behind, and what fair disclosure should look like.',
+        tags: ['Digital credit', 'Consumer protection', 'Regulation'], ford: ['5.5', '5.2'], sdg: '1.4', std: 'G20 Principles · FATF',
+        people: [['Dr. Victoria Yancy', 'Principal Investigator', 'Consumer finance law', 'Liberia', 'con sup'],
+          ['Yao Kouassi', 'Visiting Researcher', 'Credit scoring', 'Côte d’Ivoire, visiting', 'met for'],
+          ['Cecelia Kpehe', 'Doctoral Researcher', 'Borrower experience', 'Liberia', 'inv wri'],
+          ['Thomas Tamba', 'Research Assistant', 'Loan-app reviews', 'Liberia', 'dat']] },
+    ] },
+  { slug: 'emerging-tech', name: 'Emerging tech', key: 'Tech',
+    lede: 'The Internet of Things, drones, digital identity and other new technologies, tested against Liberian needs.',
+    standards: [
+      ['ISO/IEC 30141', 'Internet of Things reference architecture', 'A common architecture for designing IoT systems.'],
+      ['ITU-T Y.4000/Y.2060', 'Overview of the Internet of Things', 'The ITU’s definition and model of the IoT.'],
+      ['ISO 56002:2019', 'Innovation management system: guidance', 'How organisations manage innovation systematically.'],
+      ['W3C', 'Verifiable Credentials Data Model', 'The web standard for credentials that can be checked without calling the issuer.'],
+    ],
+    groups: [
+      { slug: 'iot-public-services', name: 'IoT for Public Services', status: 'Active',
+        topic: 'Low-cost sensors for water points and clinic cold chains',
+        sum: 'Solar-powered sensors that report when a pump fails or a vaccine fridge warms, over low-power radio.',
+        tags: ['Internet of Things', 'Sensors', 'LoRaWAN'], ford: ['2.2'], sdg: '6.1', std: 'ISO/IEC 30141 · ITU-T Y.4000',
+        people: [['Dr. Aaron Mator', 'Principal Investigator', 'Embedded systems', 'Liberia', 'con sup fun'],
+          ['Dr. Nkechi Eze', 'Co-Investigator', 'LoRaWAN networks', 'Nigeria, visiting', 'met sof'],
+          ['Bendu Gbeh', 'Doctoral Researcher', 'Water-point sensors', 'Liberia', 'inv dat'],
+          ['Eric Nyumah', 'Research Software Engineer', 'Monitoring dashboards', 'Liberia', 'sof vis']] },
+      { slug: 'drones-geospatial-lab', name: 'Drones & Geospatial Lab', status: 'Active',
+        topic: 'Drone mapping to update settlement and road data',
+        sum: 'Flying and processing aerial surveys so planners and the census have current maps of fast-growing towns.',
+        tags: ['Drones', 'GIS', 'Mapping'], ford: ['1.5', '2.11'], sdg: '11.3', std: 'ISO 56002 · FAIR data',
+        people: [['Dr. Rita Cooper', 'Principal Investigator', 'Remote sensing', 'Liberia', 'con sup'],
+          ['Brian Mwangi', 'Visiting Researcher', 'Drone photogrammetry', 'Kenya, visiting', 'met sof'],
+          ['Amos Dennis', 'Research Fellow', 'GIS', 'Liberia', 'for vis'],
+          ['Josephine Freeman', 'Research Assistant', 'Ground truthing', 'Liberia', 'inv'],
+          ['Nathaniel Gartor', 'Research Assistant', 'Flight operations', 'Liberia', 'inv res']] },
+      { slug: 'digital-identity-trust', name: 'Digital Identity & Trust', status: 'Forming',
+        topic: 'Verifiable credentials for certificates and licences',
+        sum: 'Certificates that a school, employer or clinic can check in seconds, without a phone call and without a forgery.',
+        tags: ['Digital identity', 'Verifiable credentials', 'Cryptography'], ford: ['1.2'], sdg: '16.9', std: 'W3C Verifiable Credentials',
+        people: [['Dr. Dorothy Siryon', 'Principal Investigator', 'Digital identity', 'Liberia', 'con sup'],
+          ['Moussa Traoré', 'Visiting Researcher', 'Verifiable credentials', 'Mali, visiting', 'met sof'],
+          ['James Tuan', 'Doctoral Researcher', 'Applied cryptography', 'Liberia', 'for sof'],
+          ['Hannah Wesley', 'Research Assistant', 'User studies', 'Liberia', 'inv']] },
+    ] },
+];
+// standards that hold across every group, whatever the area
+const RG_COMMON = [
+  ['ANSI/NISO Z39.104-2022', 'CRediT, Contributor Roles Taxonomy', 'Each member’s part in the work, named in the fourteen standard roles.'],
+  ['OECD, Frascati Manual 2015', 'Fields of Research and Development', 'The international classification each group is filed under.'],
+  ['United Nations, 2015', 'Sustainable Development Goals', 'Each group names the SDG target its work serves.'],
+  ['World Conference on Research Integrity, 2010', 'Singapore Statement on Research Integrity', 'Honesty, accountability, professional courtesy and good stewardship in research.'],
+];
+const rgArea = (slug) => RG_AREAS.find((a) => a.slug === slug);
+const rgInitials = (name) => name.replace(/^(Dr|Prof)\.\s+/, '').split(/[\s-]+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
 const RG_G = {
   up: '<svg viewBox="0 0 24 24"><path d="M12 6.5 19 17H5z"/></svg>',
   left: '<svg viewBox="0 0 24 24"><path d="M6.5 12 17 5v14z"/></svg>',
@@ -2611,11 +2853,210 @@ const rgOff = `<span class="quiet__off" aria-hidden="true" data-8b-motion="conto
 const rgSeal = (where, ink, eager = false) => `<div class="rg-wm rg-wm--${where}" aria-hidden="true"><img src="/img/research-group/seal-wm-${ink}.webp?v=${ASSET_V}" alt="" width="1200" height="1200"${eager ? '' : ' loading="lazy"'} decoding="async"></div>`;
 const rgMini = `<svg class="chords__mini" viewBox="0 0 20 20" aria-hidden="true" data-8b-motion="contour"><path d="M 5.4 9 C 5.5 11 5.3 11.2 4.4 12 A 3.6 3.6 0 1 0 10 16.2 C 10.5 15 10.7 14.7 12.6 14.2 A 5.8 5.8 0 1 0 5.4 9 Z"/><circle cx="11.2" cy="8.6" r="4.6"/><circle cx="6.73" cy="14.74" r="2.6"/></svg>`;
 
-exports.researchGroup = () => {
-  const desc = 'NIIP’s research groups: six research areas, one Research Hub. Search papers, submit papers and join a group, with the reports of government and operators alongside.';
-  const links = [['#states', 'Groups'], ['#modes', 'Ways in'], ['#dimmer', 'Next wave'], ['#material', 'Pillars'], ['#faq', 'FAQ'], ['/research', 'Papers']];
+// The frame every research-group page shares: the head, the floating bar (its section links and its one
+// call to act), the footer with the width-filling wordmark, and the scripts.
+const rgPage = ({ title, desc, links, cta, body }) => {
   const linkList = links.map(([h, t]) => `<li><a class="m-link" href="${h}">${t}</a></li>`).join('\n        ');
-  const areaKey = (a) => `<li class="states__slot"><button class="m-key-2" type="button" aria-pressed="false" data-area="${esc(a)}"><span class="m-key-2__cap" aria-hidden="true"><span class="m-key-2__dent"></span></span><span class="m-key-2__label">${esc(a)}</span><span class="m-key-2__state" aria-hidden="true"><span class="m-key-2__off">Open</span><span class="m-key-2__on">Picked</span></span></button></li>`;
+  return `<!doctype html>
+<!--
+  Free website template by 8B: https://8b.com/templates/hushkey/
+  Source: https://github.com/8bsite/product-landing-page-template
+  MIT License (code) https://8b.com/ · Fonts: Google Fonts (OFL) · Photos: NIIP's own (Image Library)
+  Notices: public/rg/rg.css and public/rg/rg.js.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${esc(title)} · NIIP</title>
+<meta name="description" content="${esc(desc)}">
+<meta name="generator" content="8B Templates">
+<meta property="og:type" content="website">
+<meta property="og:title" content="${esc(title)} · NIIP">
+<meta property="og:description" content="${esc(desc)}">
+<meta name="twitter:card" content="summary">
+${FAVICON}
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.gstatic.com/s/mozillaheadline/v1/QGYLz-UXahmCOps4kyMKGuSA9pYt2_P-w2kFrS88o6dLYRvBSDSOuerB_FOBB4ElYhZu.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://fonts.gstatic.com/s/mozillatext/v1/SZc-3FrnJ7S7WZIff2mJ7TbD7xNK.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/rg/rg.css?v=${ASSET_V}">
+</head>
+<body>
+<!-- navigation: the NIIP wordmark, the page's sections, the call to act; phone menu overlay -->
+<header id="nav" class="nav" data-8b-section="navigation">
+  <div class="nav__bar m-surface">
+    <a class="nav__brand" href="/" aria-label="NIIP home"><img src="/img/brand/niip-seal-256.webp?v=${ASSET_V}" alt="" width="36" height="36">NIIP</a>
+    <nav class="nav__links" id="menu" aria-label="Main">
+      <div class="nav__menu-head">
+        <span class="nav__menu-title" aria-hidden="true">NIIP</span>
+        <button class="m-key nav__close" type="button" aria-label="Close menu"><span class="m-key__cap" aria-hidden="true"><span class="m-key__dent"></span></span><span class="m-key__label" aria-hidden="true">${RG_G.close}</span></button>
+      </div>
+      <ul>
+        ${linkList}
+      </ul>
+    </nav>
+    ${rgBtn(cta[0], cta[1]).replace('class="m-btn"', 'class="m-btn nav__cta"')}
+    <button class="m-key nav__open" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span class="m-key__cap" aria-hidden="true"><span class="m-key__dent"></span></span><span class="m-key__label" aria-hidden="true">${RG_G.menu}</span></button>
+  </div>
+</header>
+<main id="main">
+${body}
+</main>
+
+<!-- footer: width-filling RESEARCH wordmark, links back into the site, the Design: 8B credit -->
+<footer id="footer" class="footer" data-8b-section="footer">
+  <div class="footer__inner wrap">
+    <p class="m-text-6 footer__mark" style="--len:8">RESEARCH</p>
+    <div class="footer__row">
+      <p class="m-text-3">NIIP Research Groups</p>
+      <nav class="footer__links" aria-label="Footer">
+        <ul>
+          <li><a class="m-link" href="/">Home</a></li>
+          <li><a class="m-link" href="/research">Research papers</a></li>
+          <li><a class="m-link" href="/research/submit">Submit a paper</a></li>
+          <li><a class="m-link" href="/reports">ICT Reports</a></li>
+          <li><a class="m-link" href="/data">Data Explorer</a></li>
+          <li><a class="m-link" href="/about">About</a></li>
+        </ul>
+      </nav>
+      <p class="m-text-9">© 2026 National ICT Intelligence Program, Monrovia · Design: <a href="https://8b.com/" style="color:inherit" data-8b-credit>8B</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/vendor/gsap/gsap.min.js?v=3.13.0"></script>
+<script src="/assets/vendor/gsap/ScrollTrigger.min.js?v=3.13.0"></script>
+<script src="/assets/vendor/gsap/SplitText.min.js?v=3.13.0"></script>
+<script src="/assets/vendor/lenis/lenis.min.js?v=1.3.27"></script>
+<script src="/assets/rg/rg.js?v=${ASSET_V}"></script>
+</body>
+</html>`;
+};
+
+// An area's own page (/research/group/<area>), in the same design: the area lettered on one great key,
+// its groups (research question, classification, members), the standards it works to, and the graphite
+// band with the way to join and the areas either side. Null for an unknown area, so the server can 404.
+exports.researchArea = (slug) => {
+  const area = rgArea(slug);
+  if (!area) return null;
+  const i = RG_AREAS.indexOf(area), n = RG_AREAS.length;
+  const prev = RG_AREAS[(i - 1 + n) % n], next = RG_AREAS[(i + 1) % n];
+  const members = area.groups.reduce((t, g) => t + g.people.length, 0);
+  const no = String(i + 1).padStart(2, '0');
+  const ford = (codes) => codes.map((c) => `${c} ${RG_FORD[c]}`).join('; ');
+  const person = ([name, role, expertise, country, credit], k) => `<li class="ra-person">
+              ${rgKey(`ra-face${k === 0 ? ' is-on' : ''}`, esc(rgInitials(name))).replace('<span class="m-key ', '<span aria-hidden="true" class="m-key ')}
+              <div><b>${esc(name)}</b><span class="m-text-8">${esc(role)} · ${esc(expertise)} · ${esc(country)}</span>
+                <p class="ra-credit"><span class="sr-only">Contribution roles: </span>${credit.split(' ').map((c) => esc(RG_CREDIT[c])).join(' · ')}</p></div>
+            </li>`;
+  const group = (g) => `<article class="m-surface ra-group" id="${g.slug}" data-8b-motion="rise" aria-labelledby="${g.slug}-name">
+        <div class="ra-about">
+          <span class="m-text-4 ra-status">${rgKey(g.status === 'Active' ? 'is-on' : '', '').replace('<span class="m-key ', '<span aria-hidden="true" class="m-key ')}${esc(g.status)}</span>
+          <h3 class="m-text-5" id="${g.slug}-name">${esc(g.name)}</h3>
+          <p class="m-text-7 ra-topic">${esc(g.topic)}</p>
+          <p class="m-text-8 ra-sum">${esc(g.sum)}</p>
+          <ul class="ra-tags" aria-label="Keywords">${g.tags.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
+          <dl class="ra-meta">
+            <div><dt class="m-text-4">Field (OECD FORD)</dt><dd>${esc(ford(g.ford))}</dd></div>
+            <div><dt class="m-text-4">SDG target</dt><dd>${esc(g.sdg)} · ${esc(RG_SDG[g.sdg])}</dd></div>
+            <div><dt class="m-text-4">Standards</dt><dd>${esc(g.std)}</dd></div>
+            <div><dt class="m-text-4">Members</dt><dd>${g.people.length}, led by ${esc(g.people[0][0])}</dd></div>
+          </dl>
+        </div>
+        <div class="ra-people">
+          <h4 class="m-text-4">Members</h4>
+          <ul>
+            ${g.people.map(person).join('\n            ')}
+          </ul>
+        </div>
+      </article>`;
+  const std = ([code, name, what]) => `<li><span class="m-text-4">${esc(code)}</span><h3 class="m-text-5">${esc(name)}</h3><p class="m-text-8">${esc(what)}</p></li>`;
+  const step = (a, dir) => `<a class="ra-step" href="/research/group/${a.slug}">${rgKey3('', dir === 'prev' ? RG_G.left : RG_G.right).replace('<span class="m-key-3 ', '<span aria-hidden="true" class="m-key-3 ')}<span><span class="m-text-9">${dir === 'prev' ? 'Previous area' : 'Next area'}</span><b>${esc(a.name)}</b></span></a>`;
+  const desc = `${area.name}: NIIP’s research groups in this area, the questions they are working on and the people in them.`;
+  const body = `<!-- hero: the area's name, its line, and the area lettered on one great key -->
+<section id="hero" class="hero is-area" data-8b-section="hero" aria-labelledby="hero-title">
+  ${rgSeal('hero', 'light', true)}
+  <div class="hero__inner wrap">
+    <div class="hero__copy">
+      <h1 id="hero-title" class="m-text-2 hero__title"><span class="hero__line">${esc(area.name)}.</span></h1>
+      <p class="m-text-3 hero__caption">Research area ${no} of ${String(n).padStart(2, '0')}</p>
+      <p class="m-text-7 hero__lede">${esc(area.lede)}</p>
+      <div class="hero__actions">
+        ${rgBtn(`/research/group?area=${area.slug}#contact`, 'Join this area')}
+        <a class="m-link" href="#groups">Meet the groups</a>
+      </div>
+      <p class="m-text-8 hero__note">${area.groups.length} groups · ${members} members · <a class="m-link" href="/research/group#states">All six areas</a></p>
+    </div>
+    <div class="hero__stage" aria-hidden="true">
+      <div class="ra-stage">
+        <span class="ra-ring"></span>
+        ${rgKey('ra-big', esc(area.key))}
+        <span class="m-tick"><span class="m-tick__label">${no}</span><span class="m-tick__line"></span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- groups: each a raised surface with its research question, classification and members -->
+<section id="groups" data-8b-section="groups" aria-labelledby="groups-title">
+  <div class="wrap">
+    <header class="ra-head">
+      <h2 id="groups-title" class="m-text-2" data-8b-motion="deboss">${area.groups.length} groups. One area.</h2>
+      <div>
+        <p class="m-text">Each group follows one research question, led by a principal investigator, with each member’s part in the work named in the standard contributor roles.</p>
+        <p class="m-text-8">Sample groups and members, shown while the first groups form.</p>
+      </div>
+    </header>
+    <div class="ra-list">
+      ${area.groups.map(group).join('\n      ')}
+    </div>
+  </div>
+</section>
+
+<!-- standards: what the area works to, then what every group works to -->
+<section id="standards" data-8b-section="standards" aria-labelledby="standards-title">
+  ${rgSeal('std', 'light')}
+  <div class="wrap">
+    <header class="ra-head">
+      <h2 id="standards-title" class="m-text-2" data-8b-motion="deboss">The standards we work to.</h2>
+      <p class="m-text">Research in ${esc(area.name.toLowerCase())} follows the published international standards below, so its methods and results can be compared and trusted anywhere.</p>
+    </header>
+    <ul class="ra-std">
+      ${area.standards.map(std).join('\n      ')}
+    </ul>
+    <p class="m-text-3 ra-std-all">Across every group</p>
+    <ul class="ra-std">
+      ${RG_COMMON.map(std).join('\n      ')}
+    </ul>
+  </div>
+</section>
+
+<!-- the graphite band: join this area, or step to the areas either side -->
+<section id="contact" class="contact is-area" data-8b-section="contact" aria-labelledby="contact-title">
+  ${rgSeal('band', 'dark')}
+  <div class="wrap ra-band">
+    <div>
+      <h2 id="contact-title" class="m-text-6" data-8b-motion="deboss">Join the ${esc(area.name.toLowerCase())} groups.</h2>
+      <p class="m-text">Send your details and the areas you work in from the sign-up; this area is filled in for you.</p>
+      ${rgBtn(`/research/group?area=${area.slug}#contact`, 'Join this area')}
+    </div>
+    <nav class="ra-steps" aria-label="Other research areas">
+      ${step(prev, 'prev')}
+      ${step(next, 'next')}
+    </nav>
+  </div>
+</section>`;
+  return rgPage({ title: area.name + ' · Research Group', desc,
+    links: [['/research/group#states', 'All areas'], ['#groups', 'Groups'], ['#standards', 'Standards'], ['/research', 'Papers']],
+    cta: [`/research/group?area=${area.slug}#contact`, 'Join this area'], body });
+};
+
+exports.researchGroup = () => {
+  const desc = 'Explore diverse research projects: NIIP’s research groups in six areas, with the reports of government and operators alongside.';
+  const links = [['#states', 'Groups'], ['#modes', 'Ways in'], ['#dimmer', 'Next wave'], ['#material', 'Pillars'], ['#faq', 'FAQ'], ['/research', 'Papers']];
+  // each area key opens its area's page; the last two keys send a paper or go to the sign-up
+  const linkKey = (href, label, state, data = '') => `<li class="states__slot"><a class="m-key-2" href="${href}"${data}><span class="m-key-2__cap" aria-hidden="true"><span class="m-key-2__dent"></span></span><span class="m-key-2__label">${esc(label)}</span><span class="m-key-2__state">${esc(state)}</span></a></li>`;
+  const areaKey = (a) => linkKey(`/research/group/${a.slug}`, a.name, `${a.groups.length} groups`, ` data-slug="${a.slug}" data-area="${esc(a.name)}"`);
   const way = (dir, label, title, text, href, go, key, alt, w, h) => `<li class="modes__item" data-dir="${dir}">
             ${rgPhoto('modes__photo', key, alt, w, h)}
             <div class="m-surface modes__caption">
@@ -2629,55 +3070,12 @@ exports.researchGroup = () => {
         <summary><span>${q}</span>${rgFaqKey}</summary>
         <p class="m-text">${a}</p>
       </details>`;
-  return `<!doctype html>
-<!--
-  Free website template by 8B: https://8b.com/templates/hushkey/
-  Source: https://github.com/8bsite/product-landing-page-template
-  MIT License (code) https://8b.com/ · Fonts: Google Fonts (OFL) · Photos: NIIP's own (Image Library)
-  Notices: public/rg/rg.css and public/rg/rg.js.
--->
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Research Group · NIIP</title>
-<meta name="description" content="${esc(desc)}">
-<meta name="generator" content="8B Templates">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Research Group · NIIP">
-<meta property="og:description" content="${esc(desc)}">
-<meta name="twitter:card" content="summary">
-${FAVICON}
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="https://fonts.gstatic.com/s/mozillaheadline/v1/QGYLz-UXahmCOps4kyMKGuSA9pYt2_P-w2kFrS88o6dLYRvBSDSOuerB_FOBB4ElYhZu.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="https://fonts.gstatic.com/s/mozillatext/v1/SZc-3FrnJ7S7WZIff2mJ7TbD7xNK.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/rg/rg.css?v=${ASSET_V}">
-</head>
-<body>
-<!-- navigation: the NIIP wordmark, the page's sections, Join a group; phone menu overlay -->
-<header id="nav" class="nav" data-8b-section="navigation">
-  <div class="nav__bar m-surface">
-    <a class="nav__brand" href="/" aria-label="NIIP home"><img src="/img/brand/niip-seal-256.webp?v=${ASSET_V}" alt="" width="36" height="36">NIIP</a>
-    <nav class="nav__links" id="menu" aria-label="Main">
-      <div class="nav__menu-head">
-        <span class="nav__menu-title" aria-hidden="true">NIIP</span>
-        <button class="m-key nav__close" type="button" aria-label="Close menu"><span class="m-key__cap" aria-hidden="true"><span class="m-key__dent"></span></span><span class="m-key__label" aria-hidden="true">${RG_G.close}</span></button>
-      </div>
-      <ul>
-        ${linkList}
-      </ul>
-    </nav>
-    ${rgBtn('#contact', 'Join a group').replace('class="m-btn"', 'class="m-btn nav__cta"')}
-    <button class="m-key nav__open" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span class="m-key__cap" aria-hidden="true"><span class="m-key__dent"></span></span><span class="m-key__label" aria-hidden="true">${RG_G.menu}</span></button>
-  </div>
-</header>
-<main id="main">
-<!-- hero: headline, two buttons, the key panel drawn in HTML/CSS, its pad lettered with research areas -->
+  return rgPage({ title: 'Research Group', desc, links, cta: ['#contact', 'Join a group'], body: `<!-- hero: headline, two buttons, the key panel drawn in HTML/CSS, its pad lettered with research areas -->
 <section id="hero" class="hero" data-8b-section="hero" aria-labelledby="hero-title">
   ${rgSeal('hero', 'light', true)}
   <div class="hero__inner wrap">
     <div class="hero__copy">
-      <h1 id="hero-title" class="m-text-2 hero__title"><span class="hero__line">Six areas.</span> <span class="hero__line">One research</span> <span class="hero__line">hub.</span></h1>
+      <h1 id="hero-title" class="m-text-2 hero__title"><span class="hero__line">Explore Diverse</span> <span class="hero__line">Research</span> <span class="hero__line">Projects</span></h1>
       <p class="m-text-3 hero__caption">NIIP Research Groups</p>
       <p class="m-text-7 hero__lede">The Research Hub puts Liberia’s ICT research in one place: search papers, submit papers and join research groups, with the reports of government and operators alongside.</p>
       <div class="hero__actions">
@@ -2724,14 +3122,14 @@ ${FAVICON}
 <section id="states" class="states" data-8b-section="states" aria-labelledby="states-title">
   <div class="states__inner wrap">
     <header class="states__head">
-      <h2 id="states-title" class="m-text-2" data-8b-motion="deboss">Press the areas you work in.</h2>
-      <p class="m-text">Each research group gathers around one of NIIP’s six research areas. A raised key is open; press it and it stays down, and it travels with you to the sign-up at the foot of the page.</p>
-      <p class="m-text-8">Press a key again to lift it. All six presses every area; Clear lifts them all.</p>
+      <h2 id="states-title" class="m-text-2" data-8b-motion="deboss">Our Current Research Areas.</h2>
+      <p class="m-text">Each research group gathers around one of NIIP’s six research areas. Press an area to open its groups: the question each one is working on, and the people in it.</p>
+      <p class="m-text-8">The last two keys send a paper of your own, or go straight to the sign-up.</p>
     </header>
     <ul class="states__keys">
       ${RG_AREAS.map(areaKey).join('\n      ')}
-      <li class="states__slot"><button class="m-key-2" type="button" data-all-on><span class="m-key-2__cap" aria-hidden="true"><span class="m-key-2__dent"></span></span><span class="m-key-2__label">All six</span><span class="m-key-2__state" aria-hidden="true"><span class="m-key-2__off">Picks all</span><span class="m-key-2__on">Picked</span></span></button></li>
-      <li class="states__slot"><button class="m-key-2" type="button" data-all-off><span class="m-key-2__cap" aria-hidden="true"><span class="m-key-2__dent"></span></span><span class="m-key-2__label">Clear</span><span class="m-key-2__state" aria-hidden="true"><span class="m-key-2__off">Lifts all</span><span class="m-key-2__on">Lifted</span></span></button></li>
+      ${linkKey('/research/submit', 'Submit a paper', 'No account')}
+      ${linkKey('#contact', 'Join a group', 'Sign-up')}
     </ul>
   </div>
 </section>
@@ -2762,7 +3160,7 @@ ${FAVICON}
         </div>
         <ol class="modes__list">
           ${way('up', 'Up', 'Search papers', 'The research library gathers the papers on Liberia’s ICT sector, each with NIIS’s own summary.', '/research', 'Open the library', 'search', 'A young woman and a young man working side by side at their laptops', 860, 574)}
-          ${way('right', 'Right', 'Join a group', 'Press the areas you work in, add your details at the foot of the page, and send the request to the program.', '#contact', 'Go to the sign-up', 'join', 'Young people working together at laptops around a shared table', 1024, 683)}
+          ${way('right', 'Right', 'Join a group', 'Open an area, meet its groups, then send your details from the foot of this page.', '#contact', 'Go to the sign-up', 'join', 'Young people working together at laptops around a shared table', 1024, 683)}
           ${way('down', 'Down', 'Submit a paper', 'Anyone can submit, no account needed. A reviewer reads every paper before it goes into the library.', '/research/submit', 'Submit a paper', 'submit', 'A smiling young woman in red glasses at her laptop, a colleague working behind her', 900, 600)}
           ${way('left', 'Left', 'The next wave', 'The Research Hub backs the next wave of Liberian researchers in AI and new technology.', '/careers/programs', 'See the programs', 'next', 'A mentor leaning in to help three students at a laptop', 668, 460)}
         </ol>
@@ -2877,7 +3275,7 @@ ${FAVICON}
         </div>
         <div class="editions__body">
           <h3 class="m-text-5">Join a group</h3>
-          <p class="m-text-8">Press your areas above, then send your details to the program.</p>
+          <p class="m-text-8">Open an area above to meet its groups, then send your details to the program.</p>
           <p class="editions__price">6 areas</p>
           ${rgBtn('#contact', 'Join a group')}
         </div>
@@ -2914,7 +3312,7 @@ ${FAVICON}
     </header>
     <div class="faq__list">
       ${faq('What is the Research Hub?', 'The part of NIIP that puts Liberia’s ICT research in one place: search papers, submit papers and join research groups, with the reports of government and operators alongside.')}
-      ${faq('Which areas do the groups cover?', 'Six: artificial intelligence, data science, cybersecurity, connectivity, digital finance and emerging tech.')}
+      ${faq('Which areas do the groups cover?', 'Six: artificial intelligence, data science, cybersecurity, connectivity, digital finance and emerging tech. Press any area above to meet its groups.')}
       ${faq('Do I need an account?', 'No. The library is open to read, and anyone can submit a paper without one.')}
       ${faq('What happens after I submit a paper?', 'A reviewer reads every paper before it goes into the NIIS research library, and the outcome is sent to the email address you give.')}
       ${faq('Can a group use NIIS data?', 'The national figures are open in the <a class="m-link" href="/data">Data Explorer</a>. Only aggregate statistics are published; personal data is protected under the Data Protection Act.')}
@@ -2939,7 +3337,7 @@ ${FAVICON}
       <div class="contact__field" data-8b-motion="rise"><label class="m-text-4" for="contact-name">Name</label><input class="m-field" id="contact-name" name="name" type="text" autocomplete="name" required></div>
       <div class="contact__field" data-8b-motion="rise"><label class="m-text-4" for="contact-email">Email</label><input class="m-field" id="contact-email" name="email" type="email" autocomplete="email" required></div>
       <div class="contact__field" data-8b-motion="rise"><label class="m-text-4" for="contact-org">Institution</label><input class="m-field" id="contact-org" name="org" type="text" autocomplete="organization" placeholder="Optional"></div>
-      <div class="contact__field" data-8b-motion="rise"><label class="m-text-4" for="join-groups">Research areas</label><input class="m-field" id="join-groups" name="groups" type="text" placeholder="Press the keys above, or type them"></div>
+      <div class="contact__field" data-8b-motion="rise"><label class="m-text-4" for="join-groups">Research areas</label><input class="m-field" id="join-groups" name="groups" type="text" placeholder="Type the areas, or join from an area’s page"></div>
       <div class="contact__field contact__field--wide" data-8b-motion="rise"><label class="m-text-4" for="contact-topic">About</label><select class="m-field" id="contact-topic" name="topic"><option>Joining a research group</option><option>Submitting a paper</option><option>Something else</option></select></div>
       <div class="contact__field contact__field--wide" data-8b-motion="rise"><label class="m-text-4" for="contact-message">Message</label><textarea class="m-field" id="contact-message" name="message" rows="5" required></textarea></div>
       <div class="contact__actions">
@@ -2948,37 +3346,7 @@ ${FAVICON}
       </div>
     </form>
   </div>
-</section>
-</main>
-
-<!-- footer: width-filling RESEARCH wordmark, links back into the site, the Design: 8B credit -->
-<footer id="footer" class="footer" data-8b-section="footer">
-  <div class="footer__inner wrap">
-    <p class="m-text-6 footer__mark" style="--len:8">RESEARCH</p>
-    <div class="footer__row">
-      <p class="m-text-3">NIIP Research Groups</p>
-      <nav class="footer__links" aria-label="Footer">
-        <ul>
-          <li><a class="m-link" href="/">Home</a></li>
-          <li><a class="m-link" href="/research">Research papers</a></li>
-          <li><a class="m-link" href="/research/submit">Submit a paper</a></li>
-          <li><a class="m-link" href="/reports">ICT Reports</a></li>
-          <li><a class="m-link" href="/data">Data Explorer</a></li>
-          <li><a class="m-link" href="/about">About</a></li>
-        </ul>
-      </nav>
-      <p class="m-text-9">© 2026 National ICT Intelligence Program, Monrovia · Design: <a href="https://8b.com/" style="color:inherit" data-8b-credit>8B</a></p>
-    </div>
-  </div>
-</footer>
-
-<script src="/assets/vendor/gsap/gsap.min.js?v=3.13.0"></script>
-<script src="/assets/vendor/gsap/ScrollTrigger.min.js?v=3.13.0"></script>
-<script src="/assets/vendor/gsap/SplitText.min.js?v=3.13.0"></script>
-<script src="/assets/vendor/lenis/lenis.min.js?v=1.3.27"></script>
-<script src="/assets/rg/rg.js?v=${ASSET_V}"></script>
-</body>
-</html>`;
+</section>` });
 };
 
 exports.research = (ctx, { papers = [], canManage = false, canSubmit = false, notice = '' }) => {

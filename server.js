@@ -584,6 +584,14 @@ async function handler(req, res) {
         logEvent('page_view', p, user);
         return send(res, 200, views.researchGroup());
       }
+      // an area's own page: its groups, their questions and members, the standards it works to
+      const rgM = /^\/research\/group\/([a-z-]+)$/.exec(p);
+      if (rgM) {
+        const html = views.researchArea(rgM[1]);
+        if (!html) return send(res, 404, views.notFound(ctx));
+        logEvent('page_view', p, user);
+        return send(res, 200, html);
+      }
       if (p === '/research') {
         logEvent('page_view', p, user);
         const canManage = hasPerm(user, 'manage_content');

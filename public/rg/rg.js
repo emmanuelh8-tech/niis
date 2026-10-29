@@ -52,24 +52,19 @@
 })();
 /* ---- section-script:states ---- */
 (() => {
-  // NIIP: the six area keys toggle; All six presses every one, Clear lifts them all, and the areas that
-  // are down are written into the sign-up form's Research areas field at the foot of the page.
-  const keys = [...document.querySelectorAll('#states .m-key-2')];
-  const areas = keys.filter(key => key.hasAttribute('aria-pressed'));
+  // NIIP: each area key opens that area's page. Coming back from an area page's Join link (?area=<slug>),
+  // the area is written into the sign-up form's Research areas field.
   const field = document.getElementById('join-groups');
-  const sync = () => { if (field) field.value = areas.filter(key => key.getAttribute('aria-pressed') === 'true').map(key => key.dataset.area).join(', '); };
-  keys.forEach(key => key.addEventListener('click', () => {
-    if (key.hasAttribute('data-all-off')) areas.forEach(area => area.setAttribute('aria-pressed', 'false'));
-    else if (key.hasAttribute('data-all-on')) areas.forEach(area => area.setAttribute('aria-pressed', 'true'));
-    else key.setAttribute('aria-pressed', String(key.getAttribute('aria-pressed') !== 'true'));
-    sync();
-  }));
+  const slug = new URLSearchParams(location.search).get('area');
+  const key = slug && [...document.querySelectorAll('#states [data-slug]')].find(k => k.dataset.slug === slug);
+  if (field && key) field.value = key.dataset.area;
 })();
 /* ---- section-script:contact ---- */
 (() => {
   // NIIP: the site keeps no sign-up list yet, so a valid form is written out as an email to the program
   // (the address in data-to) and opens in the reader's own email app, to send from there.
   const form = document.querySelector('#contact .contact__form');
+  if (!form) return;
   const status = form.querySelector('.contact__status');
   form.addEventListener('submit', event => {
     event.preventDefault();
@@ -229,6 +224,7 @@ const motionHelpers = {
   });
 });
 /* ---- scene:hero ---- */
+if (document.getElementById('hero')) {
 queueMotion(() => {
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
     if (!adjacent('hero', 'states')) return;
@@ -252,7 +248,9 @@ queueMotion(() => {
     keys.forEach((key, index) => timeline.add(motionHelpers.press(key, true, .3), .04 + index * (.62 / keys.length)));
   });
 }, { first: true, id: 'scene:hero' });
+}
 /* ---- scene:states ---- */
+if (document.getElementById('states')) {
 queueMotion(() => {
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
     if (!adjacent('hero', 'states')) return;
@@ -275,7 +273,9 @@ queueMotion(() => {
     return () => layer(false);
   });
 }, { first: true, id: 'scene:states' });
+}
 /* ---- scene:modes ---- */
+if (document.getElementById('modes')) {
 queueMotion(() => {
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
     const modes = document.getElementById('modes');
@@ -300,7 +300,9 @@ queueMotion(() => {
     return () => modes.removeAttribute('data-stage');
   });
 }, { id: 'scene:modes' });
+}
 /* ---- scene:dimmer ---- */
+if (document.getElementById('dimmer')) {
 queueMotion(() => {
   gsap.matchMedia().add({
     wide: '(prefers-reduced-motion: no-preference) and (min-width: 900px)',
@@ -322,7 +324,9 @@ queueMotion(() => {
       .add(motionHelpers.press(plus, false, .08), .92);
   });
 }, { id: 'scene:dimmer' });
+}
 /* ---- scene:chords ---- */
+if (document.getElementById('chords')) {
 queueMotion(() => {
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
     const chords = document.getElementById('chords');
@@ -357,7 +361,9 @@ queueMotion(() => {
     return () => { chords.removeAttribute('data-stage'); path.setAttribute('d', restPath); };
   });
 }, { id: 'scene:chords' });
+}
 /* ---- scene:editions ---- */
+if (document.getElementById('editions')) {
 queueMotion(() => {
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
     const editions = document.getElementById('editions');
@@ -377,7 +383,9 @@ queueMotion(() => {
     }
   });
 }, { id: 'scene:editions' });
+}
 /* ---- scene:faq ---- */
+if (document.getElementById('faq')) {
 queueMotion(() => {
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
     if (!adjacent('editions', 'faq')) return;
@@ -406,7 +414,9 @@ queueMotion(() => {
     return () => { faq.removeAttribute('data-flood'); faq.style.removeProperty('--faq-reach'); };
   });
 }, { id: 'scene:faq' });
+}
 /* ---- scene:footer ---- */
+if (document.getElementById('footer')) {
 queueMotion(() => {
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
     const footer = document.getElementById('footer');
@@ -423,3 +433,4 @@ queueMotion(() => {
     return () => split.revert();
   });
 }, { near: document.getElementById('footer'), id: 'scene:footer' });
+}

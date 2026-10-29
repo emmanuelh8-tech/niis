@@ -171,7 +171,7 @@ function mainNav(active, q) {
     ['/', 'Home', 'home', null, 'Home'],
     ['/data', 'Data Explorer', 'bars', [['/landscape', 'Data Landscape', 'layers']], 'Data'],
     ['/reports', 'ICT Reports', 'chart', [['/updates', 'News & Updates', 'doc']], 'Reports'],
-    ['/research', 'Research', 'doc', [['/research/submit', 'Submit Paper', 'plus']], 'Research'],
+    ['/research', 'Research', 'doc', [['/research/submit', 'Submit Paper', 'plus'], ['/research/group', 'Research Group', 'users']], 'Research'],
     ['/partners', 'Our Partners', 'globe', null, 'Partners'],
     ['/careers', 'Careers', 'briefcase', [['/careers/programs', 'Programs', 'calendar']], 'Careers'],
     ['/about', 'About', 'info', [['/about/team#team', 'Our Team', 'users', '/about/team'], ['/about/team#patrons', 'ICT Patrons', 'sparkle'], ['/about/team#talent', 'ICT Talent Pool', 'code']], 'About'],
@@ -253,6 +253,7 @@ function footerDh() {
         <a href="/about">Ministry of Posts &amp; Telecommunications</a>
         <a href="/about">Harris &amp; Associates LLC</a>
         <a href="/research">Research Papers</a>
+        <a href="/research/group">Research Group</a>
         <a href="/updates">Updates</a>
       </div>
     </div>
@@ -2570,6 +2571,411 @@ function rpJournalCover(p) {
 }
 // the date, the journal and the authors under a paper's headline, in the news rows' format
 const rsMeta = (p) => `<span class="bbc-meta"><time datetime="${esc(p.published_on)}">${esc(p.when)}</time><span class="bbc-sep" aria-hidden="true"></span><span>${esc(p.venue)}</span><span class="bbc-sep" aria-hidden="true"></span><span>${esc(p.short)}</span></span>`;
+// ============ RESEARCH GROUP (/research/group) ============
+// The owner asked for this page in the design of the free 8B "Hushkey" product landing template, the
+// whole of it: its soft grey keys, its floating bar, its scroll scenes and its graphite foot. So it is a
+// page of its own rather than one inside the site's shell, the bar and the footer leading back into the
+// site. The template's CSS and scripts are public/rg/rg.css and rg.js (MIT, the notice kept); GSAP and
+// Lenis are self-hosted in public/vendor. Every line of copy comes from NIIP's own material: the program
+// booklet (the Research Hub, the three pillars, the training, the contact details), the deck's six
+// research areas, and the site's Submit a Paper page (anyone can submit; a reviewer reads every paper).
+// The photos are slots in the Image Library (researchGroup). The site keeps no sign-up list yet, so the
+// form writes the request out as an email to the program.
+const RG_CONTACT = { email: 'info@niip.org', phones: ['0888 771 973', '0777 129 261'], office: 'Monrovia, Liberia' };
+const RG_AREAS = ['Artificial intelligence', 'Data science', 'Cybersecurity', 'Connectivity', 'Digital finance', 'Emerging tech'];
+const RG_G = {
+  up: '<svg viewBox="0 0 24 24"><path d="M12 6.5 19 17H5z"/></svg>',
+  left: '<svg viewBox="0 0 24 24"><path d="M6.5 12 17 5v14z"/></svg>',
+  right: '<svg viewBox="0 0 24 24"><path d="M17.5 12 7 19V5z"/></svg>',
+  down: '<svg viewBox="0 0 24 24"><path d="M12 17.5 5 7h14z"/></svg>',
+  play: '<svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg>',
+  pause: '<svg viewBox="0 0 24 24"><path d="M7.5 6h3v12h-3zm6 0h3v12h-3z"/></svg>',
+  plus: '<svg viewBox="0 0 24 24"><path d="M11 5h2v14h-2zM5 11h14v2H5z"/></svg>',
+  minus: '<svg viewBox="0 0 24 24"><path d="M5 11h14v2H5z"/></svg>',
+  close: '<svg viewBox="0 0 24 24"><path d="M6.3 4.9 12 10.6l5.7-5.7 1.4 1.4-5.7 5.7 5.7 5.7-1.4 1.4-5.7-5.7-5.7 5.7-1.4-1.4 5.7-5.7-5.7-5.7z"/></svg>',
+  menu: '<svg viewBox="0 0 24 24"><path d="M4 7.5h16v2H4zm0 7h16v2H4z"/></svg>',
+  // the hero's two round keys: search the library, and a page to submit
+  search: '<svg viewBox="0 0 24 24"><path d="M10.5 4a6.5 6.5 0 0 1 5.2 10.4l4.5 4.5-1.4 1.4-4.5-4.5A6.5 6.5 0 1 1 10.5 4zm0 2a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9z"/></svg>',
+  page: '<svg viewBox="0 0 24 24"><path fill-rule="evenodd" d="M6 3h8.5L18 6.5V21H6zM14 3.5V7h3.5z"/></svg>',
+};
+const rgKey = (cls, label) => `<span class="m-key ${cls}"><span class="m-key__cap"><span class="m-key__dent"></span></span><span class="m-key__label">${label}</span></span>`;
+const rgKey3 = (cls, label) => `<span class="m-key-3 ${cls}"><span class="m-key-3__cap"><span class="m-key-3__dent"></span></span><span class="m-key-3__label">${label}</span></span>`;
+const rgBtn = (href, label, cls = 'm-btn') => `<a class="${cls}" href="${href}"><span class="${cls}__dent" aria-hidden="true"></span><span class="${cls}__label">${label}</span></a>`;
+const rgPhoto = (cls, key, alt, w, h, motion = '') => `<figure class="m-photo ${cls}"${motion}><img src="${esc(imgs.url('researchGroup', key))}" alt="${esc(alt)}" width="${w}" height="${h}" loading="lazy" decoding="async"></figure>`;
+const rgPanel = (k) => [['e-up', RG_G.up], ['e-left', RG_G.left], ['e-ok', 'OK'], ['e-right', RG_G.right], ['e-down', RG_G.down], ['e-prev', RG_G.left],
+  ['e-next', RG_G.right], ['e-play', RG_G.play], ['e-pause', RG_G.pause], ['e-plus', RG_G.plus], ['e-minus', RG_G.minus]].map(([c, l]) => k(c, l)).join('\n          ');
+const rgFaqKey = `<span class="m-key-3" aria-hidden="true"><span class="m-key-3__cap"><span class="m-key-3__dent"></span></span><span class="m-key-3__label"><svg class="is-plus" viewBox="0 0 24 24"><path d="M11 5h2v14h-2zM5 11h14v2H5z"/></svg><svg class="is-minus" viewBox="0 0 24 24"><path d="M5 11h14v2H5z"/></svg></span></span>`;
+const rgOff = `<span class="quiet__off" aria-hidden="true" data-8b-motion="contour"><span class="m-tick"><span class="m-tick__label">Off</span><span class="m-tick__line" aria-hidden="true"></span></span><span class="m-key is-on"><span class="m-key__cap"><span class="m-key__dent"></span></span><span class="m-key__label"></span></span></span>`;
+const rgMini = `<svg class="chords__mini" viewBox="0 0 20 20" aria-hidden="true" data-8b-motion="contour"><path d="M 5.4 9 C 5.5 11 5.3 11.2 4.4 12 A 3.6 3.6 0 1 0 10 16.2 C 10.5 15 10.7 14.7 12.6 14.2 A 5.8 5.8 0 1 0 5.4 9 Z"/><circle cx="11.2" cy="8.6" r="4.6"/><circle cx="6.73" cy="14.74" r="2.6"/></svg>`;
+
+exports.researchGroup = () => {
+  const desc = 'NIIP’s research groups: six research areas, one Research Hub. Search papers, submit papers and join a group, with the reports of government and operators alongside.';
+  const links = [['#states', 'Groups'], ['#modes', 'Ways in'], ['#dimmer', 'Next wave'], ['#material', 'Pillars'], ['#faq', 'FAQ'], ['/research', 'Papers']];
+  const linkList = links.map(([h, t]) => `<li><a class="m-link" href="${h}">${t}</a></li>`).join('\n        ');
+  const areaKey = (a) => `<li class="states__slot"><button class="m-key-2" type="button" aria-pressed="false" data-area="${esc(a)}"><span class="m-key-2__cap" aria-hidden="true"><span class="m-key-2__dent"></span></span><span class="m-key-2__label">${esc(a)}</span><span class="m-key-2__state" aria-hidden="true"><span class="m-key-2__off">Open</span><span class="m-key-2__on">Picked</span></span></button></li>`;
+  const way = (dir, label, title, text, href, go, key, alt, w, h) => `<li class="modes__item" data-dir="${dir}">
+            ${rgPhoto('modes__photo', key, alt, w, h)}
+            <div class="m-surface modes__caption">
+              <span class="m-text-4">${label}</span>
+              <h3 class="m-text-5">${title}</h3>
+              <p class="m-text-8">${text}</p>
+              <a class="m-link" href="${href}">${go}</a>
+            </div>
+          </li>`;
+  const faq = (q, a) => `<details class="faq__item" data-8b-motion="rise">
+        <summary><span>${q}</span>${rgFaqKey}</summary>
+        <p class="m-text">${a}</p>
+      </details>`;
+  return `<!doctype html>
+<!--
+  Free website template by 8B: https://8b.com/templates/hushkey/
+  Source: https://github.com/8bsite/product-landing-page-template
+  MIT License (code) https://8b.com/ · Fonts: Google Fonts (OFL) · Photos: NIIP's own (Image Library)
+  Notices: public/rg/rg.css and public/rg/rg.js.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Research Group · NIIP</title>
+<meta name="description" content="${esc(desc)}">
+<meta name="generator" content="8B Templates">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Research Group · NIIP">
+<meta property="og:description" content="${esc(desc)}">
+<meta name="twitter:card" content="summary">
+${FAVICON}
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.gstatic.com/s/mozillaheadline/v1/QGYLz-UXahmCOps4kyMKGuSA9pYt2_P-w2kFrS88o6dLYRvBSDSOuerB_FOBB4ElYhZu.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://fonts.gstatic.com/s/mozillatext/v1/SZc-3FrnJ7S7WZIff2mJ7TbD7xNK.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/rg/rg.css?v=${ASSET_V}">
+</head>
+<body>
+<!-- navigation: the NIIP wordmark, the page's sections, Join a group; phone menu overlay -->
+<header id="nav" class="nav" data-8b-section="navigation">
+  <div class="nav__bar m-surface">
+    <a class="nav__brand" href="/" aria-label="NIIP home"><img src="/img/brand/niip-seal-256.webp?v=${ASSET_V}" alt="" width="36" height="36">NIIP</a>
+    <nav class="nav__links" id="menu" aria-label="Main">
+      <div class="nav__menu-head">
+        <span class="nav__menu-title" aria-hidden="true">NIIP</span>
+        <button class="m-key nav__close" type="button" aria-label="Close menu"><span class="m-key__cap" aria-hidden="true"><span class="m-key__dent"></span></span><span class="m-key__label" aria-hidden="true">${RG_G.close}</span></button>
+      </div>
+      <ul>
+        ${linkList}
+      </ul>
+    </nav>
+    ${rgBtn('#contact', 'Join a group').replace('class="m-btn"', 'class="m-btn nav__cta"')}
+    <button class="m-key nav__open" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span class="m-key__cap" aria-hidden="true"><span class="m-key__dent"></span></span><span class="m-key__label" aria-hidden="true">${RG_G.menu}</span></button>
+  </div>
+</header>
+<main id="main">
+<!-- hero: headline, two buttons, the key panel drawn in HTML/CSS, its pad lettered with research areas -->
+<section id="hero" class="hero" data-8b-section="hero" aria-labelledby="hero-title">
+  <div class="hero__inner wrap">
+    <div class="hero__copy">
+      <h1 id="hero-title" class="m-text-2 hero__title"><span class="hero__line">Six areas.</span> <span class="hero__line">One research</span> <span class="hero__line">hub.</span></h1>
+      <p class="m-text-3 hero__caption">NIIP Research Groups</p>
+      <p class="m-text-7 hero__lede">The Research Hub puts Liberia’s ICT research in one place: search papers, submit papers and join research groups, with the reports of government and operators alongside.</p>
+      <div class="hero__actions">
+        ${rgBtn('#contact', 'Join a group')}
+        <a class="m-link" href="#states">Meet the groups</a>
+      </div>
+      <p class="m-text-8 hero__note">Part of the National ICT Intelligence Program.</p>
+    </div>
+    <div class="hero__stage" aria-hidden="true">
+      <div class="hero__panel">
+        <div class="hero__cluster hero__pad">
+          <span class="hero__diamond"></span>
+          ${rgKey('hero__k-up', 'AI')}
+          ${rgKey('hero__k-left', 'Data')}
+          ${rgKey('hero__k-ok', 'Go')}
+          ${rgKey('hero__k-right', 'Cyber')}
+          ${rgKey('hero__k-down', 'Net')}
+          <span class="hero__pad-dent"></span>
+        </div>
+        <div class="hero__cluster hero__seg">
+          <span class="m-well">
+            ${rgKey('', RG_G.left)}
+            ${rgKey('', RG_G.right)}
+          </span>
+          <span class="hero__seg-dent"></span>
+        </div>
+        <div class="hero__cluster hero__play">
+          <svg class="hero__contour" viewBox="0 0 38 33" preserveAspectRatio="none"><path d="M 21.2 18.1 C 21.1 20.2 20.8 20.4 19.9 21.1 A 3.6 3.6 0 1 0 25 26.1 C 25.7 25.2 25.9 24.9 27.9 24.8 A 6.3 6.3 0 1 0 21.2 18.1 Z"/></svg>
+          ${rgKey('hero__k-play', RG_G.search)}
+          ${rgKey('hero__k-pause', RG_G.page)}
+        </div>
+        <div class="hero__cluster hero__steps">
+          <span class="m-well">
+            ${rgKey('', RG_G.plus)}
+            ${rgKey('is-on', RG_G.minus)}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- states: the six research areas as toggle keys, with All six and Clear; pressed ones fill the form -->
+<section id="states" class="states" data-8b-section="states" aria-labelledby="states-title">
+  <div class="states__inner wrap">
+    <header class="states__head">
+      <h2 id="states-title" class="m-text-2" data-8b-motion="deboss">Press the areas you work in.</h2>
+      <p class="m-text">Each research group gathers around one of NIIP’s six research areas. A raised key is open; press it and it stays down, and it travels with you to the sign-up at the foot of the page.</p>
+      <p class="m-text-8">Press a key again to lift it. All six presses every area; Clear lifts them all.</p>
+    </header>
+    <ul class="states__keys">
+      ${RG_AREAS.map(areaKey).join('\n      ')}
+      <li class="states__slot"><button class="m-key-2" type="button" data-all-on><span class="m-key-2__cap" aria-hidden="true"><span class="m-key-2__dent"></span></span><span class="m-key-2__label">All six</span><span class="m-key-2__state" aria-hidden="true"><span class="m-key-2__off">Picks all</span><span class="m-key-2__on">Picked</span></span></button></li>
+      <li class="states__slot"><button class="m-key-2" type="button" data-all-off><span class="m-key-2__cap" aria-hidden="true"><span class="m-key-2__dent"></span></span><span class="m-key-2__label">Clear</span><span class="m-key-2__state" aria-hidden="true"><span class="m-key-2__off">Lifts all</span><span class="m-key-2__on">Lifted</span></span></button></li>
+    </ul>
+  </div>
+</section>
+
+<!-- modes: sticky stage; the pad drives the four ways into the Research Hub -->
+<section id="modes" class="modes" data-8b-section="modes" aria-labelledby="modes-title">
+  <div class="modes__inner wrap">
+    <header class="modes__head">
+      <h2 id="modes-title" class="m-text-2" data-8b-motion="deboss">One hub. Four ways in.</h2>
+      <p class="m-text">Search the library, join a group, send a paper of your own, or learn with the next wave. Each direction on the pad opens one of them.</p>
+    </header>
+    <div class="modes__track">
+      <div class="modes__stage">
+        <div class="modes__pad-wrap">
+          <div class="modes__pad" aria-hidden="true">
+            <span class="modes__diamond"></span>
+            ${rgKey('modes__k-up', RG_G.up)}
+            ${rgKey('modes__k-left', RG_G.left)}
+            ${rgKey('modes__k-ok', 'OK')}
+            ${rgKey('modes__k-right', RG_G.right)}
+            ${rgKey('modes__k-down', RG_G.down)}
+            <span class="m-text-4 modes__dir modes__dir--up">Search</span>
+            <span class="m-text-4 modes__dir modes__dir--right">Join</span>
+            <span class="m-text-4 modes__dir modes__dir--down">Submit</span>
+            <span class="m-text-4 modes__dir modes__dir--left">Learn</span>
+          </div>
+          <p class="m-text-8 modes__hint">Anyone can submit a paper; no account is needed.</p>
+        </div>
+        <ol class="modes__list">
+          ${way('up', 'Up', 'Search papers', 'The research library gathers the papers on Liberia’s ICT sector, each with NIIS’s own summary.', '/research', 'Open the library', 'search', 'A young woman and a young man working side by side at their laptops', 860, 574)}
+          ${way('right', 'Right', 'Join a group', 'Press the areas you work in, add your details at the foot of the page, and send the request to the program.', '#contact', 'Go to the sign-up', 'join', 'Young people working together at laptops around a shared table', 1024, 683)}
+          ${way('down', 'Down', 'Submit a paper', 'Anyone can submit, no account needed. A reviewer reads every paper before it goes into the library.', '/research/submit', 'Submit a paper', 'submit', 'A smiling young woman in red glasses at her laptop, a colleague working behind her', 900, 600)}
+          ${way('left', 'Left', 'The next wave', 'The Research Hub backs the next wave of Liberian researchers in AI and new technology.', '/careers/programs', 'See the programs', 'next', 'A mentor leaning in to help three students at a laptop', 668, 460)}
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- dimmer: fader + plus key over one photo, grey to colour on scroll -->
+<section id="dimmer" class="dimmer" data-8b-section="dimmer" aria-labelledby="dimmer-title">
+  <div class="dimmer__inner wrap">
+    <header class="dimmer__head">
+      <h2 id="dimmer-title" class="m-text-2" data-8b-motion="deboss">Start with a circuit. End with a paper.</h2>
+      <p class="m-text">Training runs beside the research: nine professional diplomas, from data engineering to cybersecurity and cloud computing, with leading universities around the world.</p>
+    </header>
+    <div class="dimmer__rig">
+      ${rgPhoto('dimmer__photo', 'build', 'A boy smiling at the robot car he is building, beside a laptop, his friends around him', 644, 476)}
+      <div class="dimmer__fader" aria-hidden="true">
+        <span class="m-tick"><span class="m-tick__label">Level</span><span class="m-tick__line" aria-hidden="true"></span></span>
+        <div class="dimmer__groove"><span class="dimmer__thumb"></span></div>
+        <span class="m-well dimmer__steps">${rgKey('dimmer__plus', RG_G.plus)}${rgKey('dimmer__minus', RG_G.minus)}</span>
+      </div>
+    </div>
+    <ul class="dimmer__notes">
+      <li class="dimmer__note"><span class="m-text-4">Learn</span><p class="m-text-8">Nine professional diplomas, from data engineering to cybersecurity and cloud computing.</p></li>
+      <li class="dimmer__note"><span class="m-text-4">Research</span><p class="m-text-8">Papers searched, submitted and reviewed in one library, beside the national figures.</p></li>
+      <li class="dimmer__note"><span class="m-text-4">Work</span><p class="m-text-8">A path to 175+ estimated jobs for young Liberians, recruited county by county.</p></li>
+    </ul>
+  </div>
+</section>
+
+<!-- quiet: short statement -->
+<section id="quiet" class="quiet" data-8b-section="quiet" aria-labelledby="quiet-title">
+  <div class="quiet__inner wrap">
+    <div class="quiet__lines">
+      <h2 id="quiet-title" class="m-text-2 quiet__line"><span data-8b-motion="deboss">No borrowed numbers.</span>${rgOff}</h2>
+      <p class="m-text-2 quiet__line"><span data-8b-motion="deboss">No lost papers.</span>${rgOff}</p>
+      <p class="m-text-2 quiet__line"><span data-8b-motion="deboss">No account to submit.</span>${rgOff}</p>
+    </div>
+    <p class="m-text quiet__text">For decades, Liberia’s digital story was told with numbers from somewhere else. The Research Hub keeps Liberian research in one place, open to read, beside the national figures it can be tested against.</p>
+  </div>
+</section>
+
+<!-- chords: two keys meet and their outlines melt into one -->
+<section id="chords" class="chords" data-8b-section="chords" aria-labelledby="chords-title">
+  <div class="chords__inner wrap">
+    <header class="chords__head">
+      <h2 id="chords-title" class="m-text-2" data-8b-motion="deboss">A paper and the data. Together, evidence.</h2>
+      <p class="m-text">A paper can be read beside NIIS’s own figures: observed values for all 15 counties, with the method beside every number, open in the Data Explorer.</p>
+    </header>
+    <div class="chords__track">
+      <div class="chords__stage">
+        <div class="chords__art" aria-hidden="true">
+          <svg class="chords__contour" viewBox="0 0 36 34" preserveAspectRatio="none"><path d="M 9.8 15.8 C 10.1 19.2 9.7 19.6 8.2 21.1 A 6.1 6.1 0 1 0 17.9 28.1 C 18.7 26.2 19 25.7 22.4 24.9 A 10.2 10.2 0 1 0 9.8 15.8 Z"/></svg>
+          <span class="m-key is-on chords__a"><span class="m-key__cap"><span class="m-key__dent"></span></span><span class="m-key__label">Data</span></span>
+          <span class="m-key is-on chords__b"><span class="m-key__cap"><span class="m-key__dent"></span></span><span class="m-key__label">Paper</span></span>
+        </div>
+        <p class="m-text-5 chords__result">Data + Paper = <strong>Evidence</strong></p>
+      </div>
+    </div>
+    <ul class="chords__list">
+      <li class="chords__item">${rgMini}<div><h3 class="m-text-5">Evidence</h3><p class="m-text-8"><span class="m-text-4">Paper + Data</span> — a finding checked against the national figures in the Data Explorer.</p></div></li>
+      <li class="chords__item">${rgMini}<div><h3 class="m-text-5">Policy</h3><p class="m-text-8"><span class="m-text-4">Paper + Reports</span> — research read beside the reports of government and operators.</p></div></li>
+      <li class="chords__item">${rgMini}<div><h3 class="m-text-5">Skills</h3><p class="m-text-8"><span class="m-text-4">Group + Training</span> — research groups beside the program’s nine professional diplomas.</p></div></li>
+    </ul>
+  </div>
+</section>
+
+<!-- material: the program's three pillars, each with a photo -->
+<section id="material" class="material" data-8b-section="material" aria-labelledby="material-title">
+  <div class="material__inner wrap">
+    <header class="material__head">
+      <h2 id="material-title" class="m-text-2" data-8b-motion="deboss">Three pillars. One program.</h2>
+      <p class="m-text">Research is one of the three pillars of the National ICT Intelligence Program. NIIS, the system behind it all, turns every source into the figures all three stand on.</p>
+    </header>
+    <ul class="material__list">
+      <li class="material__item material__item--pill">
+        <span class="m-tick" data-8b-motion="contour"><span class="m-tick__label">01</span><span class="m-tick__line" aria-hidden="true"></span></span>
+        ${rgPhoto('material__photo', 'join', 'Young people working together at laptops around a shared table', 1024, 683, ' data-8b-motion="rise"')}
+        <h3 class="m-text-5">Data Mining &amp; Engineering</h3>
+        <p class="m-text-8">County by county, trained field teams collect on tablets, operators and ministries add their returns, and every figure is checked before it is published.</p>
+      </li>
+      <li class="material__item material__item--circle">
+        <span class="m-tick" data-8b-motion="contour"><span class="m-tick__label">02</span><span class="m-tick__line" aria-hidden="true"></span></span>
+        ${rgPhoto('material__photo', 'submit', 'A smiling young woman in red glasses at her laptop', 900, 600, ' data-8b-motion="rise"')}
+        <h3 class="m-text-5">Research &amp; Development</h3>
+        <p class="m-text-8">Search papers, submit papers and join research groups, with the reports of government and operators alongside.</p>
+      </li>
+      <li class="material__item material__item--square">
+        <span class="m-tick" data-8b-motion="contour"><span class="m-tick__label">03</span><span class="m-tick__line" aria-hidden="true"></span></span>
+        ${rgPhoto('material__photo', 'make', 'Girls building an electronics kit together with screwdrivers', 547, 365, ' data-8b-motion="rise"')}
+        <h3 class="m-text-5">Training Programs</h3>
+        <p class="m-text-8">Nine professional diplomas, from data engineering to cybersecurity and cloud computing, with leading universities around the world.</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- editions: the two ways to take part, each on a drawn panel, and the key that floods the FAQ -->
+<section id="editions" class="editions" data-8b-section="editions" aria-labelledby="editions-title">
+  <div class="editions__inner wrap">
+    <header class="editions__head">
+      <h2 id="editions-title" class="m-text-2" data-8b-motion="deboss">Two ways to take part. One library.</h2>
+      <p class="m-text">Work with others in your area, or send a paper of your own. Both lead into the same NIIS research library.</p>
+    </header>
+    <ul class="editions__list">
+      <li class="editions__item editions__item--chalk">
+        <div class="editions__panel" aria-hidden="true">
+          <span class="editions__diamond"></span>
+          ${rgPanel(rgKey)}
+        </div>
+        <div class="editions__body">
+          <h3 class="m-text-5">Join a group</h3>
+          <p class="m-text-8">Press your areas above, then send your details to the program.</p>
+          <p class="editions__price">6 areas</p>
+          ${rgBtn('#contact', 'Join a group')}
+        </div>
+      </li>
+      <li class="editions__item editions__item--graphite">
+        <div class="editions__panel" aria-hidden="true">
+          <span class="editions__diamond"></span>
+          ${rgPanel(rgKey3)}
+        </div>
+        <div class="editions__body">
+          <h3 class="m-text-5">Submit a paper</h3>
+          <p class="m-text-8">Paste your paper into the form; a reviewer reads it before it goes into the library.</p>
+          <p class="editions__price">No account</p>
+          ${rgBtn('/research/submit', 'Submit a paper')}
+        </div>
+      </li>
+    </ul>
+    <p class="m-text-8 editions__terms">Only aggregate statistics are published; personal data is protected under Liberia’s Data Protection Act.</p>
+    <div class="editions__switch" aria-hidden="true">
+      <span class="m-tick"><span class="m-tick__label">Questions</span><span class="m-tick__line" aria-hidden="true"></span></span>
+      <span class="m-key editions__key"><span class="m-key__cap"><span class="m-key__dent"></span></span><span class="m-key__label"></span></span>
+    </div>
+    <div class="editions__floor"></div>
+  </div>
+</section>
+
+<!-- faq: questions and answers (native <details>) -->
+<section id="faq" class="faq" data-8b-section="faq" aria-labelledby="faq-title">
+  <div class="faq__flood" aria-hidden="true"></div>
+  <div class="faq__inner wrap">
+    <header class="faq__head">
+      <h2 id="faq-title" class="m-text-6" data-8b-motion="deboss">Before you press join.</h2>
+      <p class="m-text-9">Short answers to what people ask most. Anything else, write to the program below.</p>
+    </header>
+    <div class="faq__list">
+      ${faq('What is the Research Hub?', 'The part of NIIP that puts Liberia’s ICT research in one place: search papers, submit papers and join research groups, with the reports of government and operators alongside.')}
+      ${faq('Which areas do the groups cover?', 'Six: artificial intelligence, data science, cybersecurity, connectivity, digital finance and emerging tech.')}
+      ${faq('Do I need an account?', 'No. The library is open to read, and anyone can submit a paper without one.')}
+      ${faq('What happens after I submit a paper?', 'A reviewer reads every paper before it goes into the NIIS research library, and the outcome is sent to the email address you give.')}
+      ${faq('Can a group use NIIS data?', 'The national figures are open in the <a class="m-link" href="/data">Data Explorer</a>. Only aggregate statistics are published; personal data is protected under the Data Protection Act.')}
+      ${faq('Where are the ICT reports?', 'On the <a class="m-link" href="/reports">ICT Reports</a> page, beside the research: the reports of government and operators.')}
+    </div>
+  </div>
+</section>
+
+<!-- contact: the program's details and the sign-up, written out as an email -->
+<section id="contact" class="contact" data-8b-section="contact" aria-labelledby="contact-title">
+  <div class="contact__inner wrap">
+    <div class="contact__head">
+      <h2 id="contact-title" class="m-text-6" data-8b-motion="deboss">Join a research group.</h2>
+      <p class="m-text">Tell the program who you are and the areas you work in. Sending opens your email app with the request written out, ready to go.</p>
+      <dl class="contact__details">
+        <div><dt class="m-text-9">Email</dt><dd><a class="m-link" href="mailto:${RG_CONTACT.email}">${RG_CONTACT.email}</a></dd></div>
+        <div><dt class="m-text-9">Phone</dt><dd>${RG_CONTACT.phones.map((p) => `<a class="m-link" href="tel:+231${p.replace(/\D/g, '').replace(/^0/, '')}">${p}</a>`).join(' · ')}</dd></div>
+        <div><dt class="m-text-9">Office</dt><dd class="m-text">${RG_CONTACT.office}</dd></div>
+      </dl>
+    </div>
+    <form class="contact__form" novalidate data-to="${RG_CONTACT.email}" data-sent="Your email app is opening with the request. Send it from there to finish." data-invalid="Please add your name, a valid email and a few words.">
+      <div class="contact__field" data-8b-motion="rise"><label class="m-text-4" for="contact-name">Name</label><input class="m-field" id="contact-name" name="name" type="text" autocomplete="name" required></div>
+      <div class="contact__field" data-8b-motion="rise"><label class="m-text-4" for="contact-email">Email</label><input class="m-field" id="contact-email" name="email" type="email" autocomplete="email" required></div>
+      <div class="contact__field" data-8b-motion="rise"><label class="m-text-4" for="contact-org">Institution</label><input class="m-field" id="contact-org" name="org" type="text" autocomplete="organization" placeholder="Optional"></div>
+      <div class="contact__field" data-8b-motion="rise"><label class="m-text-4" for="join-groups">Research areas</label><input class="m-field" id="join-groups" name="groups" type="text" placeholder="Press the keys above, or type them"></div>
+      <div class="contact__field contact__field--wide" data-8b-motion="rise"><label class="m-text-4" for="contact-topic">About</label><select class="m-field" id="contact-topic" name="topic"><option>Joining a research group</option><option>Submitting a paper</option><option>Something else</option></select></div>
+      <div class="contact__field contact__field--wide" data-8b-motion="rise"><label class="m-text-4" for="contact-message">Message</label><textarea class="m-field" id="contact-message" name="message" rows="5" required></textarea></div>
+      <div class="contact__actions">
+        <button class="m-btn-2" type="submit"><span class="m-btn-2__dent" aria-hidden="true"></span><span class="m-btn-2__label">Send request</span></button>
+        <p class="m-text-9 contact__status" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+  </div>
+</section>
+</main>
+
+<!-- footer: width-filling RESEARCH wordmark, links back into the site, the Design: 8B credit -->
+<footer id="footer" class="footer" data-8b-section="footer">
+  <div class="footer__inner wrap">
+    <p class="m-text-6 footer__mark" style="--len:8">RESEARCH</p>
+    <div class="footer__row">
+      <p class="m-text-3">NIIP Research Groups</p>
+      <nav class="footer__links" aria-label="Footer">
+        <ul>
+          <li><a class="m-link" href="/">Home</a></li>
+          <li><a class="m-link" href="/research">Research papers</a></li>
+          <li><a class="m-link" href="/research/submit">Submit a paper</a></li>
+          <li><a class="m-link" href="/reports">ICT Reports</a></li>
+          <li><a class="m-link" href="/data">Data Explorer</a></li>
+          <li><a class="m-link" href="/about">About</a></li>
+        </ul>
+      </nav>
+      <p class="m-text-9">© 2026 National ICT Intelligence Program, Monrovia · Design: <a href="https://8b.com/" style="color:inherit" data-8b-credit>8B</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/vendor/gsap/gsap.min.js?v=3.13.0"></script>
+<script src="/assets/vendor/gsap/ScrollTrigger.min.js?v=3.13.0"></script>
+<script src="/assets/vendor/gsap/SplitText.min.js?v=3.13.0"></script>
+<script src="/assets/vendor/lenis/lenis.min.js?v=1.3.27"></script>
+<script src="/assets/rg/rg.js?v=${ASSET_V}"></script>
+</body>
+</html>`;
+};
+
 exports.research = (ctx, { papers = [], canManage = false, canSubmit = false, notice = '' }) => {
   const paperYear = (p) => String(p.published_on || '').slice(0, 4);
   // The paper library in the news-page format: the newest paper leads (its cover large, the red

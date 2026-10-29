@@ -579,6 +579,11 @@ async function handler(req, res) {
           values: user ? { sub_name: user.name, sub_email: user.email, sub_org: user.organization || '' } : {},
         }));
       }
+      // The research groups: a page of its own in the 8B template's design (views.researchGroup)
+      if (p === '/research/group') {
+        logEvent('page_view', p, user);
+        return send(res, 200, views.researchGroup());
+      }
       if (p === '/research') {
         logEvent('page_view', p, user);
         const canManage = hasPerm(user, 'manage_content');

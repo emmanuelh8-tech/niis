@@ -75,6 +75,18 @@ const COLLECTIONS = {
       { key: 'circle-2', label: 'Circle image 2', def: '/img/researchCircle/circle-2.jpg' },
     ],
   },
+  researchGroup: {
+    label: 'Research Group page',
+    note: 'The photos on /research/group. Search, Join and Next wave hold stand-ins from the booklet set until the owner’s own photos arrive.',
+    slots: [
+      { key: 'search', label: 'Search papers', hint: 'Woman at her desk (the Shutterstock preview, once licensed); stand-in for now', def: '/img/research-group/search.jpg' },
+      { key: 'submit', label: 'Submit a paper', hint: 'Woman in red glasses at her laptop; also Research & Development', def: '/img/research-group/submit.jpg' },
+      { key: 'join', label: 'Join a group', hint: 'Hands holding gears; also Data Mining & Engineering; stand-in for now', def: '/img/research-group/join.jpg' },
+      { key: 'next', label: 'The next wave', hint: 'Mentor with children at a laptop; stand-in for now', def: '/img/research-group/next.jpg' },
+      { key: 'build', label: 'Circuit to paper', hint: 'Boy with a robot car kit (the grey-to-colour photo)', def: '/img/research-group/build.jpg' },
+      { key: 'make', label: 'Training Programs', hint: 'Girls with an electronics kit', def: '/img/research-group/make.jpg' },
+    ],
+  },
   partnerLogos: {
     label: 'Partner logos',
     note: 'Official logo supplied by each partner institution. A partner without one is not shown on Our Partners.',

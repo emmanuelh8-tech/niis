@@ -291,36 +291,61 @@ ${footerDh()}
 }
 
 // ---------- signed-in workspace shell ----------
-function appLayout(ctx, { title, active = '', body, extraHead = '' }) {
+// In the Research Group's design (the owner's call, 30 Oct 2026): the 8B template's soft keys, surfaces and
+// wells, its fonts, in UN blue (public/rg/ws.css, loaded after the site's stylesheet). The sidebar is a
+// floating surface of keys, the page you are on pressed down; the bar a floating pill. The workspace's own
+// pages (native) take the full set of components; a public page seen while signed in keeps its own parts.
+// Accounts come by role: Public User, Researcher (once docs/sql/researcher-role.sql has run), Stakeholder
+// (the data focal point of an institution) and Administrator, each with its dashboard and services.
+const ROLE_LABEL = { public: 'Public User', researcher: 'Researcher', stakeholder: 'Stakeholder', admin: 'Administrator' };
+const ROLE_LINE = { public: 'Public User', researcher: 'Researcher', stakeholder: 'Data focal point', admin: 'Administrator' };
+const WS_HEAD = `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.gstatic.com/s/mozillaheadline/v1/QGYLz-UXahmCOps4kyMKGuSA9pYt2_P-w2kFrS88o6dLYRvBSDSOuerB_FOBB4ElYhZu.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://fonts.gstatic.com/s/mozillatext/v1/SZc-3FrnJ7S7WZIff2mJ7TbD7xNK.woff2" as="font" type="font/woff2" crossorigin>`;
+// the seal pressed faintly behind a workspace page's head
+const wsSeal = `<div class="hk-wm" aria-hidden="true"><img src="/img/research-group/seal-wm-light.webp?v=${ASSET_V}" alt="" width="1200" height="1200" decoding="async"></div>`;
+function appLayout(ctx, { title, active = '', body, extraHead = '', native = true }) {
   const u = ctx.user;
   const has = (p) => ctx.perms.includes(p);
   const item = (href, key, icn, label, badge = 0) =>
-    `<a class="sb-item ${active === key ? 'active' : ''}" href="${href}">${icon(icn)}<span class="sb-label">${label}</span>${badge ? `<span class="badge">${badge}</span>` : ''}</a>`;
-  const roleLabel = { public: 'Public User', stakeholder: 'Stakeholder', admin: 'Administrator' }[u.role];
+    `<a class="sb-item ${active === key ? 'active' : ''}" href="${href}"${active === key ? ' aria-current="page"' : ''}>${icon(icn)}<span class="sb-label">${label}</span>${badge ? `<span class="badge">${badge}</span>` : ''}</a>`;
+  const roleLabel = ROLE_LABEL[u.role] || u.role;
   const initials = u.name.split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+  const focal = u.role === 'stakeholder' || u.role === 'admin';
   return `<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#ffffff">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#e2e8ee">
 <title>${esc(title)} · NIIP</title>
 ${FONT_HEAD}
+${WS_HEAD}
 <link rel="stylesheet" href="/assets/styles.css?v=${ASSET_V}">
+<link rel="stylesheet" href="/assets/rg/ws.css?v=${ASSET_V}">
 ${FAVICON}
 <script src="/assets/liberia-counties.js?v=${ASSET_V}" defer></script>
 ${SITE_HEAD}
 ${extraHead}
-</head><body>
+</head><body class="hk${native ? ' hk-native' : ''}">
 <div class="app">
   <aside class="sidebar">
     <a class="sb-brand" href="/portal">${sealImg(38, 'sb-seal')}
       <span class="sb-brand-text"><strong>NIIP</strong><span>ICT Intelligence Program</span></span>
     </a>
-    <nav class="sb-nav">
+    <nav class="sb-nav" aria-label="Workspace">
       <span class="sb-section-label">Workspace</span>
       ${item('/portal', 'portal', 'home', 'Overview')}
+      ${item('/account', 'account', 'info', 'Account')}
       ${item('/data', 'data', 'database', 'Data Explorer')}
-      ${item('/partners', 'partners', 'users', 'Our Partners')}
-      ${item('/research', 'research', 'doc', 'Research Papers', ctx.paperReview || 0)}
+      ${item('/dashboards', 'dashboards', 'gauge', 'Dashboards')}
+      <span class="sb-section-label">Services</span>
+      ${focal ? item('/portal/submit-data', 'submitdata', 'cloudup', 'Submit data') : ''}
+      ${has('messaging') ? item('/portal/request-indicator', 'requestind', 'plus', 'Request an indicator') : ''}
+      ${item('/research/submit', 'submitpaper', 'doc', 'Submit research')}
+      ${item('/research/group', 'groups', 'users', 'Research groups')}
+      ${item('/careers', 'careers', 'briefcase', 'Jobs &amp; programs')}
+      <span class="sb-section-label">Library</span>
+      ${item('/research', 'research', 'book', 'Research Papers', ctx.paperReview || 0)}
       ${item('/media', 'media', 'image', 'Media Library')}
-      ${has('analytics') ? `<span class="sb-section-label">Insights</span>${item('/analytics', 'analytics', 'chart', 'Platform Analytics')}` : ''}
+      ${item('/partners', 'partners', 'globe', 'Our Partners')}
+      ${has('analytics') ? item('/analytics', 'analytics', 'chart', 'Platform Analytics') : ''}
       <span class="sb-section-label">Communication</span>
       ${has('messaging') ? item('/messages', 'messages', 'chat', 'Messages', ctx.unreadMsgs || 0) : ''}
       ${has('admin_inbox') ? item('/admin/inbox', 'inbox', 'inbox', 'Team Inbox', ctx.unreadInbox || 0) : ''}
@@ -328,18 +353,18 @@ ${extraHead}
       ${has('manage_content') ? item('/admin/images', 'images', 'image', 'Image Library') : ''}
       <span class="sb-section-label">Resources</span>
       ${item('/', 'site', 'globe', 'Public Website')}
-      ${item('/api/docs', 'apidocs', 'doc', 'API Documentation')}
+      ${item('/api/docs', 'apidocs', 'code', 'API Documentation')}
     </nav>
     <div class="sb-user">
-      <span class="sb-avatar">${esc(initials)}</span>
-      <span class="sb-user-info"><strong>${esc(u.name)}</strong><span>${esc(roleLabel)}</span></span>
-      <form method="post" action="/logout" class="inline-form"><button class="sb-logout" type="submit" title="Log out">${icon('logout')}</button></form>
+      <a class="sb-avatar" href="/account" aria-label="Your account" title="Your account">${esc(initials)}</a>
+      <span class="sb-user-info"><strong>${esc(u.name)}</strong><span>${esc(ROLE_LINE[u.role] || roleLabel)}</span></span>
+      <form method="post" action="/logout" class="inline-form"><button class="sb-logout" type="submit" title="Log out" aria-label="Log out">${icon('logout')}</button></form>
     </div>
   </aside>
   <div class="content">
     <div class="content-topbar">
       <span class="crumb">NIIP<strong>${esc(title)}</strong></span>
-      <span class="topbar-actions"><span class="role-chip ${u.role === 'admin' ? 'admin' : ''}">${esc(roleLabel)}</span></span>
+      <span class="topbar-actions"><a class="role-chip ${u.role === 'admin' ? 'admin' : ''}" href="/account">${esc(roleLabel)}</a></span>
     </div>
     <div class="page-body">${body}</div>
   </div>
@@ -349,7 +374,7 @@ ${extraHead}
 
 // small helper: wrap public vs. workspace shell depending on session
 function shell(ctx, opts) {
-  return ctx.user ? appLayout(ctx, { ...opts, active: opts.workspaceActive || opts.active }) : publicLayout(ctx, opts);
+  return ctx.user ? appLayout(ctx, { ...opts, active: opts.workspaceActive || opts.active, native: false }) : publicLayout(ctx, opts);
 }
 
 // ---------- reusable dropdown markup ----------
@@ -5127,8 +5152,9 @@ exports.register = (ctx, { error, success, form = {} }) => publicLayout(ctx, {
           <div class="lg-field"><label for="rg-phone">Phone (optional)</label><input id="rg-phone" name="phone" maxlength="40" autocomplete="tel" placeholder="+231 …" value="${esc(form.phone || '')}"></div>
           <div class="lg-field"><label for="rg-level">Access level</label>
             <select id="rg-level" name="role_requested">
-              <option value="public" ${form.role_requested !== 'stakeholder' ? 'selected' : ''}>Public user, researcher, journalist, citizen</option>
-              <option value="stakeholder" ${form.role_requested === 'stakeholder' ? 'selected' : ''}>Stakeholder, government, donor, institutional partner</option>
+              <option value="public" ${!['stakeholder', 'researcher'].includes(form.role_requested) ? 'selected' : ''}>Public user, journalist, citizen${(ctx.roles || []).includes('researcher') ? '' : ', researcher'}</option>
+              ${(ctx.roles || []).includes('researcher') ? `<option value="researcher" ${form.role_requested === 'researcher' ? 'selected' : ''}>Researcher, university, think tank, independent</option>` : ''}
+              <option value="stakeholder" ${form.role_requested === 'stakeholder' ? 'selected' : ''}>Stakeholder, data focal point of a ministry, operator or partner</option>
             </select></div>
           <div class="lg-field"><label for="rg-why">What data do you need? (optional)</label><textarea id="rg-why" name="purpose" rows="3" maxlength="1000" placeholder="e.g. county-level connectivity series for a reporting project…">${esc(form.purpose || '')}</textarea></div>
           <button class="lg-submit pearl" type="submit"><span class="pearl-wrap"><span class="pearl-p"><span class="lg-submit-t">Submit request</span></span></span></button>
@@ -5140,36 +5166,186 @@ exports.register = (ctx, { error, success, form = {} }) => publicLayout(ctx, {
 });
 
 // ============ WORKSPACE (signed-in) ============
+// The services a signed-in account can reach, each a card on the dashboard and a key in the sidebar.
+// [key, href, icon, title, what it does, who has it]
+const WS_SERVICES = [
+  ['submitdata', '/portal/submit-data', 'cloudup', 'Submit data', 'Send your institution’s figures, one value or a CSV file; each passes the automated checks and waits for review.', (r) => r === 'stakeholder' || r === 'admin'],
+  ['requestind', '/portal/request-indicator', 'plus', 'Request an indicator', 'Ask the team to measure something NIIS does not track yet; the reply comes to your Messages.', (r, has) => has('messaging')],
+  ['submitpaper', '/research/submit', 'doc', 'Submit research', 'Send a paper; a reviewer reads every paper before it goes into the library.', () => true],
+  ['groups', '/research/group', 'users', 'Research groups', 'Six research areas, their groups, the questions they work on and the people in them.', () => true],
+  ['careers', '/careers', 'briefcase', 'Jobs & programs', 'Open roles at NIIP and the nine professional diplomas.', () => true],
+  ['data', '/data', 'database', 'Data Explorer', 'Map, trend and county table for every indicator your account may see.', () => true],
+  ['dashboards', '/dashboards', 'gauge', 'Dashboards', 'Curated topic dashboards with their sync status.', () => true],
+  ['research', '/research', 'book', 'Research library', 'The papers on Liberia’s ICT sector, each with NIIS’s own summary.', () => true],
+  ['media', '/media', 'image', 'Media library', 'Images, research papers and video from the program.', () => true],
+  ['analytics', '/analytics', 'chart', 'Platform analytics', 'Usage and trends across the stored data.', (r, has) => has('analytics')],
+  ['messages', '/messages', 'chat', 'Messages', 'Your direct line to the ICT Statistics & Policy Unit.', (r, has) => has('messaging')],
+  ['admin', '/admin', 'shield', 'Admin panel', 'Accounts, the review queue, content and platform settings.', (r, has) => has('manage_users')],
+  ['inbox', '/admin/inbox', 'inbox', 'Team inbox', 'Every conversation, shared across the administration team.', (r, has) => has('admin_inbox')],
+  ['images', '/admin/images', 'image', 'Image library', 'Every photo slot on the site: upload, replace, restore.', (r, has) => has('manage_content')],
+  ['apidocs', '/api/docs', 'code', 'API documentation', 'The free JSON API over NIIS.', () => true],
+];
+// what each account type is for, and the services it leads with
+const WS_ROLES = {
+  public: { title: 'Public User', line: 'Explore Liberia’s ICT data, follow the research, and write to the team.',
+    first: ['data', 'dashboards', 'research', 'requestind', 'submitpaper', 'careers'] },
+  researcher: { title: 'Researcher', line: 'Data for your research, the library and the research groups, and a way to publish your own work.',
+    first: ['research', 'submitpaper', 'groups', 'data', 'requestind', 'analytics'] },
+  stakeholder: { title: 'Data focal point', line: 'You send your institution’s figures into NIIS and follow them through review; ask for what is missing.',
+    first: ['submitdata', 'requestind', 'submitpaper', 'data', 'analytics', 'messages'] },
+  admin: { title: 'Administrator', line: 'Accounts, the review queue, the site’s content and the platform settings.',
+    first: ['admin', 'inbox', 'images', 'submitdata', 'analytics', 'messages'] },
+};
+const wsServices = (ctx) => {
+  const has = (p) => ctx.perms.includes(p);
+  return WS_SERVICES.filter((x) => x[5](ctx.user.role, has));
+};
+const wsCard = ([, href, icn, t, d]) => `<a class="portal-card" href="${href}"><h3>${icon(icn)} ${esc(t)}</h3><p>${esc(d)}</p></a>`;
+
 exports.portal = (ctx, stats) => {
-  const u = ctx.user; const has = (p) => ctx.perms.includes(p);
-  const cards = [
-    ['/data', 'database', 'Data Explorer', 'Map, trend and county table for every indicator you are authorized to see.', true],
-    ['/dashboards', 'gauge', 'Dashboards', 'Six curated topic dashboards with live sync status.', true],
-    ['/media', 'image', 'Media Library', 'Images, research papers and embedded video from the project.', true],
-    ['/analytics', 'chart', 'Platform Analytics', 'Usage and trend analysis across the stored data.', has('analytics')],
-    ['/messages', 'chat', 'Messages', 'Your direct line to the ICT Statistics & Policy Unit.', has('messaging')],
-    ['/admin', 'shield', 'Admin Panel', 'Users, quality review queue, content and platform settings.', has('manage_users')],
-    ['/admin/inbox', 'inbox', 'Team Inbox', 'All user conversations, shared across the admin team.', has('admin_inbox')],
-  ];
+  const u = ctx.user;
+  const role = WS_ROLES[u.role] || WS_ROLES.public;
+  const all = wsServices(ctx);
+  const first = role.first.map((k) => all.find((x) => x[0] === k)).filter(Boolean);
+  const rest = all.filter((x) => !first.includes(x));
   const stat = (label, val, accent) => `<div class="kpi"><div class="kpi-label">${label}</div><div class="kpi-value" ${accent ? 'style="color:var(--clay)"' : ''}>${val}</div></div>`;
   return appLayout(ctx, {
     title: 'Overview', active: 'portal', body: `
-    <p class="kicker">Workspace</p>
-    <h1>Welcome back, ${esc(u.name.split(' ')[0])}</h1>
-    <p class="lede-sm">Here is the current state of NIIS.</p>
+    ${wsSeal}
+    <p class="kicker">${esc(role.title)}${u.organization ? ' · ' + esc(u.organization) : ''}</p>
+    <h1>Welcome back, ${esc(u.name.split(' ')[0])}.</h1>
+    <p class="lede-sm">${esc(role.line)}</p>
     <div class="kpi-grid">
+      ${stats.myPending != null ? stat('Your submissions in review', fmt(stats.myPending), stats.myPending > 0) : ''}
+      ${stats.myApproved != null ? stat('Your submissions approved', fmt(stats.myApproved)) : ''}
       ${stat('Data points published', fmt(stats.dataPoints))}
       ${stat('Indicators tracked', fmt(stats.indicators))}
       ${stat('Counties covered', '15')}
-      ${stat('Series updated', `<span style="font-size:1.1rem">${esc(String(stats.lastUpdated).slice(0, 10))}</span>`)}
+      ${stat('Series updated', `<span style="font-size:.62em">${esc(String(stats.lastUpdated).slice(0, 10))}</span>`)}
       ${stats.pendingRequests != null ? stat('Pending access requests', fmt(stats.pendingRequests), stats.pendingRequests > 0) : ''}
       ${stats.pendingSubs != null ? stat('Submissions in review queue', fmt(stats.pendingSubs), stats.pendingSubs > 0) : ''}
       ${stats.unread ? stat('Unread messages', fmt(stats.unread), true) : ''}
     </div>
-    <h2>Your workspace</h2>
-    <div class="card-grid">
-      ${cards.filter((c) => c[4]).map(([href, icn, t, d]) => `<a class="portal-card" href="${href}"><h3>${icon(icn)} ${esc(t)}</h3><p>${esc(d)}</p></a>`).join('')}
+    <h2>Your services</h2>
+    <div class="card-grid">${first.map(wsCard).join('')}</div>
+    ${rest.length ? `<h2>Everything else</h2>
+    <div class="card-grid">${rest.map(wsCard).join('')}</div>` : ''}`,
+  });
+};
+
+// The account: who you are to the platform, what your account type may do, and your services.
+const WS_PERM = { view_public: 'Public data', view_registered_data: 'Registered data', view_stakeholder_data: 'Stakeholder data', download_open_data: 'Open data downloads',
+  analytics: 'Platform analytics', messaging: 'Messages to the team', admin_inbox: 'Team inbox', manage_users: 'Accounts', manage_content: 'Site content',
+  manage_datasets: 'Datasets', manage_settings: 'Platform settings' };
+exports.account = (ctx) => {
+  const u = ctx.user;
+  const role = WS_ROLES[u.role] || WS_ROLES.public;
+  const initials = u.name.split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+  const row = (k, v) => (v ? `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>` : '');
+  const since = u.created_at ? new Date(u.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  const all = wsServices(ctx);
+  const first = role.first.map((k) => all.find((x) => x[0] === k)).filter(Boolean);
+  return appLayout(ctx, {
+    title: 'Account', active: 'account', body: `
+    ${wsSeal}
+    <p class="kicker">Account</p>
+    <div class="ac-head">
+      <span class="ac-key" aria-hidden="true">${esc(initials)}</span>
+      <div><h1>${esc(u.name)}</h1><p class="lede-sm" style="margin:0">${esc(role.title)}${u.organization ? ' · ' + esc(u.organization) : ''}. ${esc(role.line)}</p></div>
+    </div>
+    <div class="panel"><h3>Your details</h3>
+      <dl class="ac-list">
+        ${row('Name', u.name)}${row('Email', u.email)}${row('Organization', u.organization)}
+        ${row('Account type', ROLE_LABEL[u.role] || u.role)}${row('Status', u.status)}${row('Member since', since)}
+      </dl>
+    </div>
+    <div class="panel"><h3>What your account can do</h3>
+      <div class="ac-perms">${ctx.perms.filter((p) => WS_PERM[p]).map((p) => `<span class="tag">${esc(WS_PERM[p])}</span>`).join('')}</div>
+      <p class="muted" style="margin-top:14px">An administrator sets what each account type may do, in the Admin Panel.</p>
+    </div>
+    <h2>Your services</h2>
+    <div class="card-grid">${first.map(wsCard).join('')}</div>
+    <div class="panel" style="margin-top:28px"><h3>Change your details</h3>
+      <p class="muted">To change your name, email, organization or password, write to the team and an administrator will make the change.</p>
+      <div class="ac-actions">
+        ${ctx.perms.includes('messaging') ? '<a class="btn btn-teal" href="/messages">Write to the team</a>' : ''}
+        <form method="post" action="/logout" class="inline-form"><button class="btn btn-ghost" type="submit">Log out</button></form>
+      </div>
     </div>`,
+  });
+};
+
+// Request an indicator: a short form that becomes a message in the Team Inbox.
+exports.requestIndicator = (ctx, { sent = false, error = '', values = {}, indicatorCount = 0 } = {}) => {
+  const v = (k) => esc(values[k] || '');
+  const opt = (name, list) => list.map((o) => `<option${values[name] === o ? ' selected' : ''}>${o}</option>`).join('');
+  return appLayout(ctx, {
+    title: 'Request an indicator', active: 'requestind', body: `
+    ${wsSeal}
+    <p class="kicker">Services</p>
+    <h1>Request an indicator.</h1>
+    <p class="lede-sm">Ask the team to measure something NIIS does not track yet. The request goes to the ICT Statistics &amp; Policy Unit’s inbox, and the reply comes to your <a href="/messages">Messages</a>. ${indicatorCount ? `NIIS tracks ${fmt(indicatorCount)} indicators today; see them in the <a href="/data">Data Explorer</a>.` : 'See what NIIS tracks today in the <a href="/data">Data Explorer</a>.'}</p>
+    ${sent ? '<div class="alert alert-ok">Sent to the team. The reply comes to your Messages.</div>' : ''}
+    ${error ? `<div class="alert alert-error" role="alert">${esc(error)}</div>` : ''}
+    <div class="panel">
+      <form method="post" action="/portal/request-indicator" class="grid-form">
+        <label>Indicator<input name="indicator" required maxlength="160" value="${v('indicator')}" placeholder="e.g. Share of schools with an internet connection"></label>
+        <label>How it would be defined (optional)<textarea name="definition" rows="2" maxlength="1000" placeholder="What is counted, and over what">${v('definition')}</textarea></label>
+        <div class="two-col" style="grid-template-columns:1fr 1fr">
+          <label>Level<select name="level">${opt('level', ['National', 'County', 'District', 'Not sure'])}</select></label>
+          <label>How often<select name="frequency">${opt('frequency', ['Yearly', 'Quarterly', 'Monthly', 'Not sure'])}</select></label>
+        </div>
+        <label>What it is for<textarea name="why" rows="4" required maxlength="2000" placeholder="The decision, study or report it would serve">${v('why')}</textarea></label>
+        <button class="btn btn-teal" type="submit">Send the request</button>
+      </form>
+    </div>`,
+  });
+};
+
+// Submit data: the data focal point's way in, one value or a CSV file, into the review queue.
+exports.submitData = (ctx, { indicators = [], counties = [], list = [], added = 0, errors = [], mode = 'value' } = {}) => {
+  const ind = new Map(indicators.map((i) => [i.code, i.name]));
+  const cty = new Map(counties.map((c) => [c.id, c.name]));
+  const status = (st) => `<span class="tag tag-${st === 'approved' ? 'active' : st === 'rejected' ? 'suspended' : 'pending'}">${esc(st)}</span>`;
+  return appLayout(ctx, {
+    title: 'Submit data', active: 'submitdata', body: `
+    ${wsSeal}
+    <p class="kicker">Services · data focal point</p>
+    <h1>Submit data.</h1>
+    <p class="lede-sm">Send ${ctx.user.organization ? esc(ctx.user.organization) + '’s' : 'your institution’s'} figures into NIIS. Every value passes the automated checks, then waits in the review queue until an administrator approves it for publication.</p>
+    ${added ? `<div class="alert alert-ok">${added} ${added === 1 ? 'value' : 'values'} sent to the review queue.</div>` : ''}
+    ${errors.length ? `<div class="alert alert-error" role="alert">${errors.length === 1 ? esc(errors[0]) : `Some rows could not be read:<br>${errors.slice(0, 12).map(esc).join('<br>')}${errors.length > 12 ? `<br>and ${errors.length - 12} more` : ''}`}</div>` : ''}
+    <div class="two-col" style="grid-template-columns:1fr 1fr">
+      <div class="panel"><h3>One value</h3>
+        <form method="post" action="/portal/submit-data" class="grid-form">
+          <input type="hidden" name="mode" value="value">
+          <label>Indicator<select name="indicator_code" required>${indicators.map((i) => `<option value="${esc(i.code)}">${esc(i.name)}</option>`).join('')}</select></label>
+          <label>County<select name="county_id"><option value="">National</option>${counties.map((c) => `<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></label>
+          <div class="two-col" style="grid-template-columns:1fr 1fr">
+            <label>Year<input name="year" type="number" min="2000" max="2100" value="${new Date().getFullYear()}" required></label>
+            <label>Value<input name="value" type="number" step="any" required></label>
+          </div>
+          <label>Source note (optional)<input name="source" maxlength="120" placeholder="e.g. 2026 returns, quarter 2"></label>
+          <button class="btn btn-teal" type="submit">Send for review</button>
+        </form>
+      </div>
+      <div class="panel"><h3>A CSV file</h3>
+        <form method="post" action="/portal/submit-data" class="grid-form" enctype="multipart/form-data">
+          <input type="hidden" name="mode" value="file">
+          <p class="muted" style="margin:0">One row a line: <code>indicator_code, county (or National), year, value</code>, and a source at the end if you like. A header row is fine. Up to 1 MB.</p>
+          <label>File<input name="file" type="file" accept=".csv,text/csv" required></label>
+          <label>Source note (optional)<input name="source" maxlength="120" placeholder="e.g. Annual operator return 2026"></label>
+          <button class="btn btn-teal" type="submit">Send the file</button>
+        </form>
+        <p class="muted mono" style="font-size:.78rem;margin-top:12px">internet_penetration, Nimba, 2026, 32.5<br>internet_penetration, National, 2026, 36.9</p>
+      </div>
+    </div>
+    <h2>Your submissions</h2>
+    ${list.length ? `<table class="data-table"><thead><tr><th>Indicator</th><th>County</th><th class="num">Year</th><th class="num">Value</th><th>Status</th><th>Checks</th><th>Sent</th></tr></thead><tbody>
+      ${list.map((x) => `<tr><td>${esc(ind.get(x.indicator_code) || x.indicator_code)}</td><td>${esc(x.county_id ? cty.get(x.county_id) || '' : 'National')}</td>
+        <td class="num mono">${x.year}</td><td class="num mono">${fmt(x.value)}</td><td>${status(x.status)}</td>
+        <td class="${String(x.validation_note).startsWith('FLAG') ? 'flag' : 'muted'}">${esc(x.validation_note || '')}</td><td class="mono muted">${esc(fmtTs(x.created_at))}</td></tr>`).join('')}
+    </tbody></table>` : '<p class="muted">Nothing sent yet. Your first values will show here with their review status.</p>'}`,
   });
 };
 
@@ -5275,8 +5451,10 @@ exports.adminConversation = (ctx, { conv, msgs }) => appLayout(ctx, {
 exports.admin = (ctx, { users, pending, reviewed, indicators, counties, settings, rolePerms, unreadInbox, accessRequests = [], papersList = [], updatesList = [], mediaList = [], siteContent = {}, notice = '', generations = [], seedanceReady = false }) => {
   const permHas = (role, perm) => rolePerms.some((r) => r.role === role && r.permission === perm);
   const editablePerms = ['view_registered_data', 'view_stakeholder_data', 'analytics', 'messaging', 'download_open_data'];
+  const permRoles = (ctx.roles || ['public', 'stakeholder', 'admin']).filter((r) => r !== 'admin');
   return appLayout(ctx, {
     title: 'Admin Panel', active: 'admin', body: `
+  ${wsSeal}
   <p class="kicker">Administration</p>
   <h1>Platform administration</h1>
   <p class="lede-sm"><a href="/admin/inbox">Team inbox${unreadInbox ? ` <span class="badge">${unreadInbox} new</span>` : ''}</a> · jump to
@@ -5298,7 +5476,7 @@ exports.admin = (ctx, { users, pending, reviewed, indicators, counties, settings
       <div>
         <form method="post" action="/admin/requests/action" class="grid-form">
           <input type="hidden" name="id" value="${r.id}"><input type="hidden" name="action" value="approve">
-          <label>Role<select name="role"><option ${r.role_requested === 'public' ? 'selected' : ''}>public</option><option ${r.role_requested === 'stakeholder' ? 'selected' : ''}>stakeholder</option></select></label>
+          <label>Role<select name="role">${(ctx.roles || ['public', 'stakeholder', 'admin']).filter((x) => x !== 'admin').map((x) => `<option ${r.role_requested === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
           <label>Temporary password<input name="password" required minlength="8" placeholder="min. 8 characters"></label>
           <button class="btn btn-teal">Create account</button>
         </form>
@@ -5315,7 +5493,7 @@ exports.admin = (ctx, { users, pending, reviewed, indicators, counties, settings
     ${users.map((u) => `<tr>
       <td>${esc(u.name)}<br><span class="mono muted">${esc(u.email)}</span>${u.organization ? `<br><span class="muted">${esc(u.organization)}</span>` : ''}</td>
       <td><form method="post" action="/admin/users/role" class="inline-form"><input type="hidden" name="id" value="${u.id}">
-        <select name="role" onchange="this.form.submit()">${['public', 'stakeholder', 'admin'].map((r) => `<option ${r === u.role ? 'selected' : ''}>${r}</option>`).join('')}</select></form></td>
+        <select name="role" onchange="this.form.submit()">${(ctx.roles || ['public', 'stakeholder', 'admin']).map((r) => `<option ${r === u.role ? 'selected' : ''}>${r}</option>`).join('')}</select></form></td>
       <td><span class="tag tag-${esc(u.status)}">${esc(u.status)}</span></td>
       <td>${u.status === 'pending' ? `<form method="post" action="/admin/users/status" class="inline-form"><input type="hidden" name="id" value="${u.id}"><input type="hidden" name="status" value="active"><button class="btn btn-sm btn-teal">Verify &amp; activate</button></form>` : ''}
         ${u.status === 'active' && u.role !== 'admin' ? `<form method="post" action="/admin/users/status" class="inline-form"><input type="hidden" name="id" value="${u.id}"><input type="hidden" name="status" value="suspended"><button class="btn btn-sm btn-ghost">Suspend</button></form>` : ''}
@@ -5328,7 +5506,7 @@ exports.admin = (ctx, { users, pending, reviewed, indicators, counties, settings
       <label>Name<input name="name" required></label>
       <label>Email<input name="email" type="email" required></label>
       <label>Organization<input name="organization"></label>
-      <label>Role<select name="role"><option>stakeholder</option><option>public</option><option>admin</option></select></label>
+      <label>Role<select name="role">${['stakeholder', ...(ctx.roles || ['public', 'stakeholder', 'admin']).filter((x) => x !== 'stakeholder')].map((x) => `<option>${x}</option>`).join('')}</select></label>
       <label>Temporary password<input name="password" required minlength="8"></label>
       <button class="btn btn-teal">Create account</button>
     </form>
@@ -5491,10 +5669,9 @@ exports.admin = (ctx, { users, pending, reviewed, indicators, counties, settings
     </div>
     <div class="panel"><h3>Role permissions</h3>
       <form method="post" action="/admin/permissions">
-        <table class="data-table"><thead><tr><th>Permission</th><th>Public</th><th>Stakeholder</th></tr></thead><tbody>
+        <table class="data-table"><thead><tr><th>Permission</th>${permRoles.map((r) => `<th>${esc(ROLE_LABEL[r] || r)}</th>`).join('')}</tr></thead><tbody>
           ${editablePerms.map((perm) => `<tr><td class="mono">${esc(perm)}</td>
-            <td><input type="checkbox" name="perm_public_${perm}" ${permHas('public', perm) ? 'checked' : ''}></td>
-            <td><input type="checkbox" name="perm_stakeholder_${perm}" ${permHas('stakeholder', perm) ? 'checked' : ''}></td></tr>`).join('')}
+            ${permRoles.map((r) => `<td><input type="checkbox" name="perm_${r}_${perm}" ${permHas(r, perm) ? 'checked' : ''} aria-label="${esc((ROLE_LABEL[r] || r) + ': ' + perm)}"></td>`).join('')}</tr>`).join('')}
         </tbody></table>
         <button class="btn btn-teal" style="margin-top:.7rem">Save permissions</button>
       </form>

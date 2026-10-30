@@ -30,14 +30,14 @@ Relational schema (SQLite in this build; standard SQL, ports directly to Postgre
 One row per (indicator, county, year); `county_id IS NULL` is the national aggregate. Unique on `(indicator_code, county_id, year)` — approvals upsert.
 
 ### `data_submissions` (quality review queue)
-Incoming data from surveys, operator feeds and manual templates. `channel` (`survey`|`operator_feed`|`manual`), `status` (`pending`|`approved`|`rejected`), `validation_note` from automated checks, `reviewed_by`/`reviewed_at` on human decision.
+Incoming data from surveys, operator feeds and manual templates, including what a stakeholder (an institution's data focal point) sends from the workspace's Submit data page, one value or a CSV file, on the `manual` channel with `source` starting `Focal point:`. `channel` (`survey`|`operator_feed`|`manual`), `status` (`pending`|`approved`|`rejected`), `validation_note` from automated checks, `reviewed_by`/`reviewed_at` on human decision.
 
 ### `saved_queries`
 Data Query builder saves: user_id, name, indicators (CSV codes), counties (CSV names or `all`), year_from, year_to, format.
 
 ## Access control
 
-`users` (email, role: `public`|`stakeholder`|`admin`, status: `pending`|`active`|`suspended`) · `sessions` (HttpOnly cookie tokens, 12 h) · `role_permissions` (`(role, permission)` pairs — editable by administrators, not hard-coded) · `settings` (`registration_mode`, `stakeholder_provisioning`, `messaging_model`, `last_etl_sync`).
+`users` (email, role: `public`|`researcher`|`stakeholder`|`admin`, where `researcher` needs `docs/sql/researcher-role.sql`, status: `pending`|`active`|`suspended`) · `sessions` (HttpOnly cookie tokens, 12 h) · `role_permissions` (`(role, permission)` pairs — editable by administrators, not hard-coded) · `settings` (`registration_mode`, `stakeholder_provisioning`, `messaging_model`, `last_etl_sync`).
 
 ## Content
 

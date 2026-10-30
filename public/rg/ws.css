@@ -1,0 +1,250 @@
+/*
+  NIIP workspace theme. Derived from the free "Hushkey" product landing page template by 8B
+  (https://github.com/8bsite/product-landing-page-template), MIT License, Copyright (c) 2026 8B; the full
+  notice is in public/rg/rg.css. Fonts: Mozilla Headline and Mozilla Text (SIL OFL 1.1).
+*/
+/* latin-ext */
+@font-face {
+  font-family: 'Mozilla Headline';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 75%;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/mozillaheadline/v1/QGYLz-UXahmCOps4kyMKGuSA9pYt2_P-w2kFrS88o6dLYRvBSDSOuerB_FOBB4ElbBZuhco.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Mozilla Headline';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 75%;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/mozillaheadline/v1/QGYLz-UXahmCOps4kyMKGuSA9pYt2_P-w2kFrS88o6dLYRvBSDSOuerB_FOBB4ElYhZu.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Mozilla Text';
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/mozillatext/v1/SZc-3FrnJ7S7WZIff2mJ7TbD4RNKuCc.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Mozilla Text';
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/mozillatext/v1/SZc-3FrnJ7S7WZIff2mJ7TbD7xNK.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face { font-family: "Mozilla Headline Fallback"; src: local("Arial Bold"), local("Arial-BoldMT"); font-weight: 550 799; size-adjust: 70.9%; ascent-override: 134%; descent-override: 36.7%; line-gap-override: 0%; }
+@font-face { font-family: "Mozilla Text Fallback"; src: local("Arial"), local("ArialMT"); font-weight: 100 549; size-adjust: 106.6%; ascent-override: 89.2%; descent-override: 24.4%; line-gap-override: 0%; }
+
+/* ---- the palette and the shapes, the Research Group's own (UN blue) */
+body.hk {
+  --hk-1: #e2e8ee;   /* ground and key faces */
+  --hk-2: #0c2236;   /* text and the ink of every shadow */
+  --hk-3: #fbfbfc;   /* highlights */
+  --hk-4: #8796a5;   /* hairlines */
+  --hk-5: #00608f;   /* stamped headings, labels: UN blue deepened for AA */
+  --hk-6: #b0c4d4;   /* the ground's upper edge */
+  --hk-7: #009edb;   /* UN blue */
+  --hk-8: #4a5d70;   /* muted text (5.6:1 on the ground) */
+  --hk-9: #003a5c;   /* deep shade */
+  --hk-font-1: "Mozilla Headline", "Mozilla Headline Fallback", "Arial Narrow", Arial, sans-serif;
+  --hk-font-2: "Mozilla Text", "Mozilla Text Fallback", Arial, sans-serif;
+  --hk-key: linear-gradient(180deg, var(--hk-3), var(--hk-1) 62%, color-mix(in srgb, var(--hk-1), var(--hk-2) 6%));
+  --hk-dent: linear-gradient(180deg, color-mix(in srgb, var(--hk-1), var(--hk-2) 11%), var(--hk-1) 52%, var(--hk-3));
+  --hk-surface: linear-gradient(180deg, var(--hk-3), var(--hk-1) 46%);
+  --hk-blue-key: linear-gradient(180deg, #0a77ab, #005b8e 72%);
+  --hk-shadow-1: 0 .5em .9em -.3em color-mix(in srgb, var(--hk-2) 34%, transparent), 0 .1em .18em color-mix(in srgb, var(--hk-2) 14%, transparent), inset 0 .1em .08em var(--hk-3), inset 0 -.14em .3em color-mix(in srgb, var(--hk-2) 9%, transparent);
+  --hk-shadow-2: inset 0 .28em .5em color-mix(in srgb, var(--hk-2) 26%, transparent), inset 0 -.12em .16em var(--hk-3);
+  --hk-shadow-4: 0 .5em .9em -.25em color-mix(in srgb, var(--hk-9) 85%, transparent), inset 0 .08em .06em color-mix(in srgb, var(--hk-3) 16%, transparent), inset 0 -.14em .3em color-mix(in srgb, var(--hk-9) 40%, transparent);
+  --hk-shadow-5: inset 0 .28em .5em color-mix(in srgb, var(--hk-9) 75%, transparent), inset 0 -.1em .14em color-mix(in srgb, var(--hk-3) 10%, transparent);
+  --hk-shadow-6: 0 2px 1px var(--hk-3), 0 -1px 1px color-mix(in srgb, var(--hk-2) 30%, transparent);
+  --hk-shadow-8: 0 18px 40px -18px color-mix(in srgb, var(--hk-2) 32%, transparent), 0 2px 4px color-mix(in srgb, var(--hk-2) 8%, transparent), inset 0 1px 0 var(--hk-3);
+  background: var(--hk-1);
+}
+
+/* ---- the shell, on every workspace page: the sidebar a floating surface of keys, the bar a floating pill */
+.hk .app { grid-template-columns: 284px minmax(0, 1fr); background: linear-gradient(180deg, var(--hk-6), var(--hk-1) 440px); }
+.hk .sidebar { position: sticky; top: 14px; height: calc(100vh - 28px); margin: 14px 0 14px 14px; padding: 6px; border: 0; border-radius: 34px;
+  background: var(--hk-surface); box-shadow: var(--hk-shadow-8); color: var(--hk-2); font-family: var(--hk-font-2); overflow-y: auto; scrollbar-width: thin; }
+.hk .sb-brand { border: 0; padding: 16px 14px 10px; color: var(--hk-5); gap: 12px; }
+.hk .sb-seal { border-radius: 50%; box-shadow: var(--hk-shadow-1); }
+.hk .sb-brand-text strong { font-family: var(--hk-font-1); font-stretch: 75%; font-weight: 700; font-size: 26px; line-height: 1; letter-spacing: .03em; color: var(--hk-5); text-shadow: var(--hk-shadow-6); }
+.hk .sb-brand-text span { font-family: var(--hk-font-2); font-size: 9.5px; font-weight: 400; letter-spacing: .26em; color: var(--hk-8); }
+.hk .sb-nav { gap: 9px; padding: 4px 12px 14px; }
+.hk .sb-section-label { padding: 18px 8px 4px; font-family: var(--hk-font-2); font-size: 10.5px; font-weight: 400; letter-spacing: .34em; color: var(--hk-8); }
+.hk .sb-item { min-height: 46px; padding: 0 16px; gap: 12px; border-radius: 999px; background: var(--hk-key); box-shadow: var(--hk-shadow-1);
+  color: var(--hk-2); font-family: var(--hk-font-2); font-size: 14.5px; font-weight: 600; letter-spacing: .01em; transition: box-shadow .25s ease, background .25s ease, transform .25s ease; }
+.hk .sb-item::after, .hk .sb-item.active::before { display: none; }
+.hk .sb-item .icn { color: var(--hk-5); opacity: 1; }
+.hk .sb-item:hover { background: var(--hk-key); color: var(--hk-5); box-shadow: var(--hk-shadow-1), inset 0 2px 5px color-mix(in srgb, var(--hk-2) 10%, transparent); }
+.hk .sb-item:hover .icn { color: var(--hk-7); }
+.hk .sb-item:active { transform: translateY(1px); }
+/* the page you are on: its key pressed down */
+.hk .sb-item.active { background: var(--hk-dent); box-shadow: var(--hk-shadow-2); color: var(--hk-5); }
+.hk .sb-item.active .icn { color: var(--hk-5); }
+.hk .badge { background: var(--hk-blue-key); color: #fff; box-shadow: var(--hk-shadow-4); font-family: var(--hk-font-2); font-weight: 600; letter-spacing: .02em; }
+.hk .sb-user { margin: 4px 10px 10px; padding: 10px 10px 10px 12px; border: 0; border-radius: 26px; background: var(--hk-1); box-shadow: var(--hk-shadow-2); }
+.hk .sb-avatar { background: var(--hk-blue-key); box-shadow: var(--hk-shadow-4); color: #fff; font-family: var(--hk-font-2); font-weight: 600; letter-spacing: .04em; }
+.hk .sb-user-info strong { color: var(--hk-2); font-size: 13.5px; }
+.hk .sb-user-info span { color: var(--hk-5); font-size: 11.5px; letter-spacing: .06em; }
+.hk .sb-logout { display: grid; place-items: center; inline-size: 38px; block-size: 38px; padding: 0; border-radius: 50%; color: var(--hk-5); background: var(--hk-key); box-shadow: var(--hk-shadow-1); }
+.hk .sb-logout:hover { color: var(--hk-5); background: var(--hk-dent); box-shadow: var(--hk-shadow-2); }
+.hk .content { background: transparent; }
+.hk .content-topbar { top: 14px; margin: 14px 14px 0; min-height: 64px; padding: 6px 8px 6px 28px; border: 0; border-radius: 999px; background: var(--hk-surface); box-shadow: var(--hk-shadow-8); z-index: 20; }
+.hk .crumb { font-family: var(--hk-font-2); font-size: 10.5px; font-weight: 400; letter-spacing: .34em; text-transform: uppercase; color: var(--hk-8); }
+.hk .crumb strong { font-family: var(--hk-font-1); font-stretch: 75%; font-weight: 700; font-size: 24px; line-height: 1.05; letter-spacing: .01em; text-transform: none; color: var(--hk-5); text-shadow: var(--hk-shadow-6); }
+.hk .role-chip, .hk .role-chip.admin { display: inline-flex; align-items: center; min-height: 48px; padding: 0 24px; border-radius: 999px; background: var(--hk-key); box-shadow: var(--hk-shadow-1);
+  color: var(--hk-5); font-family: var(--hk-font-2); font-size: 11.5px; font-weight: 600; letter-spacing: .14em; }
+.hk .topbar-actions .tb-link { display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; border-radius: 999px; background: var(--hk-key); box-shadow: var(--hk-shadow-1);
+  color: var(--hk-2); font-family: var(--hk-font-2); font-size: 14px; font-weight: 600; text-decoration: none; }
+.hk .topbar-actions .tb-link:hover { background: var(--hk-dent); box-shadow: var(--hk-shadow-2); }
+.hk .page-body { padding: 40px 36px 72px; }
+@media (max-width: 900px) {
+  .hk .app { grid-template-columns: 76px minmax(0, 1fr); }
+  .hk .sidebar { margin: 10px 0 10px 10px; top: 10px; height: calc(100vh - 20px); border-radius: 30px; padding: 4px; }
+  .hk .sb-brand { justify-content: center; padding: 12px 0 6px; }
+  .hk .sb-nav { padding: 4px 6px 10px; gap: 10px; }
+  .hk .sb-item { justify-content: center; min-height: 46px; padding: 0; border-radius: 50%; inline-size: 46px; margin-inline: auto; }
+  .hk .sb-item .badge { position: absolute; top: -4px; right: -6px; font-size: 10px; padding: .05rem .35rem; }
+  .hk .sb-user { margin: 4px 6px 8px; padding: 6px; flex-direction: column; gap: 8px; border-radius: 30px; }
+  .hk .content-topbar { margin: 10px 10px 0; padding: 6px 6px 6px 20px; top: 10px; }
+  .hk .crumb strong { font-size: 20px; }
+  .hk .page-body { padding: 28px 16px 56px; }
+}
+
+/* ---- the workspace's own pages: type, surfaces, keys and wells */
+.hk-native .page-body { position: relative; isolation: isolate; font-family: var(--hk-font-2); color: var(--hk-2); }
+.hk-native .page-body h1 { margin: 0 0 18px; font-family: var(--hk-font-1); font-stretch: 75%; font-weight: 700; font-size: clamp(46px, 5.4vw, 84px); line-height: .92; letter-spacing: -.005em;
+  color: var(--hk-5); text-shadow: var(--hk-shadow-6); text-wrap: balance; }
+.hk-native .page-body h2 { margin: 64px 0 20px; font-family: var(--hk-font-1); font-stretch: 75%; font-weight: 700; font-size: clamp(32px, 3.2vw, 50px); line-height: .95; color: var(--hk-5); text-shadow: var(--hk-shadow-6); scroll-margin-top: 110px; }
+.hk-native .page-body h3 { font-family: var(--hk-font-1); font-stretch: 75%; font-weight: 700; font-size: 25px; line-height: 1.05; color: var(--hk-2); }
+.hk-native .page-body .kicker { margin-bottom: 14px; font-family: var(--hk-font-2); font-size: 12px; font-weight: 300; letter-spacing: .42em; color: var(--hk-5); }
+.hk-native .page-body .kicker a { color: inherit; }
+.hk-native .page-body .lede-sm { max-width: 46em; margin-bottom: 30px; font-size: 18px; line-height: 1.5; color: var(--hk-2); }
+.hk-native .page-body .muted { color: var(--hk-8); }
+.hk-native .page-body .mono { font-family: var(--mono, ui-monospace, monospace); }
+.hk-native .page-body a:not([class]) { color: var(--hk-5); text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+.hk-native .page-body a:not([class]):hover { text-decoration-thickness: 3px; }
+.hk-native .page-body code { padding: .1em .45em; border-radius: 8px; background: var(--hk-1); box-shadow: var(--hk-shadow-2); font-size: .9em; }
+/* key numbers: square keys in rings, as the template's toggle keys sit */
+.hk-native .kpi-grid { grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 34px; margin: 22px 11px 36px; }
+.hk-native .kpi { position: relative; display: grid; align-content: space-between; gap: 18px; min-height: 160px; padding: 20px 20px 18px; border: 0; border-radius: 26px; background: var(--hk-key); box-shadow: var(--hk-shadow-1); }
+.hk-native .kpi::before { content: ""; position: absolute; inset: -11px; border: 1.5px solid var(--hk-4); border-radius: 37px; pointer-events: none; }
+.hk-native .kpi-label { font-family: var(--hk-font-2); font-size: 12px; font-weight: 600; line-height: 1.3; letter-spacing: .1em; color: var(--hk-5); }
+.hk-native .kpi-value { margin: 0; font-family: var(--hk-font-1); font-stretch: 75%; font-weight: 700; font-size: 54px; line-height: .95; color: var(--hk-2); }
+.hk-native .kpi-value[style*="color"] { color: var(--hk-7) !important; text-shadow: none; }
+/* cards: raised surfaces, the icon on a round key */
+.hk-native .card-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 26px; margin-top: 8px; }
+.hk-native .portal-card, .hk-native .media-card { padding: 22px 22px 24px; border: 0; border-radius: 34px; background: var(--hk-surface); box-shadow: var(--hk-shadow-8); color: var(--hk-2); transition: transform .3s ease, box-shadow .3s ease; }
+.hk-native .portal-card:hover { transform: translateY(-3px); box-shadow: var(--hk-shadow-8), 0 26px 40px -24px color-mix(in srgb, var(--hk-9) 40%, transparent); }
+.hk-native .portal-card h3 { gap: 14px; margin-bottom: 10px; }
+.hk-native .portal-card h3 .icn { flex: none; inline-size: 46px; block-size: 46px; padding: 12px; border-radius: 50%; background: var(--hk-key); box-shadow: var(--hk-shadow-1); color: var(--hk-5); }
+.hk-native .portal-card:hover h3 .icn { background: var(--hk-dent); box-shadow: var(--hk-shadow-2); }
+.hk-native .portal-card p, .hk-native .media-card p { font-size: 15px; line-height: 1.5; color: var(--hk-8); }
+.hk-native .media-thumb { border-radius: 24px; overflow: hidden; box-shadow: var(--hk-shadow-2); }
+/* panels: the template's raised surface */
+.hk-native .panel, .hk-native .chart-card, .hk-native .msg-form, .hk-native .api-block { margin-bottom: 28px; padding: clamp(22px, 2.6vw, 36px); border: 0; border-radius: 34px; background: var(--hk-surface); box-shadow: var(--hk-shadow-8); }
+.hk-native .panel h3, .hk-native .chart-card h3 { margin-bottom: 14px; }
+.hk-native .two-col { gap: 28px; }
+/* tables sit in a pressed well */
+.hk-native .data-table { border: 0; border-radius: 26px; background: var(--hk-1); box-shadow: var(--hk-shadow-2); overflow: hidden; font-size: 15px; }
+.hk-native .data-table th { background: transparent; color: var(--hk-5); padding: 16px 16px 12px; font-family: var(--hk-font-2); font-size: 11.5px; font-weight: 600; letter-spacing: .12em; border-bottom: 1.5px solid var(--hk-4); }
+.hk-native .data-table td { padding: 14px 16px; border-top: 1px solid color-mix(in srgb, var(--hk-4) 38%, transparent); }
+.hk-native .data-table tr:first-child td { border-top: 0; }
+.hk-native .data-table tr:hover td { background: color-mix(in srgb, var(--hk-3) 55%, transparent); }
+.hk-native .data-table tr.unread td { background: color-mix(in srgb, var(--hk-7) 12%, transparent); }
+/* fields: pressed wells; labels in small spaced capitals */
+.hk-native .page-body :is(.grid-form, .msg-form, form) label { font-family: var(--hk-font-2); font-size: 11.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--hk-5); }
+.hk-native .page-body :is(input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]), select, textarea) {
+  display: block; inline-size: 100%; min-height: 50px; margin-top: 8px; padding: 13px 20px; border: 0; border-radius: 999px; background: var(--hk-1); box-shadow: var(--hk-shadow-2);
+  color: var(--hk-2); font-family: var(--hk-font-2); font-size: 16px; font-weight: 400; letter-spacing: 0; text-transform: none; line-height: 1.4; appearance: none; -webkit-appearance: none; }
+.hk-native .page-body textarea { border-radius: 26px; resize: vertical; }
+.hk-native .page-body select { padding-right: 46px; background-image: linear-gradient(45deg, transparent 50%, var(--hk-5) 50%), linear-gradient(-45deg, transparent 50%, var(--hk-5) 50%);
+  background-position: right 26px top 50%, right 20px top 50%; background-size: 6px 6px; background-repeat: no-repeat; }
+.hk-native .page-body .inline-form select { display: inline-block; inline-size: auto; min-height: 40px; margin: 0; padding: 8px 40px 8px 16px; font-size: 14px; }
+.hk-native .page-body :is(input, select, textarea):focus-visible { outline: 2px solid var(--hk-7); outline-offset: 3px; }
+.hk-native .page-body ::placeholder { color: var(--hk-8); opacity: .85; }
+.hk-native .page-body input[type="checkbox"] { inline-size: 22px; block-size: 22px; accent-color: var(--hk-5); }
+.hk-native .grid-form { gap: 16px; }
+/* buttons: the template's keys; the primary ones a deep UN blue so a white label passes AA */
+.hk .page-body .btn { min-height: 48px; padding: 0 26px; border: 0; border-radius: 999px; font-family: var(--hk-font-2); font-size: 15px; font-weight: 600; letter-spacing: .02em; transition: box-shadow .25s ease, transform .1s ease, background .25s ease; }
+.hk .page-body :is(.btn-teal, .btn-gold, .btn-navy) { background: var(--hk-blue-key); color: #fff; box-shadow: var(--hk-shadow-4); }
+.hk .page-body :is(.btn-teal, .btn-gold, .btn-navy):hover { background: linear-gradient(180deg, #004a74, #005b8e); box-shadow: var(--hk-shadow-5); color: #fff; }
+.hk .page-body :is(.btn-ghost, .btn-outline) { background: var(--hk-key); color: var(--hk-5); box-shadow: var(--hk-shadow-1); }
+.hk .page-body :is(.btn-ghost, .btn-outline):hover { background: var(--hk-dent); box-shadow: var(--hk-shadow-2); color: var(--hk-5); }
+.hk .page-body .btn:active { transform: translateY(1px); }
+.hk .page-body .btn-sm { min-height: 38px; padding: 0 16px; font-size: 13.5px; }
+.hk .page-body .btn:disabled { opacity: .55; cursor: default; }
+/* tags: small pressed wells */
+.hk-native .page-body .tag { padding: .32rem .8rem; border-radius: 999px; background: var(--hk-1); box-shadow: var(--hk-shadow-2); color: var(--hk-5); font-family: var(--hk-font-2); font-size: 11px; font-weight: 600; letter-spacing: .1em; }
+.hk-native .page-body .tag-suspended { color: #b00d29; }
+.hk-native .page-body .tag-pending { color: var(--hk-2); }
+/* notices */
+.hk-native .alert { position: relative; padding: 16px 22px 16px 46px; border: 0; border-radius: 26px; background: var(--hk-surface); box-shadow: var(--hk-shadow-8); color: var(--hk-2); font-size: 15px; }
+.hk-native .alert::before { content: ""; position: absolute; left: 20px; top: 50%; inline-size: 12px; block-size: 12px; margin-top: -6px; border-radius: 50%; background: var(--hk-7); box-shadow: 0 0 0 4px color-mix(in srgb, var(--hk-7) 22%, transparent); }
+.hk-native .alert-error::before { background: #c8102e; box-shadow: 0 0 0 4px rgb(200 16 46 / .2); }
+/* messages: the team's raised, yours pressed in */
+.hk-native .thread { gap: 14px; margin: 26px 0; }
+.hk-native .msg { padding: 16px 20px; border: 0; border-radius: 26px; background: var(--hk-surface); box-shadow: var(--hk-shadow-8); }
+.hk-native .msg-user { background: var(--hk-1); box-shadow: var(--hk-shadow-2); }
+.hk-native .msg-admin { background: var(--hk-surface); }
+.hk-native .msg-head { color: var(--hk-5); }
+/* the NIIP seal pressed into the ground behind a page's head */
+.hk-wm { position: absolute; z-index: -1; top: -60px; right: -120px; inline-size: min(560px, 60vw); pointer-events: none; user-select: none; opacity: .8; }
+.hk-wm img { inline-size: 100%; block-size: auto; }
+@media (max-width: 900px) {
+  .hk-native .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; }
+  .hk-native .kpi { min-height: 130px; padding: 16px; }
+  .hk-native .kpi-value { font-size: 40px; }
+  .hk-native .page-body h2 { margin-top: 44px; }
+  .hk-wm { right: -38vw; top: -20px; inline-size: 92vw; }
+}
+
+/* the workspace reads flush left: the site justifies its reading pages, but in narrow cards and on a
+   phone justified lines open wide gaps */
+.hk-native .page-body :is(p, li, dd) { text-align: left; -webkit-hyphens: manual; hyphens: manual; }
+.hk-native .kpi-value span { white-space: nowrap; }
+@media (max-width: 900px) {
+  /* side-by-side panels stack, wide tables scroll inside their well, the date key fits */
+  .hk-native .page-body .two-col { grid-template-columns: minmax(0, 1fr) !important; }
+  .hk-native .data-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .hk-native .data-table .inline-form select { min-inline-size: 140px; }
+  .hk-native .data-table td, .hk-native .data-table th { min-inline-size: 96px; }
+  .hk-native .kpi-value span { font-size: .5em !important; }
+}
+
+/* the avatar and the role chip lead to the account */
+.hk .sb-avatar, .hk .role-chip { text-decoration: none; }
+.hk .sb-avatar:hover { box-shadow: var(--hk-shadow-5); }
+.hk .role-chip:hover { background: var(--hk-dent); box-shadow: var(--hk-shadow-2); }
+/* a file chooser: a well with a key in it */
+.hk-native .page-body input[type="file"] { display: block; inline-size: 100%; margin-top: 8px; padding: 8px; border-radius: 999px; background: var(--hk-1); box-shadow: var(--hk-shadow-2);
+  color: var(--hk-2); font-family: var(--hk-font-2); font-size: 14px; text-transform: none; letter-spacing: 0; }
+.hk-native .page-body input[type="file"]::file-selector-button { margin-right: 14px; min-height: 38px; padding: 0 18px; border: 0; border-radius: 999px; background: var(--hk-key); box-shadow: var(--hk-shadow-1);
+  color: var(--hk-5); font-family: var(--hk-font-2); font-weight: 600; cursor: pointer; }
+
+/* ---- the account page */
+.hk-native .ac-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 28px; align-items: center; margin-bottom: 36px; }
+.hk-native .ac-key { display: grid; place-items: center; inline-size: 120px; block-size: 120px; border-radius: 50%; background: var(--hk-key); box-shadow: var(--hk-shadow-1);
+  font-family: var(--hk-font-1); font-stretch: 75%; font-weight: 700; font-size: 46px; color: var(--hk-5); text-shadow: var(--hk-shadow-6); position: relative; }
+.hk-native .ac-key::before { content: ""; position: absolute; inset: -11px; border: 1.5px solid var(--hk-4); border-radius: 50%; }
+.hk-native .ac-head h1 { margin-bottom: 8px; }
+.hk-native .ac-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 32px; }
+.hk-native .ac-list div { display: grid; gap: 6px; padding-top: 14px; border-top: 1.5px solid var(--hk-4); }
+.hk-native .ac-list dt { font-size: 11.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--hk-5); }
+.hk-native .ac-list dd { margin: 0; font-size: 18px; color: var(--hk-2); overflow-wrap: anywhere; }
+.hk-native .ac-perms { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+.hk-native .ac-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; }
+@media (max-width: 900px) {
+  .hk-native .ac-head { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .hk-native .ac-key { inline-size: 92px; block-size: 92px; font-size: 36px; margin: 11px; }
+  .hk-native .ac-list { grid-template-columns: minmax(0, 1fr); }
+}

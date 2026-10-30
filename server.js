@@ -394,6 +394,8 @@ async function handler(req, res) {
     const ctx = { user, perms: user ? [...(cache.permsByRole.get(user.role) || [])] : [],
       // the site's own address, for share links (Vercel says https in x-forwarded-proto)
       origin: `${String(req.headers['x-forwarded-proto'] || 'http').split(',')[0]}://${req.headers.host || 'localhost'}` };
+    // the account types on offer; Researcher appears once docs/sql/researcher-role.sql has given it permissions
+    ctx.roles = ['public', ...(cache.permsByRole.has('researcher') ? ['researcher'] : []), 'stakeholder', 'admin'];
     if (user && (hasPerm(user, 'messaging') || hasPerm(user, 'admin_inbox'))) {
       const badges = await sdb.rpc('user_badges', { p_user_id: user.id, p_is_admin: hasPerm(user, 'admin_inbox') });
       ctx.unreadMsgs = badges.unreadMsgs || 0;
@@ -770,7 +772,7 @@ async function handler(req, res) {
       await sdb.ins('access_requests', [{
         name: f.name.trim().slice(0, 120), email, organization: (f.organization || '').trim().slice(0, 160),
         phone: (f.phone || '').trim().slice(0, 40),
-        role_requested: f.role_requested === 'stakeholder' ? 'stakeholder' : 'public',
+        role_requested: ctx.roles.filter((r) => r !== 'admin').includes(f.role_requested) ? f.role_requested : 'public',
         purpose: (f.purpose || '').trim().slice(0, 1000),
       }]);
       logEvent('page_view', '/register/submitted', user);
@@ -918,7 +920,7 @@ async function handler(req, res) {
 
     // ================= AUTHENTICATED WORKSPACE =================
     if (!user) {
-      if (['/portal', '/media', '/analytics', '/messages', '/admin'].some((s) => p === s || p.startsWith(s + '/'))) {
+      if (['/portal', '/account', '/media', '/analytics', '/messages', '/admin'].some((s) => p === s || p.startsWith(s + '/'))) {
         return redirect(res, '/login');
       }
       return send(res, 404, views.notFound(ctx));
@@ -931,7 +933,85 @@ async function handler(req, res) {
         dataPoints: s.dataPoints, indicators: s.indicators, lastUpdated: s.lastUpdated, unread: ctx.unreadMsgs || 0,
       };
       if (hasPerm(user, 'manage_users')) { stats.pendingRequests = s.pendingRequests; stats.pendingSubs = s.pendingSubs; }
+      // a data focal point's own submissions, waiting and approved
+      if (user.role === 'stakeholder') {
+        const mine = await sdb.sel(`data_submissions?select=status&submitted_by=eq.${user.id}`).catch(() => []);
+        stats.myPending = mine.filter((x) => x.status === 'pending').length;
+        stats.myApproved = mine.filter((x) => x.status === 'approved').length;
+      }
       return send(res, 200, views.portal(ctx, stats));
+    }
+
+    // ----- the account and its services -----
+    if (p === '/account') {
+      logEvent('page_view', p, user);
+      return send(res, 200, views.account(ctx));
+    }
+    // Request an indicator: written into the user's conversation with the team, so it lands in the Team
+    // Inbox like any other message (every role may write to the team)
+    if (p === '/portal/request-indicator') {
+      if (!hasPerm(user, 'messaging')) return send(res, 403, views.forbidden(ctx));
+      if (req.method === 'POST') {
+        const f = parseForm(await readBody(req));
+        const t = (k, n) => String(f[k] || '').trim().slice(0, n);
+        const name = t('indicator', 160), why = t('why', 2000);
+        if (!name || !why) return send(res, 400, views.requestIndicator(ctx, { error: 'Name the indicator and say what it is for.', values: f, indicatorCount: cache.indicators.length }));
+        const body = ['Indicator request', '', 'Indicator: ' + name, t('definition', 1000) ? 'Definition: ' + t('definition', 1000) : '',
+          'Level: ' + (t('level', 60) || 'not given'), 'How often: ' + (t('frequency', 60) || 'not given'), '', 'What it is for:', why].filter((l, i, a) => l || a[i - 1]).join('\n');
+        let [conv] = await sdb.sel(`conversations?select=*&user_id=eq.${user.id}`);
+        if (!conv) [conv] = await sdb.ins('conversations', [{ user_id: user.id, subject: ('Indicator request: ' + name).slice(0, 120) }], true);
+        await sdb.ins('messages', [{ conversation_id: conv.id, sender_id: user.id, from_admin_team: 0, body: body.slice(0, 4000), read_by_user: 1 }]);
+        await sdb.upd('conversations', `id=eq.${conv.id}`, { updated_at: new Date().toISOString() });
+        return redirect(res, '/portal/request-indicator?sent=1');
+      }
+      logEvent('page_view', p, user);
+      return send(res, 200, views.requestIndicator(ctx, { sent: url.searchParams.get('sent') === '1', indicatorCount: cache.indicators.length }));
+    }
+    // Submit data: a stakeholder as the data focal point of their institution (and administrators) sends
+    // one value, or a CSV file of rows; each passes the automated checks and waits in the review queue
+    // for an administrator, as the manual channel always has
+    if (p === '/portal/submit-data') {
+      if (!['stakeholder', 'admin'].includes(user.role)) return send(res, 403, views.forbidden(ctx));
+      const mine = () => sdb.sel(`data_submissions?select=*&submitted_by=eq.${user.id}&order=created_at.desc&limit=40`);
+      const page = async (status, opts) => send(res, status, views.submitData(ctx, {
+        indicators: cache.indicators, counties: cache.counties, list: await mine(), ...opts }));
+      if (req.method === 'POST') {
+        const ctype = String(req.headers['content-type'] || '');
+        let f = {}, csvText = '', fileName = '';
+        if (ctype.startsWith('multipart/form-data')) {
+          if ((+req.headers['content-length'] || 0) > 1100000) { req.resume(); return page(413, { errors: ['That file is larger than 1 MB. Split it into smaller files and send each.'] }); }
+          for (const q of imagestore.parseMultipart(await readBodyBuffer(req, 1100000), ctype) || []) {
+            if (q.filename == null) f[q.name] = q.data.toString('utf8');
+            else if (q.name === 'file' && q.data.length) { csvText = q.data.toString('utf8'); fileName = String(q.filename).slice(0, 120); }
+          }
+        } else f = parseForm(await readBody(req));
+        const note = String(f.source || '').trim().slice(0, 120);
+        const source = 'Focal point: ' + (user.organization || user.name) + (note ? ' · ' + note : '') + (fileName ? ' · ' + fileName : '');
+        const rows = [], errors = [];
+        if (f.mode === 'file') {
+          if (!csvText) errors.push('Choose a CSV file to send.');
+          else { const r = parseBulkCsv(csvText); rows.push(...r.rows); errors.push(...r.errors); }
+        } else {
+          const county = f.county_id ? cache.counties.find((c) => c.id === Number(f.county_id)) : null;
+          const year = Number(f.year), value = Number(f.value);
+          if (!cache.indicatorByCode.get(f.indicator_code)) errors.push('Choose an indicator.');
+          else if (f.county_id && !county) errors.push('Choose a county, or National.');
+          else if (!Number.isInteger(year) || year < 2000 || year > 2100) errors.push('Give the year as four digits.');
+          else if (String(f.value || '').trim() === '' || !Number.isFinite(value)) errors.push('Give the value as a number.');
+          else rows.push({ indicator: f.indicator_code, county_id: county ? county.id : null, year, value });
+        }
+        if (rows.length) {
+          await sdb.ins('data_submissions', rows.slice(0, 2000).map((r) => {
+            const v = validateSubmission(r.indicator, r.value);
+            return { indicator_code: r.indicator, county_id: r.county_id, year: r.year, value: r.value, source,
+              submitted_by: user.id, channel: 'manual', status: 'pending', validation_note: v.note };
+          }));
+          logEvent('page_view', '/portal/submit-data/sent', user);
+        }
+        return page(errors.length && !rows.length ? 400 : 200, { added: Math.min(rows.length, 2000), errors, mode: f.mode === 'file' ? 'file' : 'value' });
+      }
+      logEvent('page_view', p, user);
+      return page(200, {});
     }
 
     if (p === '/media' && req.method === 'GET') {
@@ -1125,7 +1205,7 @@ async function handler(req, res) {
           return redirect(res, '/admin#users');
         }
         if (p === '/admin/users/role') {
-          if (['public', 'stakeholder', 'admin'].includes(f.role)) await sdb.upd('users', `id=eq.${Number(f.id)}`, { role: f.role });
+          if (ctx.roles.includes(f.role)) await sdb.upd('users', `id=eq.${Number(f.id)}`, { role: f.role });
           cache.sessions.clear();
           return redirect(res, '/admin#users');
         }
@@ -1134,7 +1214,7 @@ async function handler(req, res) {
           if (email && f.name && f.password && f.password.length >= 8) {
             const existing = await sdb.sel(`users?select=id&email=eq.${sdb.enc(email)}`);
             if (!existing.length) {
-              await sdb.ins('users', [{ email, name: f.name.trim(), organization: (f.organization || '').trim(), password_hash: hashPassword(f.password), role: ['public', 'stakeholder', 'admin'].includes(f.role) ? f.role : 'stakeholder', status: 'active' }]);
+              await sdb.ins('users', [{ email, name: f.name.trim(), organization: (f.organization || '').trim(), password_hash: hashPassword(f.password), role: ctx.roles.includes(f.role) ? f.role : 'stakeholder', status: 'active' }]);
             }
           }
           return redirect(res, '/admin#users');
@@ -1148,7 +1228,7 @@ async function handler(req, res) {
               if (!f.password || f.password.length < 8) return redirect(res, '/admin?notice=' + encodeURIComponent('Temporary password must be at least 8 characters.') + '#requests');
               const existing = await sdb.sel(`users?select=id&email=eq.${sdb.enc(ar.email)}`);
               if (existing.length) return redirect(res, '/admin?notice=' + encodeURIComponent('A user with that email already exists.') + '#requests');
-              const role = ['public', 'stakeholder'].includes(f.role) ? f.role : ar.role_requested;
+              const role = ctx.roles.filter((r) => r !== 'admin').includes(f.role) ? f.role : ar.role_requested;
               await sdb.ins('users', [{ email: ar.email, name: ar.name, organization: ar.organization, password_hash: hashPassword(f.password), role, status: 'active' }]);
               await sdb.upd('access_requests', `id=eq.${ar.id}`, { status: 'approved', reviewed_by: user.id, reviewed_at: new Date().toISOString() });
               return redirect(res, '/admin?notice=' + encodeURIComponent(`Account created for ${ar.email} (${role}). Share the temporary password with the applicant.`) + '#requests');
@@ -1282,7 +1362,7 @@ async function handler(req, res) {
         }
         if (p === '/admin/permissions') {
           if (!hasPerm(user, 'manage_settings')) return send(res, 403, views.forbidden(ctx));
-          const roles = ['public', 'stakeholder'];
+          const roles = ctx.roles.filter((r) => r !== 'admin');
           const allPerms = ['view_registered_data', 'view_stakeholder_data', 'analytics', 'messaging', 'download_open_data'];
           for (const role of roles) {
             for (const perm of allPerms) {

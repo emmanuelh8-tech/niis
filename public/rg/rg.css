@@ -582,6 +582,19 @@ select.m-field { background-image: linear-gradient(45deg, transparent 50%, var(-
 
 /* ---- NIIP: the six area keys are links to the area pages */
 a.m-key-2 { text-decoration: none; }
+/* the hero panel's drawn keys are links too: they press like the template's buttons, with its hover ring */
+a.m-key { cursor: pointer; color: var(--color-5); text-decoration: none; }
+a.m-key .m-key__dent { transition: opacity .25s ease; }
+a.m-key::after { content: ""; position: absolute; inset: -.3em; border: 1.5px solid var(--color-4); border-radius: inherit; opacity: 0; transform: scale(.9); transition: opacity .3s ease, transform .3s ease; pointer-events: none; }
+@media (hover: hover) { a.m-key:hover::after { opacity: 1; transform: none; } a.m-key:hover .m-key__dent { opacity: .6; } }
+a.m-key:active .m-key__dent { opacity: 1; transition-duration: .08s; }
+a.m-key:focus-visible { outline: 2px solid var(--color-2); outline-offset: 5px; }
+#hero .hero__seg .m-key__label { font-size: .98em; letter-spacing: .03em; }
+/* the play cluster spans the whole panel (its contour is drawn across it), so it and its outline let a
+   press through to the pad and the arrow keys beneath; only its own two keys take one */
+#hero .hero__play, #hero .hero__contour { pointer-events: none; }
+#hero .hero__play .m-key { pointer-events: auto; }
+#hero .hero__steps .m-key__label:not(:has(svg)) { font-size: 1.2em; }
 
 /* ---- NIIP area pages (/research/group/<area>): the hero lettered with the area on one great key, then
    its groups, each a raised surface with its research question, its classification and its members as

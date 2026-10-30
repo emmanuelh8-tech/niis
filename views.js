@@ -2841,6 +2841,8 @@ const RG_G = {
   page: '<svg viewBox="0 0 24 24"><path fill-rule="evenodd" d="M6 3h8.5L18 6.5V21H6zM14 3.5V7h3.5z"/></svg>',
 };
 const rgKey = (cls, label) => `<span class="m-key ${cls}"><span class="m-key__cap"><span class="m-key__dent"></span></span><span class="m-key__label">${label}</span></span>`;
+// a drawn key that is also a link: its name read out and shown on hover, its letters left to the eye
+const rgLink = (cls, label, href, name) => `<a class="m-key ${cls}" href="${href}" aria-label="${esc(name)}" title="${esc(name)}"><span class="m-key__cap" aria-hidden="true"><span class="m-key__dent"></span></span><span class="m-key__label" aria-hidden="true">${label}</span></a>`;
 const rgKey3 = (cls, label) => `<span class="m-key-3 ${cls}"><span class="m-key-3__cap"><span class="m-key-3__dent"></span></span><span class="m-key-3__label">${label}</span></span>`;
 const rgBtn = (href, label, cls = 'm-btn') => `<a class="${cls}" href="${href}"><span class="${cls}__dent" aria-hidden="true"></span><span class="${cls}__label">${label}</span></a>`;
 const rgPhoto = (cls, key, alt, w, h, motion = '') => `<figure class="m-photo ${cls}"${motion}><img src="${esc(imgs.url('researchGroup', key))}" alt="${esc(alt)}" width="${w}" height="${h}" loading="lazy" decoding="async"></figure>`;
@@ -2987,11 +2989,11 @@ exports.researchArea = (slug) => {
       </div>
       <p class="m-text-8 hero__note">${area.groups.length} groups · ${members} members · <a class="m-link" href="/research/group#states">All six areas</a></p>
     </div>
-    <div class="hero__stage" aria-hidden="true">
+    <div class="hero__stage">
       <div class="ra-stage">
-        <span class="ra-ring"></span>
-        ${rgKey('ra-big', esc(area.key))}
-        <span class="m-tick"><span class="m-tick__label">${no}</span><span class="m-tick__line"></span></span>
+        <span class="ra-ring" aria-hidden="true"></span>
+        ${rgLink('ra-big', esc(area.key), '#groups', `Meet the ${area.name.toLowerCase()} groups`)}
+        <span class="m-tick" aria-hidden="true"><span class="m-tick__label">${no}</span><span class="m-tick__line"></span></span>
       </div>
     </div>
   </div>
@@ -3084,41 +3086,42 @@ exports.researchGroup = () => {
       </div>
       <p class="m-text-8 hero__note">Part of the National ICT Intelligence Program.</p>
     </div>
-    <div class="hero__stage" aria-hidden="true">
+    <!-- the panel's keys all lead somewhere: the six areas, the areas list, the library, a paper, the sign-up, the questions -->
+    <nav class="hero__stage" aria-label="Research areas and shortcuts">
       <div class="hero__panel">
         <div class="hero__cluster hero__pad">
-          <span class="hero__diamond"></span>
-          ${rgKey('hero__k-up', 'AI')}
-          ${rgKey('hero__k-left', 'Data')}
-          ${rgKey('hero__k-ok', 'Go')}
-          ${rgKey('hero__k-right', 'Cyber')}
-          ${rgKey('hero__k-down', 'Net')}
-          <span class="hero__pad-dent"></span>
+          <span class="hero__diamond" aria-hidden="true"></span>
+          ${rgLink('hero__k-up', 'AI', '/research/group/ai', 'Artificial intelligence groups')}
+          ${rgLink('hero__k-left', 'Data', '/research/group/data-science', 'Data science groups')}
+          ${rgLink('hero__k-ok', 'Go', '#states', 'All research areas')}
+          ${rgLink('hero__k-right', 'Cyber', '/research/group/cybersecurity', 'Cybersecurity groups')}
+          ${rgLink('hero__k-down', 'Net', '/research/group/connectivity', 'Connectivity groups')}
+          <span class="hero__pad-dent" aria-hidden="true"></span>
         </div>
         <div class="hero__cluster hero__seg">
           <span class="m-well">
-            ${rgKey('', RG_G.left)}
-            ${rgKey('', RG_G.right)}
+            ${rgLink('', 'Fin', '/research/group/digital-finance', 'Digital finance groups')}
+            ${rgLink('', 'Tech', '/research/group/emerging-tech', 'Emerging tech groups')}
           </span>
-          <span class="hero__seg-dent"></span>
+          <span class="hero__seg-dent" aria-hidden="true"></span>
         </div>
         <div class="hero__cluster hero__play">
-          <svg class="hero__contour" viewBox="0 0 38 33" preserveAspectRatio="none"><path d="M 21.2 18.1 C 21.1 20.2 20.8 20.4 19.9 21.1 A 3.6 3.6 0 1 0 25 26.1 C 25.7 25.2 25.9 24.9 27.9 24.8 A 6.3 6.3 0 1 0 21.2 18.1 Z"/></svg>
-          ${rgKey('hero__k-play', RG_G.search)}
-          ${rgKey('hero__k-pause', RG_G.page)}
+          <svg class="hero__contour" viewBox="0 0 38 33" preserveAspectRatio="none" aria-hidden="true"><path d="M 21.2 18.1 C 21.1 20.2 20.8 20.4 19.9 21.1 A 3.6 3.6 0 1 0 25 26.1 C 25.7 25.2 25.9 24.9 27.9 24.8 A 6.3 6.3 0 1 0 21.2 18.1 Z"/></svg>
+          ${rgLink('hero__k-play', RG_G.search, '/research', 'Search the research library')}
+          ${rgLink('hero__k-pause', RG_G.page, '/research/submit', 'Submit a paper')}
         </div>
         <div class="hero__cluster hero__steps">
           <span class="m-well">
-            ${rgKey('', RG_G.plus)}
-            ${rgKey('is-on', RG_G.minus)}
+            ${rgLink('', RG_G.plus, '#contact', 'Join a group')}
+            ${rgLink('is-on', '?', '#faq', 'Questions and answers')}
           </span>
         </div>
       </div>
-    </div>
+    </nav>
   </div>
 </section>
 
-<!-- states: the six research areas as toggle keys, with All six and Clear; pressed ones fill the form -->
+<!-- states: the six research areas as keys, each opening its area's page, then Submit a paper and Join a group -->
 <section id="states" class="states" data-8b-section="states" aria-labelledby="states-title">
   <div class="states__inner wrap">
     <header class="states__head">

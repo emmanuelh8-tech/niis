@@ -647,6 +647,71 @@ a.m-key:focus-visible { outline: 2px solid var(--color-2); outline-offset: 5px; 
 .ra-step span:last-child { display: grid; gap: 2px; }
 .ra-step b { font-family: var(--font-1); font-stretch: 75%; font-size: 28px; font-weight: 700; line-height: 1; }
 @media (hover: hover) { .ra-step:hover b { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1.5px; } }
+/* ---- NIIP: the Research Group as several pages (30 Oct 2026). The bar marks the page you are on; a page
+   that opens on a section other than the hero gives it room under the floating bar. */
+#nav .m-link[aria-current="page"] { background-size: 100% 3px; color: var(--color-5); }
+main > section:first-child:not(#hero) { padding-top: clamp(124px, 16vh, 160px); }
+
+/* the headline on two lines, two words each, on every screen: each line kept whole, the size set by
+   the column so the longer line ("Research Projects", 6.2em) always fits */
+#hero .hero__inner { container-type: inline-size; }
+#hero:not(.is-area) .hero__title { font-size: min(116px, 7.1cqi); max-width: none; }
+#hero:not(.is-area) .hero__line { white-space: nowrap; }
+@media (max-width: 899px) {
+  #hero:not(.is-area) .hero__title { font-size: min(84px, 15.6cqi); }
+  /* on a phone the headline sits directly over the key tiles, the rest of the copy under them */
+  #hero .hero__inner { gap: 0; }
+  #hero .hero__copy { display: contents; }
+  #hero .hero__title { order: 1; }
+  #hero .hero__stage { order: 2; margin-top: 24px; }
+  #hero .hero__caption { order: 3; margin-top: 28px; }
+  #hero .hero__lede { order: 4; }
+  #hero .hero__actions { order: 5; }
+  #hero .hero__note { order: 6; }
+  /* and each heading over its own tiles: the template set the area keys above their heading on a phone */
+  #states .states__keys { order: 0; }
+}
+
+/* a tighter rhythm from the statement down (the owner found the gaps too big): sections half the
+   template's padding, shorter pinned scroll for the chord, less floor before the FAQ */
+#quiet, #chords, #material, #editions, #scenes { padding-top: clamp(56px, 8vh, 88px); padding-bottom: clamp(56px, 8vh, 88px); }
+#editions { padding-bottom: 0; }
+#faq, #contact { padding-top: clamp(56px, 8vh, 88px); padding-bottom: clamp(56px, 8vh, 88px); }
+#quiet .quiet__text { margin-top: 32px; }
+#material .material__head, #editions .editions__head { margin-bottom: 44px; }
+#material .material__item--circle { margin-top: 64px; }
+#material .material__item--square { margin-top: 20px; }
+#chords .chords__stage { padding: 24px 0 8px; }
+#chords .chords__list { margin-top: 28px; }
+#chords[data-stage] .chords__track { block-size: 170vh; }
+#editions .editions__switch { padding-top: 40px; }
+#editions .editions__floor { block-size: 9vh; min-block-size: 64px; }
+
+/* more photos lower down: a strip under the statement (a pill, a frame and a circle, as the template
+   cuts its photos), a pair under the chords, one in the FAQ's empty column, and the overview's cards */
+.rg-strip { display: grid; grid-template-columns: .8fr 1.25fr .9fr; gap: 28px; align-items: center; margin-top: 48px; }
+.rg-strip__photo { aspect-ratio: 4 / 3; }
+.rg-strip__photo--pill { aspect-ratio: 1 / 1.25; border-radius: var(--radius-1); }
+.rg-strip__photo--circle { aspect-ratio: 1; border-radius: 50%; }
+.rg-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; margin-top: 44px; }
+.rg-pair__photo { aspect-ratio: 16 / 10; }
+#faq .faq__photo { margin-top: 28px; max-inline-size: 440px; aspect-ratio: 4 / 3; background: color-mix(in srgb, var(--color-7), #000 14%); box-shadow: var(--shadow-5); }
+.rg-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+.rg-card { display: grid; gap: 8px; padding: 12px 12px 24px; color: var(--color-2); text-decoration: none; transition: transform .3s ease; }
+.rg-card > span { padding-inline: 12px; }
+.rg-card .m-text-4 { margin-top: 10px; color: var(--color-5); }
+.rg-card .m-link { justify-self: start; margin: 8px 12px 0; padding-inline: 0; }
+.rg-card__photo { aspect-ratio: 4 / 3; }
+@media (hover: hover) { .rg-card:hover { transform: translateY(-3px); } .rg-card:hover .m-link { background-size: 100% 3px; } }
+/* each member's email and line, under their roles */
+.ra-reach { display: flex; flex-wrap: wrap; gap: 2px 16px; margin-top: 6px; }
+.ra-reach .m-link { font-size: 13px; font-weight: 500; color: var(--color-5); overflow-wrap: anywhere; }
+@media (max-width: 899px) {
+  .rg-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 36px; }
+  .rg-strip li:nth-child(2) { grid-column: 1 / -1; order: -1; }
+  .rg-pair, .rg-cards { grid-template-columns: minmax(0, 1fr); }
+}
+
 #contact .rg-wm--band { --wm-size: clamp(340px, 36vw, 560px); }
 #contact .rg-wm--band img { right: calc(var(--wm-size) * -.2); top: 50%; transform: translateY(-50%); }
 #standards .rg-wm--std { --wm-size: clamp(360px, 40vw, 620px); }

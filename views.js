@@ -2857,8 +2857,8 @@ const rgMini = `<svg class="chords__mini" viewBox="0 0 20 20" aria-hidden="true"
 
 // The frame every research-group page shares: the head, the floating bar (its section links and its one
 // call to act), the footer with the width-filling wordmark, and the scripts.
-const rgPage = ({ title, desc, links, cta, body }) => {
-  const linkList = links.map(([h, t]) => `<li><a class="m-link" href="${h}">${t}</a></li>`).join('\n        ');
+const rgPage = ({ title, desc, links, current = '', cta, body }) => {
+  const linkList = links.map(([h, t]) => `<li><a class="m-link" href="${h}"${h === current ? ' aria-current="page"' : ''}>${t}</a></li>`).join('\n        ');
   return `<!doctype html>
 <!--
   Free website template by 8B: https://8b.com/templates/hushkey/
@@ -2913,12 +2913,12 @@ ${body}
       <p class="m-text-3">NIIP Research Groups</p>
       <nav class="footer__links" aria-label="Footer">
         <ul>
-          <li><a class="m-link" href="/">Home</a></li>
+          <li><a class="m-link" href="/research/group">Overview</a></li>
+          <li><a class="m-link" href="/research/group/how-it-works">How it works</a></li>
+          <li><a class="m-link" href="/research/group/program">Program</a></li>
+          <li><a class="m-link" href="/research/group/join">Join</a></li>
           <li><a class="m-link" href="/research">Research papers</a></li>
-          <li><a class="m-link" href="/research/submit">Submit a paper</a></li>
-          <li><a class="m-link" href="/reports">ICT Reports</a></li>
-          <li><a class="m-link" href="/data">Data Explorer</a></li>
-          <li><a class="m-link" href="/about">About</a></li>
+          <li><a class="m-link" href="/">NIIP home</a></li>
         </ul>
       </nav>
       <p class="m-text-9">© 2026 National ICT Intelligence Program, Monrovia · Design: <a href="https://8b.com/" style="color:inherit" data-8b-credit>8B</a></p>
@@ -2946,12 +2946,16 @@ exports.researchArea = (slug) => {
   const members = area.groups.reduce((t, g) => t + g.people.length, 0);
   const no = String(i + 1).padStart(2, '0');
   const ford = (codes) => codes.map((c) => `${c} ${RG_FORD[c]}`).join('; ');
-  const person = ([name, role, expertise, country, credit], k) => `<li class="ra-person">
+  // each member's email at the program's domain, and the program's line with their own extension
+  // (dialled as RFC 3966 has it), so no sample number can ring a stranger's phone
+  const email = (name) => name.replace(/^(Dr|Prof)\.\s+/, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/\s+/).filter(Boolean).join('.') + '@niip.org';
+  const person = ([name, role, expertise, country, credit], k, gi) => `<li class="ra-person">
               ${rgKey(`ra-face${k === 0 ? ' is-on' : ''}`, esc(rgInitials(name))).replace('<span class="m-key ', '<span aria-hidden="true" class="m-key ')}
               <div><b>${esc(name)}</b><span class="m-text-8">${esc(role)} · ${esc(expertise)} · ${esc(country)}</span>
-                <p class="ra-credit"><span class="sr-only">Contribution roles: </span>${credit.split(' ').map((c) => esc(RG_CREDIT[c])).join(' · ')}</p></div>
+                <p class="ra-credit"><span class="sr-only">Contribution roles: </span>${credit.split(' ').map((c) => esc(RG_CREDIT[c])).join(' · ')}</p>
+                <p class="ra-reach"><a class="m-link" href="mailto:${email(name)}">${email(name)}</a><a class="m-link" href="tel:+231888771973;ext=${(i + 1) * 100 + gi * 20 + k + 1}">0888 771 973 ext. ${(i + 1) * 100 + gi * 20 + k + 1}</a></p></div>
             </li>`;
-  const group = (g) => `<article class="m-surface ra-group" id="${g.slug}" data-8b-motion="rise" aria-labelledby="${g.slug}-name">
+  const group = (g, gi) => `<article class="m-surface ra-group" id="${g.slug}" data-8b-motion="rise" aria-labelledby="${g.slug}-name">
         <div class="ra-about">
           <span class="m-text-4 ra-status">${rgKey(g.status === 'Active' ? 'is-on' : '', '').replace('<span class="m-key ', '<span aria-hidden="true" class="m-key ')}${esc(g.status)}</span>
           <h3 class="m-text-5" id="${g.slug}-name">${esc(g.name)}</h3>
@@ -2968,7 +2972,7 @@ exports.researchArea = (slug) => {
         <div class="ra-people">
           <h4 class="m-text-4">Members</h4>
           <ul>
-            ${g.people.map(person).join('\n            ')}
+            ${g.people.map((p, k) => person(p, k, gi)).join('\n            ')}
           </ul>
         </div>
       </article>`;
@@ -2984,7 +2988,7 @@ exports.researchArea = (slug) => {
       <p class="m-text-3 hero__caption">Research area ${no} of ${String(n).padStart(2, '0')}</p>
       <p class="m-text-7 hero__lede">${esc(area.lede)}</p>
       <div class="hero__actions">
-        ${rgBtn(`/research/group?area=${area.slug}#contact`, 'Join this area')}
+        ${rgBtn(`${RG_JOIN}?area=${area.slug}#contact`, 'Join this area')}
         <a class="m-link" href="#groups">Meet the groups</a>
       </div>
       <p class="m-text-8 hero__note">${area.groups.length} groups · ${members} members · <a class="m-link" href="/research/group#states">All six areas</a></p>
@@ -3006,11 +3010,11 @@ exports.researchArea = (slug) => {
       <h2 id="groups-title" class="m-text-2" data-8b-motion="deboss">${area.groups.length} groups. One area.</h2>
       <div>
         <p class="m-text">Each group follows one research question, led by a principal investigator, with each member’s part in the work named in the standard contributor roles.</p>
-        <p class="m-text-8">Sample groups and members, shown while the first groups form.</p>
+        <p class="m-text-8">Sample groups, members and contact details, shown while the first groups form.</p>
       </div>
     </header>
     <div class="ra-list">
-      ${area.groups.map(group).join('\n      ')}
+      ${area.groups.map((g, gi) => group(g, gi)).join('\n      ')}
     </div>
   </div>
 </section>
@@ -3040,7 +3044,7 @@ exports.researchArea = (slug) => {
     <div>
       <h2 id="contact-title" class="m-text-6" data-8b-motion="deboss">Join the ${esc(area.name.toLowerCase())} groups.</h2>
       <p class="m-text">Send your details and the areas you work in from the sign-up; this area is filled in for you.</p>
-      ${rgBtn(`/research/group?area=${area.slug}#contact`, 'Join this area')}
+      ${rgBtn(`${RG_JOIN}?area=${area.slug}#contact`, 'Join this area')}
     </div>
     <nav class="ra-steps" aria-label="Other research areas">
       ${step(prev, 'prev')}
@@ -3049,13 +3053,18 @@ exports.researchArea = (slug) => {
   </div>
 </section>`;
   return rgPage({ title: area.name + ' · Research Group', desc,
-    links: [['/research/group#states', 'All areas'], ['#groups', 'Groups'], ['#standards', 'Standards'], ['/research', 'Papers']],
-    cta: [`/research/group?area=${area.slug}#contact`, 'Join this area'], body });
+    links: RG_NAV, current: '/research/group#states', cta: [`${RG_JOIN}?area=${area.slug}#contact`, 'Join this area'], body });
 };
 
-exports.researchGroup = () => {
-  const desc = 'Explore diverse research projects: NIIP’s research groups in six areas, with the reports of government and operators alongside.';
-  const links = [['#states', 'Groups'], ['#modes', 'Ways in'], ['#dimmer', 'Next wave'], ['#material', 'Pillars'], ['#faq', 'FAQ'], ['/research', 'Papers']];
+// The Research Group is a small site of its own pages (the owner's call, 30 October 2026): the Overview
+// (the headline and the six areas, with a card for each other page), How it works, Program and Join, and
+// a page for each area. They share one bar (it marks the page you are on), one footer and the sections
+// below; each page is a run of them. The template's scenes that cross a border stay together: the hero
+// with the areas, the two ways to take part with the FAQ they flood.
+const RG_JOIN = '/research/group/join';
+const RG_NAV = [['/research/group', 'Overview'], ['/research/group#states', 'Areas'], ['/research/group/how-it-works', 'How it works'],
+  ['/research/group/program', 'Program'], ['/research/group/join', 'Join'], ['/research', 'Papers']];
+const rgSections = (prefill = '') => {
   // each area key opens its area's page; the last two keys send a paper or go to the sign-up
   const linkKey = (href, label, state, data = '') => `<li class="states__slot"><a class="m-key-2" href="${href}"${data}><span class="m-key-2__cap" aria-hidden="true"><span class="m-key-2__dent"></span></span><span class="m-key-2__label">${esc(label)}</span><span class="m-key-2__state">${esc(state)}</span></a></li>`;
   const areaKey = (a) => linkKey(`/research/group/${a.slug}`, a.name, `${a.groups.length} groups`, ` data-slug="${a.slug}" data-area="${esc(a.name)}"`);
@@ -3072,16 +3081,25 @@ exports.researchGroup = () => {
         <summary><span>${q}</span>${rgFaqKey}</summary>
         <p class="m-text">${a}</p>
       </details>`;
-  return rgPage({ title: 'Research Group', desc, links, cta: ['#contact', 'Join a group'], body: `<!-- hero: headline, two buttons, the key panel drawn in HTML/CSS, its pad lettered with research areas -->
+  // a photo card on the overview that opens one of the other pages
+  const scene = (href, label, title, text, key, alt, w, h) => `<li><a class="m-surface rg-card" href="${href}" data-8b-motion="rise">
+        ${rgPhoto('rg-card__photo', key, alt, w, h)}
+        <span class="m-text-4">${label}</span>
+        <span class="m-text-5">${title}</span>
+        <span class="m-text-8">${text}</span>
+        <span class="m-link">Open the page</span>
+      </a></li>`;
+  return {
+    hero: `<!-- hero: headline, two buttons, the key panel drawn in HTML/CSS, its pad lettered with research areas -->
 <section id="hero" class="hero" data-8b-section="hero" aria-labelledby="hero-title">
   ${rgSeal('hero', 'light', true)}
   <div class="hero__inner wrap">
     <div class="hero__copy">
-      <h1 id="hero-title" class="m-text-2 hero__title"><span class="hero__line">Explore Diverse</span> <span class="hero__line">Research</span> <span class="hero__line">Projects</span></h1>
+      <h1 id="hero-title" class="m-text-2 hero__title"><span class="hero__line">Explore Diverse</span> <span class="hero__line">Research Projects</span></h1>
       <p class="m-text-3 hero__caption">NIIP Research Groups</p>
       <p class="m-text-7 hero__lede">The Research Hub puts Liberia’s ICT research in one place: search papers, submit papers and join research groups, with the reports of government and operators alongside.</p>
       <div class="hero__actions">
-        ${rgBtn('#contact', 'Join a group')}
+        ${rgBtn(`${RG_JOIN}#contact`, 'Join a group')}
         <a class="m-link" href="#states">Meet the groups</a>
       </div>
       <p class="m-text-8 hero__note">Part of the National ICT Intelligence Program.</p>
@@ -3112,16 +3130,15 @@ exports.researchGroup = () => {
         </div>
         <div class="hero__cluster hero__steps">
           <span class="m-well">
-            ${rgLink('', RG_G.plus, '#contact', 'Join a group')}
-            ${rgLink('is-on', '?', '#faq', 'Questions and answers')}
+            ${rgLink('', RG_G.plus, `${RG_JOIN}#contact`, 'Join a group')}
+            ${rgLink('is-on', '?', `${RG_JOIN}#faq`, 'Questions and answers')}
           </span>
         </div>
       </div>
     </nav>
   </div>
-</section>
-
-<!-- states: the six research areas as keys, each opening its area's page, then Submit a paper and Join a group -->
+</section>`,
+    states: `<!-- states: the six research areas as keys, each opening its area's page, then Submit a paper and Join a group -->
 <section id="states" class="states" data-8b-section="states" aria-labelledby="states-title">
   <div class="states__inner wrap">
     <header class="states__head">
@@ -3132,12 +3149,25 @@ exports.researchGroup = () => {
     <ul class="states__keys">
       ${RG_AREAS.map(areaKey).join('\n      ')}
       ${linkKey('/research/submit', 'Submit a paper', 'No account')}
-      ${linkKey('#contact', 'Join a group', 'Sign-up')}
+      ${linkKey(`${RG_JOIN}#contact`, 'Join a group', 'Sign-up')}
     </ul>
   </div>
-</section>
-
-<!-- modes: sticky stage; the pad drives the four ways into the Research Hub -->
+</section>`,
+    scenes: `<!-- scenes: the overview's way into the other pages, each a photo card -->
+<section id="scenes" class="rg-scenes" data-8b-section="scenes" aria-labelledby="scenes-title">
+  <div class="wrap">
+    <header class="ra-head">
+      <h2 id="scenes-title" class="m-text-2" data-8b-motion="deboss">Inside the research groups.</h2>
+      <p class="m-text">How the Research Hub works, the program it belongs to, and how to take part, each on a page of its own.</p>
+    </header>
+    <ul class="rg-cards">
+      ${scene('/research/group/how-it-works', 'How it works', 'Four ways in', 'Search, join, submit, learn: the ways into the Research Hub.', 'search', 'A young woman and a young man working side by side at their laptops', 860, 574)}
+      ${scene('/research/group/program', 'Program', 'Three pillars', 'Data, research and training: the program the groups belong to.', 'make', 'Girls building an electronics kit together with screwdrivers', 547, 365)}
+      ${scene(`${RG_JOIN}`, 'Join', 'Take part', 'Join a group or send a paper, with the questions people ask first.', 'submit', 'A smiling young woman in red glasses at her laptop', 900, 600)}
+    </ul>
+  </div>
+</section>`,
+    modes: `<!-- modes: sticky stage; the pad drives the four ways into the Research Hub -->
 <section id="modes" class="modes" data-8b-section="modes" aria-labelledby="modes-title">
   <div class="modes__inner wrap">
     <header class="modes__head">
@@ -3163,16 +3193,15 @@ exports.researchGroup = () => {
         </div>
         <ol class="modes__list">
           ${way('up', 'Up', 'Search papers', 'The research library gathers the papers on Liberia’s ICT sector, each with NIIS’s own summary.', '/research', 'Open the library', 'search', 'A young woman and a young man working side by side at their laptops', 860, 574)}
-          ${way('right', 'Right', 'Join a group', 'Open an area, meet its groups, then send your details from the foot of this page.', '#contact', 'Go to the sign-up', 'join', 'Young people working together at laptops around a shared table', 1024, 683)}
+          ${way('right', 'Right', 'Join a group', 'Open an area, meet its groups, then send your details from the Join page.', `${RG_JOIN}#contact`, 'Go to the sign-up', 'join', 'Young people working together at laptops around a shared table', 1024, 683)}
           ${way('down', 'Down', 'Submit a paper', 'Anyone can submit, no account needed. A reviewer reads every paper before it goes into the library.', '/research/submit', 'Submit a paper', 'submit', 'A smiling young woman in red glasses at her laptop, a colleague working behind her', 900, 600)}
           ${way('left', 'Left', 'The next wave', 'The Research Hub backs the next wave of Liberian researchers in AI and new technology.', '/careers/programs', 'See the programs', 'next', 'A mentor leaning in to help three students at a laptop', 668, 460)}
         </ol>
       </div>
     </div>
   </div>
-</section>
-
-<!-- dimmer: fader + plus key over one photo, grey to colour on scroll -->
+</section>`,
+    dimmer: `<!-- dimmer: fader + plus key over one photo, grey to colour on scroll -->
 <section id="dimmer" class="dimmer" data-8b-section="dimmer" aria-labelledby="dimmer-title">
   <div class="dimmer__inner wrap">
     <header class="dimmer__head">
@@ -3193,9 +3222,8 @@ exports.researchGroup = () => {
       <li class="dimmer__note"><span class="m-text-4">Work</span><p class="m-text-8">A path to 175+ estimated jobs for young Liberians, recruited county by county.</p></li>
     </ul>
   </div>
-</section>
-
-<!-- quiet: short statement -->
+</section>`,
+    quiet: `<!-- quiet: short statement -->
 <section id="quiet" class="quiet" data-8b-section="quiet" aria-labelledby="quiet-title">
   ${rgSeal('quiet', 'light')}
   <div class="quiet__inner wrap">
@@ -3205,10 +3233,14 @@ exports.researchGroup = () => {
       <p class="m-text-2 quiet__line"><span data-8b-motion="deboss">No account to submit.</span>${rgOff}</p>
     </div>
     <p class="m-text quiet__text">For decades, Liberia’s digital story was told with numbers from somewhere else. The Research Hub keeps Liberian research in one place, open to read, beside the national figures it can be tested against.</p>
+    <ul class="rg-strip" aria-label="The research groups at work">
+      <li>${rgPhoto('rg-strip__photo rg-strip__photo--pill', 'make', 'Girls building an electronics kit together with screwdrivers', 547, 365, ' data-8b-motion="rise"')}</li>
+      <li>${rgPhoto('rg-strip__photo', 'join', 'Young people working together at laptops around a shared table', 1024, 683, ' data-8b-motion="rise"')}</li>
+      <li>${rgPhoto('rg-strip__photo rg-strip__photo--circle', 'submit', 'A smiling young woman in red glasses at her laptop', 900, 600, ' data-8b-motion="rise"')}</li>
+    </ul>
   </div>
-</section>
-
-<!-- chords: two keys meet and their outlines melt into one -->
+</section>`,
+    chords: `<!-- chords: two keys meet and their outlines melt into one -->
 <section id="chords" class="chords" data-8b-section="chords" aria-labelledby="chords-title">
   <div class="chords__inner wrap">
     <header class="chords__head">
@@ -3230,10 +3262,13 @@ exports.researchGroup = () => {
       <li class="chords__item">${rgMini}<div><h3 class="m-text-5">Policy</h3><p class="m-text-8"><span class="m-text-4">Paper + Reports</span> — research read beside the reports of government and operators.</p></div></li>
       <li class="chords__item">${rgMini}<div><h3 class="m-text-5">Skills</h3><p class="m-text-8"><span class="m-text-4">Group + Training</span> — research groups beside the program’s nine professional diplomas.</p></div></li>
     </ul>
+    <div class="rg-pair">
+      ${rgPhoto('rg-pair__photo', 'build', 'A boy smiling at the robot car he is building, beside a laptop, his friends around him', 644, 476, ' data-8b-motion="rise"')}
+      ${rgPhoto('rg-pair__photo', 'next', 'A mentor leaning in to help three students at a laptop', 668, 460, ' data-8b-motion="rise"')}
+    </div>
   </div>
-</section>
-
-<!-- material: the program's three pillars, each with a photo -->
+</section>`,
+    material: `<!-- material: the program's three pillars, each with a photo -->
 <section id="material" class="material" data-8b-section="material" aria-labelledby="material-title">
   <div class="material__inner wrap">
     <header class="material__head">
@@ -3261,9 +3296,8 @@ exports.researchGroup = () => {
       </li>
     </ul>
   </div>
-</section>
-
-<!-- editions: the two ways to take part, each on a drawn panel, and the key that floods the FAQ -->
+</section>`,
+    editions: `<!-- editions: the two ways to take part, each on a drawn panel, and the key that floods the FAQ -->
 <section id="editions" class="editions" data-8b-section="editions" aria-labelledby="editions-title">
   <div class="editions__inner wrap">
     <header class="editions__head">
@@ -3278,7 +3312,7 @@ exports.researchGroup = () => {
         </div>
         <div class="editions__body">
           <h3 class="m-text-5">Join a group</h3>
-          <p class="m-text-8">Open an area above to meet its groups, then send your details to the program.</p>
+          <p class="m-text-8">Open an area from the Overview to meet its groups, then send your details below.</p>
           <p class="editions__price">6 areas</p>
           ${rgBtn('#contact', 'Join a group')}
         </div>
@@ -3303,28 +3337,27 @@ exports.researchGroup = () => {
     </div>
     <div class="editions__floor"></div>
   </div>
-</section>
-
-<!-- faq: questions and answers (native <details>) -->
+</section>`,
+    faq: `<!-- faq: questions and answers (native <details>) -->
 <section id="faq" class="faq" data-8b-section="faq" aria-labelledby="faq-title">
   <div class="faq__flood" aria-hidden="true">${rgSeal('faq', 'dark')}</div>
   <div class="faq__inner wrap">
     <header class="faq__head">
       <h2 id="faq-title" class="m-text-6" data-8b-motion="deboss">Before you press join.</h2>
       <p class="m-text-9">Short answers to what people ask most. Anything else, write to the program below.</p>
+      ${rgPhoto('faq__photo', 'search', 'A young woman and a young man working side by side at their laptops', 860, 574, ' data-8b-motion="rise"')}
     </header>
     <div class="faq__list">
       ${faq('What is the Research Hub?', 'The part of NIIP that puts Liberia’s ICT research in one place: search papers, submit papers and join research groups, with the reports of government and operators alongside.')}
-      ${faq('Which areas do the groups cover?', 'Six: artificial intelligence, data science, cybersecurity, connectivity, digital finance and emerging tech. Press any area above to meet its groups.')}
+      ${faq('Which areas do the groups cover?', 'Six: artificial intelligence, data science, cybersecurity, connectivity, digital finance and emerging tech. Each has its own page, open from the <a class="m-link" href="/research/group#states">Overview</a>.')}
       ${faq('Do I need an account?', 'No. The library is open to read, and anyone can submit a paper without one.')}
       ${faq('What happens after I submit a paper?', 'A reviewer reads every paper before it goes into the NIIS research library, and the outcome is sent to the email address you give.')}
       ${faq('Can a group use NIIS data?', 'The national figures are open in the <a class="m-link" href="/data">Data Explorer</a>. Only aggregate statistics are published; personal data is protected under the Data Protection Act.')}
       ${faq('Where are the ICT reports?', 'On the <a class="m-link" href="/reports">ICT Reports</a> page, beside the research: the reports of government and operators.')}
     </div>
   </div>
-</section>
-
-<!-- contact: the program's details and the sign-up, written out as an email -->
+</section>`,
+    contact: `<!-- contact: the program's details and the sign-up, written out as an email -->
 <section id="contact" class="contact" data-8b-section="contact" aria-labelledby="contact-title">
   <div class="contact__inner wrap">
     <div class="contact__head">
@@ -3340,7 +3373,7 @@ exports.researchGroup = () => {
       <div class="contact__field" data-8b-motion="rise"><label class="m-text-4" for="contact-name">Name</label><input class="m-field" id="contact-name" name="name" type="text" autocomplete="name" required></div>
       <div class="contact__field" data-8b-motion="rise"><label class="m-text-4" for="contact-email">Email</label><input class="m-field" id="contact-email" name="email" type="email" autocomplete="email" required></div>
       <div class="contact__field" data-8b-motion="rise"><label class="m-text-4" for="contact-org">Institution</label><input class="m-field" id="contact-org" name="org" type="text" autocomplete="organization" placeholder="Optional"></div>
-      <div class="contact__field" data-8b-motion="rise"><label class="m-text-4" for="join-groups">Research areas</label><input class="m-field" id="join-groups" name="groups" type="text" placeholder="Type the areas, or join from an area’s page"></div>
+      <div class="contact__field" data-8b-motion="rise"><label class="m-text-4" for="join-groups">Research areas</label><input class="m-field" id="join-groups" name="groups" type="text" value="${esc(prefill)}" placeholder="Type the areas, or join from an area’s page"></div>
       <div class="contact__field contact__field--wide" data-8b-motion="rise"><label class="m-text-4" for="contact-topic">About</label><select class="m-field" id="contact-topic" name="topic"><option>Joining a research group</option><option>Submitting a paper</option><option>Something else</option></select></div>
       <div class="contact__field contact__field--wide" data-8b-motion="rise"><label class="m-text-4" for="contact-message">Message</label><textarea class="m-field" id="contact-message" name="message" rows="5" required></textarea></div>
       <div class="contact__actions">
@@ -3349,7 +3382,33 @@ exports.researchGroup = () => {
       </div>
     </form>
   </div>
-</section>` });
+</section>`,
+  };
+};
+// a page that opens on one of the sections takes that section's heading as its own h1
+const rgPromote = (html) => html.replace('<h2 ', '<h1 ').replace('</h2>', '</h1>');
+
+exports.researchGroup = () => {
+  const S = rgSections();
+  return rgPage({ title: 'Research Group', desc: 'Explore diverse research projects: NIIP’s research groups in six areas, with the reports of government and operators alongside.',
+    links: RG_NAV, current: '/research/group', cta: [RG_JOIN + '#contact', 'Join a group'], body: [S.hero, S.states, S.scenes].join('\n\n') });
+};
+const RG_PAGES = {
+  'how-it-works': { title: 'How it works', parts: ['modes', 'dimmer', 'quiet'],
+    desc: 'How NIIP’s Research Hub works: search papers, join a group, submit a paper, and the training that brings on the next wave.' },
+  program: { title: 'Program', parts: ['material', 'chords'],
+    desc: 'The National ICT Intelligence Program’s three pillars, and how research, data and training meet.' },
+  join: { title: 'Join', parts: ['editions', 'faq', 'contact'],
+    desc: 'Join a NIIP research group or submit a paper: the two ways to take part, the questions people ask first, and the sign-up.' },
+};
+// one of the Research Group's pages beyond the overview; null for any other name (the server then tries the areas)
+exports.researchGroupPage = (slug, areaSlug = '') => {
+  const pg = RG_PAGES[slug];
+  if (!pg) return null;
+  const area = areaSlug ? rgArea(areaSlug) : null;
+  const S = rgSections(area ? area.name : '');
+  return rgPage({ title: pg.title + ' · Research Group', desc: pg.desc, links: RG_NAV, current: '/research/group/' + slug,
+    cta: [RG_JOIN + '#contact', 'Join a group'], body: rgPromote(pg.parts.map((p) => S[p]).join('\n\n')) });
 };
 
 exports.research = (ctx, { papers = [], canManage = false, canSubmit = false, notice = '' }) => {

@@ -45,6 +45,7 @@
 /* ---- section-script:hero ---- */
 (() => {
   const hero = document.getElementById('hero');
+  if (!hero) return;
   if (!('IntersectionObserver' in window)) return;
   new IntersectionObserver(([entry]) => {
     if (entry.isIntersecting) hero.removeAttribute('data-idle'); else hero.setAttribute('data-idle', '');

@@ -584,10 +584,11 @@ async function handler(req, res) {
         logEvent('page_view', p, user);
         return send(res, 200, views.researchGroup());
       }
-      // an area's own page: its groups, their questions and members, the standards it works to
+      // the Research Group's other pages (How it works, Program, Join), then an area's own page: its
+      // groups, their questions and members, the standards it works to
       const rgM = /^\/research\/group\/([a-z-]+)$/.exec(p);
       if (rgM) {
-        const html = views.researchArea(rgM[1]);
+        const html = views.researchGroupPage(rgM[1], url.searchParams.get('area') || '') || views.researchArea(rgM[1]);
         if (!html) return send(res, 404, views.notFound(ctx));
         logEvent('page_view', p, user);
         return send(res, 200, html);

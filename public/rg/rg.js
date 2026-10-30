@@ -227,7 +227,7 @@ const motionHelpers = {
 /* ---- scene:hero ---- */
 if (document.getElementById('hero')) {
 queueMotion(() => {
-  gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
+  gsap.matchMedia().add('(prefers-reduced-motion: no-preference) and (min-width: 900px)', () => {
     if (!adjacent('hero', 'states')) return;
     const hero = document.getElementById('hero');
     const stage = hero.querySelector('.hero__stage');
@@ -329,7 +329,7 @@ queueMotion(() => {
 /* ---- scene:chords ---- */
 if (document.getElementById('chords')) {
 queueMotion(() => {
-  gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
+  gsap.matchMedia().add('(prefers-reduced-motion: no-preference) and (min-width: 900px)', () => {
     const chords = document.getElementById('chords');
     const track = chords.querySelector('.chords__track');
     const art = chords.querySelector('.chords__art');

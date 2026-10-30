@@ -712,6 +712,38 @@ main > section:first-child:not(#hero) { padding-top: clamp(124px, 16vh, 160px); 
   .rg-pair, .rg-cards { grid-template-columns: minmax(0, 1fr); }
 }
 
+/* ---- a phone's rhythm (the owner still found the gaps wide on a phone): the template's section padding
+   from about 126 px to 56, the tighter sections to 44, the heads closer to what they introduce, the hero
+   no taller than its content. The chord does not pin there: pinned, it held two small keys on an empty
+   screen for most of two screens, so a phone shows it merged, as reduced motion does. */
+@media (max-width: 899px) {
+  :root { --space-1: 56px; }
+  #hero { min-height: 0; padding-bottom: 28px; }
+  #hero.is-area { min-height: 0; }
+  #quiet, #chords, #material, #editions, #scenes, #faq, #contact { padding-top: 44px; padding-bottom: 44px; }
+  #editions { padding-bottom: 0; }
+  #modes .modes__head, #dimmer .dimmer__head, #material .material__head, #editions .editions__head, .ra-head { margin-bottom: 24px; }
+  #modes { padding-bottom: 24px; }
+  /* the pinned photo stage sticks just under the floating bar instead of padding itself clear of it,
+     so it starts right under the intro rather than after an empty band */
+  #modes[data-stage] .modes__stage { top: 76px; block-size: calc(100svh - 76px); padding-top: 8px; }
+  #dimmer .dimmer__notes { margin-top: 26px; gap: 18px; }
+  #quiet .quiet__text { margin-top: 24px; }
+  #material .material__list { gap: 32px; }
+  #chords .chords__stage { padding: 12px 0 0; }
+  #chords .chords__list { margin-top: 20px; gap: 20px; }
+  #editions .editions__list { gap: 40px; }
+  #editions .editions__terms { margin-top: 24px; }
+  #editions .editions__switch { padding-top: 28px; }
+  #editions .editions__floor { block-size: 48px; min-block-size: 0; }
+  #faq .faq__inner, #contact .contact__inner { gap: 28px; }
+  .rg-pair, .rg-strip { margin-top: 28px; }
+  .ra-list { gap: 24px; }
+  .ra-std { gap: 22px; }
+  .ra-std-all { margin: 40px 0 18px; }
+  #standards { padding-top: 0; }
+}
+
 #contact .rg-wm--band { --wm-size: clamp(340px, 36vw, 560px); }
 #contact .rg-wm--band img { right: calc(var(--wm-size) * -.2); top: 50%; transform: translateY(-50%); }
 #standards .rg-wm--std { --wm-size: clamp(360px, 40vw, 620px); }

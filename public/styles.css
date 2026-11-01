@@ -6373,3 +6373,10 @@ html:has(#paper-pdf) { scroll-behavior: smooth; }
   #homeVideo .vid-frame iframe, #homeVideo .vid-frame video { inset: 6px 6px 10px; width: calc(100% - 12px); height: calc(100% - 16px); border-radius: 8px; }
 }
 @media (prefers-reduced-motion: reduce) { #homeVideo .vq-item { transition: none; } }
+
+/* ---- the home page banner (the owner's, 1 Nov 2026): edge to edge, shown whole at its own height, the
+   tall picture on a phone; the reports below it get back the top room they had given up to the papers */
+.home-banner { margin: 1.5rem 0 0; padding: 0; line-height: 0; background: #f4f4f5; }
+.home-banner picture, .home-banner img { display: block; inline-size: 100%; block-size: auto; }
+.home-banner + #natReports { padding-top: 2.5rem !important; }
+@media (max-width: 760px) { .home-banner { margin-top: 1rem; } .home-banner + #natReports { padding-top: 1.75rem !important; } }

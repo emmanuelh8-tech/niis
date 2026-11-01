@@ -413,6 +413,8 @@ exports.home = (ctx, { headlines, papers, keyStats, dashboards, indicatorsForSea
 
   ${featuredPapers()}
 
+  ${homeBanner()}
+
   ${nationalReports()}
 
   ${homeVideoSection(homeVideo, homeVideoTitle, homeVideoCaption, homeVideoPlaylist)}
@@ -428,6 +430,19 @@ exports.home = (ctx, { headlines, papers, keyStats, dashboards, indicatorsForSea
   <script>${homeVideoScript}</script>`,
   });
 };
+
+// The owner's banner, edge to edge between the featured papers and the reports and shown whole (never
+// cropped): the wide picture on a screen wider than a phone, the tall one on a phone. Both are Image
+// Library slots (Home page banner). The words are in the picture, so its alt text carries them.
+function homeBanner() {
+  return `<section class="home-banner" aria-label="Quality data makes you stand out">
+    <picture>
+      <source media="(max-width: 760px)" srcset="${esc(imgs.url('banners', 'home-mobile'))}" width="1600" height="2000">
+      <img src="${esc(imgs.url('banners', 'home-desktop'))}" width="1920" height="1080" loading="lazy" decoding="async"
+        alt="Quality data makes you stand out. Collecting Liberia’s ICT data. A blue pawn steps out of a row of black pawns, beside the National ICT Intelligence Program seal. www.niip.org, info@niip.org, 0888 771 973 / 0777 129 261.">
+    </picture>
+  </section>`;
+}
 
 // Scroll-triggered image slider hero. Seven slides cross-fade as the visitor scrolls through a tall
 // sticky band, opening with the program's name over its building, then the President, and closing with

@@ -75,6 +75,14 @@ const COLLECTIONS = {
       { key: 'circle-2', label: 'Circle image 2', def: '/img/researchCircle/circle-2.jpg' },
     ],
   },
+  banners: {
+    label: 'Home page banner',
+    note: 'The full-width banner between Featured Research Papers and National ICT Reports: one picture for wide screens, one for phones.',
+    slots: [
+      { key: 'home-desktop', label: 'Wide screens', hint: '1920 × 1080 (16:9)', def: '/img/banners/quality-data-desktop.webp' },
+      { key: 'home-mobile', label: 'Phones', hint: '1600 × 2000 (4:5)', def: '/img/banners/quality-data-mobile.webp' },
+    ],
+  },
   researchGroup: {
     label: 'Research Group page',
     note: 'The photos on /research/group. Search, Join and Next wave hold stand-ins from the booklet set until the owner’s own photos arrive.',

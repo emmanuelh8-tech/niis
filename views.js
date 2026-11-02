@@ -212,7 +212,7 @@ function mainNav(active, q) {
     <div class="gov-navlinks dock">
       ${links.map(navItem).join('')}
     </div>
-    <a class="nav-cta pearl" href="/login"><span class="pearl-wrap"><span class="pearl-p">Get Started</span></span></a>
+    <span class="shot-wrap nav-cta-wrap"><a class="nav-cta shot" href="/login"><span class="shot-hl" aria-hidden="true"></span><span class="shot-lo" aria-hidden="true"></span><span class="shot-label">Get Started</span></a></span>
     <button class="nav-icon-btn nav-find" type="button" aria-label="Search indicators" aria-controls="navSheet" data-sheet-search>${icon('search')}</button>
     <button class="nav-icon-btn nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navSheet"><span></span><span></span><span></span></button>
   </div>
@@ -229,7 +229,7 @@ function mainNav(active, q) {
         <ul class="sheet-list">
           ${links.map(sheetRow).join('')}
         </ul>
-        <a class="sheet-cta" href="/login"><span>Get Started</span>${icon('arrow')}</a>
+        <span class="shot-wrap sheet-cta-wrap"><a class="sheet-cta shot shot-lg" href="/login"><span class="shot-hl" aria-hidden="true"></span><span class="shot-lo" aria-hidden="true"></span><span class="shot-label">Get Started${icon('arrow')}</span></a></span>
       </div>
     </div>
   </div></nav>`;

@@ -202,12 +202,8 @@ ul.plain, ol.plain { list-style: none; }
 .nav-subitem.active { background: #E7EFFA; color: #0B2C63; }
 .nav-subitem.active .icn { color: #1C5BB8; }
 .nav-subhead { margin-bottom: .25rem; padding-bottom: .65rem; border-bottom: 1px solid #E3EAF5; border-radius: 8px 8px 0 0; color: #0B2C63; font-weight: 700; }
-/* Log In pill (blue) */
-.nav-cta { flex: 0 0 auto; display: flex; align-items: center; gap: .45rem; margin-left: .7rem; padding: .5rem 1.1rem; border-radius: 999px;
-  background: linear-gradient(135deg, #1C5BB8, #0B2C63); color: #fff; font-weight: 700; font-size: .8rem; letter-spacing: .05em; text-transform: uppercase;
-  box-shadow: 0 3px 10px rgba(11,44,99,.26); }
-.nav-cta:hover { text-decoration: none; filter: brightness(1.1); }
-.nav-cta .icn { width: 1.05em; height: 1.05em; stroke-width: 2.1; }
+/* Get Started: the Web Shot pill (see THE GET STARTED BUTTON); its wrapper takes the place in the bar */
+.nav-cta-wrap { flex: 0 0 auto; margin-left: .7rem; }
 /* the phone app bar and its menu sheet: hidden on desktop */
 .nav-brand, .nav-icon-btn, .nav-sheet { display: none; }
 /* phones and small tablets: an app bar (the flag and name on the left, search and the menu on the
@@ -217,7 +213,7 @@ ul.plain, ol.plain { list-style: none; }
   .nav-shell > .nav-find { grid-column: 1; grid-row: 1; }
   .nav-shell > .nav-mapblock { grid-column: 2; grid-row: 1; justify-self: center; }
   .nav-shell > .nav-burger { grid-column: 3; grid-row: 1; }
-  .nav-search, .gov-navlinks.dock, .nav-cta { display: none; }
+  .nav-search, .gov-navlinks.dock, .nav-cta-wrap { display: none; }
   .nav-mapblock { gap: .6rem; margin: 0; padding: 0; }
   .nav-mapblock .liberia-flag { width: 34px; height: auto; }
   .nav-logo { width: 44px; height: 44px; }
@@ -279,11 +275,8 @@ ul.plain, ol.plain { list-style: none; }
   .sheet-sub a { display: flex; align-items: center; min-height: 44px; color: #33415A; font-size: 1rem; }
   .sheet-sub a:hover { text-decoration: none; }
   .sheet-sub a.active { color: #0B2C63; font-weight: 600; }
-  .sheet-cta { display: flex; align-items: center; justify-content: center; gap: .55rem; height: 52px; margin: 1.4rem 1.4rem 0; border-radius: 4px;
-    background: #0B2C63; color: #fff; font-weight: 700; font-size: .95rem; }
-  .sheet-cta:hover { text-decoration: none; }
-  .sheet-cta .icn { width: 18px; height: 18px; }
-  .sheet-cta:active { filter: brightness(1.15); }
+  .shot-wrap.sheet-cta-wrap { display: flex; margin: 1.4rem 1.4rem 0; }   /* full width; outranks .shot-wrap's inline-flex */
+  .sheet-cta { flex: 1 1 auto; }
 }
 @media (prefers-reduced-motion: reduce) { .dock-ic, .nav-label, .nav-burger span, .nav-drawer, .nav-scrim, .sheet-plus i::before, .sheet-plus i::after { transition: none; } }
 
@@ -5161,34 +5154,61 @@ input[type=range]:active::-webkit-slider-thumb { transform: scale(.94); }
 input[type=range]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 2px #10141C, 0 0 0 6px rgba(255,204,0,.55); }
 input[type=range]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px #10141C, 0 0 0 6px rgba(255,204,0,.55); }
 
-/* ============ THE GET STARTED BUTTON: A PEARL ============
+/* ============ THE GET STARTED BUTTON: WEB SHOT ============
+   A red glass pill that shoots silk at the pointer (after the owner's "Web Shot Button" component, ported
+   from React to this stylesheet and app.js). Bring the cursor near and thin threads leave the edge facing
+   it and hang at the pointer; move away and they spring back. The threads are a canvas behind the pill
+   (.shot-threads, drawn in the wrapper's colour) and only the pill takes the click. No backdrop blur: the
+   bar is solid white, and a blur on it repaints the animated pages beneath every frame. */
+.shot-wrap { position: relative; isolation: isolate; display: inline-flex; color: #0B2C63; }
+.shot-threads { position: absolute; z-index: -1; pointer-events: none; }
+.shot { --shot-tint: #C8102E; position: relative; display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  height: 44px; padding: 0 1.5rem; border: 0; border-radius: 999px; white-space: nowrap; user-select: none; -webkit-user-select: none; cursor: pointer;
+  touch-action: none;   /* a drag that starts on the pill draws threads instead of scrolling the menu; a tap still opens */
+  background: rgba(200,16,46,.92); background: color-mix(in oklab, var(--shot-tint) 92%, transparent); color: #fff;
+  font: 600 14px/1 var(--sans); letter-spacing: -.01em; text-transform: none;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.7), inset 0 1px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(255,255,255,.3),
+    inset 0 -12px 18px -10px rgba(0,0,0,.14), inset 0 10px 16px -8px rgba(255,255,255,.55), 0 12px 28px -12px rgba(0,0,0,.3), 0 1px 3px rgba(0,0,0,.1);
+  transition: transform .2s cubic-bezier(.3,1.3,.5,1); }
+.shot:hover { text-decoration: none; }
+.shot:active { transform: scale(.96); }
+.shot:focus-visible { outline: 2px solid #0B2C63; outline-offset: 2px; }
+.shot-hl, .shot-lo { position: absolute; border-radius: 999px; pointer-events: none; }
+.shot-hl { left: 7%; right: 7%; top: 2px; height: 48%; background: linear-gradient(to bottom, rgba(255,255,255,.75), rgba(255,255,255,0)); }
+.shot-lo { left: 20%; right: 20%; bottom: 2px; height: 34%; background: linear-gradient(to top, rgba(255,255,255,.45), rgba(255,255,255,0)); filter: blur(2px); }
+.shot-label { position: relative; display: inline-flex; align-items: center; gap: .5rem; text-shadow: 0 1px 1px rgba(0,0,0,.3); }
+.shot .icn { width: 1.1em; height: 1.1em; flex: none; }
+.shot-lg { height: 56px; padding: 0 2rem; font-size: 16px; }
+@media (prefers-reduced-motion: reduce) { .shot { transition: none; } .shot:active { transform: none; } }
+
+/* ============ THE PEARL BUTTON (sign-in and send) ============
    A logo-navy glossy pill: inner highlights above and below, a soft sheen across the top and a curved
    glare behind it, the label fading out toward its foot. On hover the sheen lifts, the glare drops;
    pressed, it sinks. (After the "Pearl Button" component the owner chose,
    scaled from its poster size to the nav bar.) */
-:is(.nav-cta, .lg-submit, .sp2-send).pearl { --pearl-bg: #0B2C63; position: relative; padding: 0; border: 0; border-radius: 100px; background: var(--pearl-bg); filter: none; cursor: pointer;
+:is(.lg-submit, .sp2-send).pearl { --pearl-bg: #0B2C63; position: relative; padding: 0; border: 0; border-radius: 100px; background: var(--pearl-bg); filter: none; cursor: pointer;
   box-shadow: inset 0 .18rem .55rem rgba(255,255,255,.3), inset 0 -.06rem .2rem rgba(0,0,0,.7), inset 0 -.25rem .55rem rgba(255,255,255,.5),
     0 .7rem .9rem rgba(11,44,99,.22), 0 .35rem .35rem -.22rem rgba(11,44,99,.7);
   transition: box-shadow .2s ease, transform .2s ease; }
-:is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-wrap { position: relative; display: block; overflow: hidden; padding: .58rem 1.05rem; border-radius: inherit;
+:is(.lg-submit, .sp2-send).pearl .pearl-wrap { position: relative; display: block; overflow: hidden; padding: .58rem 1.05rem; border-radius: inherit;
   color: rgba(255,255,255,.92); font: 600 .7rem/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
-:is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-wrap::before, :is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-wrap::after { content: ''; position: absolute; transition: all .3s ease; pointer-events: none; }
-:is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-wrap::before { left: -15%; right: -15%; bottom: 25%; top: -100%; border-radius: 50%; background: rgba(255,255,255,.12); }
-:is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-wrap::after { left: 6%; right: 6%; top: 12%; bottom: 40%; border-radius: 12px 12px 0 0;
+:is(.lg-submit, .sp2-send).pearl .pearl-wrap::before, :is(.lg-submit, .sp2-send).pearl .pearl-wrap::after { content: ''; position: absolute; transition: all .3s ease; pointer-events: none; }
+:is(.lg-submit, .sp2-send).pearl .pearl-wrap::before { left: -15%; right: -15%; bottom: 25%; top: -100%; border-radius: 50%; background: rgba(255,255,255,.12); }
+:is(.lg-submit, .sp2-send).pearl .pearl-wrap::after { left: 6%; right: 6%; top: 12%; bottom: 40%; border-radius: 12px 12px 0 0;
   box-shadow: inset 0 6px 5px -6px rgba(255,255,255,.8); background: linear-gradient(180deg, rgba(255,255,255,.3) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0) 100%); }
-:is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-p { position: relative; display: flex; align-items: center; gap: .5rem; transform: translateY(2%); transition: transform .2s ease;
+:is(.lg-submit, .sp2-send).pearl .pearl-p { position: relative; display: flex; align-items: center; gap: .5rem; transform: translateY(2%); transition: transform .2s ease;
   -webkit-mask-image: linear-gradient(to bottom, #fff 40%, transparent); mask-image: linear-gradient(to bottom, #fff 40%, transparent); }
-:is(.nav-cta, .lg-submit, .sp2-send).pearl:hover { text-decoration: none;
+:is(.lg-submit, .sp2-send).pearl:hover { text-decoration: none;
   box-shadow: inset 0 .18rem .3rem rgba(255,255,255,.4), inset 0 -.06rem .2rem rgba(0,0,0,.7), inset 0 -.25rem .55rem rgba(255,255,255,.7),
     0 .7rem .9rem rgba(11,44,99,.22), 0 .35rem .35rem -.22rem rgba(11,44,99,.7); }
-:is(.nav-cta, .lg-submit, .sp2-send).pearl:hover .pearl-wrap::before { transform: translateY(-5%); }
-:is(.nav-cta, .lg-submit, .sp2-send).pearl:hover .pearl-wrap::after { opacity: .4; transform: translateY(5%); }
-:is(.nav-cta, .lg-submit, .sp2-send).pearl:hover .pearl-p { transform: translateY(-4%); }
-:is(.nav-cta, .lg-submit, .sp2-send).pearl:active { transform: translateY(2px);
+:is(.lg-submit, .sp2-send).pearl:hover .pearl-wrap::before { transform: translateY(-5%); }
+:is(.lg-submit, .sp2-send).pearl:hover .pearl-wrap::after { opacity: .4; transform: translateY(5%); }
+:is(.lg-submit, .sp2-send).pearl:hover .pearl-p { transform: translateY(-4%); }
+:is(.lg-submit, .sp2-send).pearl:active { transform: translateY(2px);
   box-shadow: inset 0 .18rem .3rem rgba(255,255,255,.5), inset 0 -.06rem .2rem rgba(0,0,0,.8), inset 0 -.25rem .55rem rgba(255,255,255,.4),
     0 .5rem .7rem rgba(11,44,99,.2), 0 .28rem .28rem -.2rem rgba(11,44,99,.7); }
-:is(.nav-cta, .lg-submit, .sp2-send).pearl:focus-visible { outline: 2px solid #FFCC00; outline-offset: 3px; }
-@media (prefers-reduced-motion: reduce) { :is(.nav-cta, .lg-submit, .sp2-send).pearl, :is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-p, :is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-wrap::before, :is(.nav-cta, .lg-submit, .sp2-send).pearl .pearl-wrap::after { transition: none; } }
+:is(.lg-submit, .sp2-send).pearl:focus-visible { outline: 2px solid #FFCC00; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { :is(.lg-submit, .sp2-send).pearl, :is(.lg-submit, .sp2-send).pearl .pearl-p, :is(.lg-submit, .sp2-send).pearl .pearl-wrap::before, :is(.lg-submit, .sp2-send).pearl .pearl-wrap::after { transition: none; } }
 
 /* ============ THE PAGE ARRIVES WHOLE ============
    Nothing waits to be scrolled to: every section, card, chart, heading and number is in its

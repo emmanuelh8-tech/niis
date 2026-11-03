@@ -4618,10 +4618,6 @@ exports.team = (ctx) => {
             <p class="tp-lede">Young Liberians we have found building, designing and securing the country’s digital future.</p>
           </div>
         </div>
-        <div class="tp-orbs" role="group" aria-label="Filter by field">
-          ${[['', 'All', 'layers', TALENTS.length], ...[...new Set(TALENTS.map((t) => t.field))].map((f) => [f, f, (FIELD_MARK[f] || ['sparkle'])[0], TALENTS.filter((t) => t.field === f).length])]
-            .map(([f, label, ic, n], k) => `<button type="button" class="tp-orb${k ? '' : ' is-on'}" data-tp-field="${esc(f)}" aria-pressed="${k ? 'false' : 'true'}"><span class="dock-ic"><i class="dock-water" aria-hidden="true"></i>${icon(ic)}</span><span class="tp-orb-l">${esc(label)} <b>${n}</b></span></button>`).join('')}
-        </div>
         <div class="ts">
           <div class="ts-stage" data-tmap aria-hidden="true">${TALENTS.map((t, i) => `
             <button type="button" class="ts-node" data-person="talent" data-i="${i}" data-field="${esc(t.field)}" tabindex="-1" style="--c:${(FIELD_MARK[t.field] || ['', '#0B2C63'])[1]}"><img src="/img/talent/sq/${t.img}.jpg?v=${ASSET_V}" alt="" width="240" height="240" loading="lazy" decoding="async" draggable="false"></button>`).join('')}

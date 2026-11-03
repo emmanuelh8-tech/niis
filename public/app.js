@@ -1161,22 +1161,6 @@
     box.addEventListener('focusout', function (e) { if (e.target.closest('.ts-list')) pick(-1); });
     qsa('.ts-list button', box).forEach(function (b2) { b2.addEventListener('click', function () { onPick(b2); }); });
 
-    // a field button fades the other faces back and rings this field's people
-    var chips = qsa('[data-tp-field]');
-    chips.forEach(function (bt) {
-      bt.addEventListener('click', function () {
-        var f = bt.dataset.tpField;
-        pressOnly(chips, 'data-tp-field', f);
-        nodes.forEach(function (nd, i) {
-          dim[i] = !!f && nd.dataset.field !== f;
-          nd.classList.toggle('is-dim', dim[i]);
-          nd.classList.toggle('is-match', !!f && !dim[i]);
-        });
-        list.forEach(function (li) { li.hidden = !!f && li.dataset.field !== f; });
-        pick(-1);
-      });
-    });
-
     var hc = honeycomb();
     if (!hc) return;
     D = hc.d; cell = seat(hc.cells);

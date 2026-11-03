@@ -4434,7 +4434,7 @@ const SOCIAL = {
 const SOCIAL_ORDER = ['gh', 'ig', 'fb', 'in', 'x'];
 // the sample profiles have no accounts yet, so every link is a placeholder
 const socialLinks = (name, focusable) => SOCIAL_ORDER.map((k) => `<a href="#" aria-label="${esc(name)} on ${SOCIAL[k].label}"${focusable ? '' : ' tabindex="-1"'}><svg viewBox="${SOCIAL[k].vb}" aria-hidden="true"><path d="${SOCIAL[k].d}"/></svg></a>`).join('');
-// National ICT System Patrons: the President, the Vice President and Morocco's Chargé d'Affaires, the only
+// National ICT Patrons: the President, the Vice President and Morocco's Chargé d'Affaires, the only
 // three the owner keeps here (3 Nov 2026: Madam Jarsea Burphy moved to the team as Program Coordinator, and
 // the sample patrons were removed). With what the Executive Mansion, the Ministry of Foreign Affairs and
 // the press record: no social links, nothing that sources disagree on. Photographs: the President's from
@@ -4579,7 +4579,7 @@ exports.team = (ctx) => {
     const on = Math.abs(slot) < 2.5;
     return `<li class="tw-slot"><button type="button" class="tw-card${on ? '' : ' is-off'}" data-person="team" data-i="${i}" style="--s:${slot};--up:${slot === 0 ? 'var(--tw-lift)' : 0};--k:${[1, .9, .86][Math.abs(slot)] || .6};z-index:${10 - Math.abs(slot)}" aria-label="${esc(m.name)}, ${esc(m.role)}. Open profile">
             <span class="tw-ph"><img src="/img/team/${m.img}.jpg?v=${ASSET_V}" alt="" width="600" height="600" decoding="async" draggable="false"></span>
-            <span class="tw-lab"><small>${esc(m.role)}</small><b>${esc(m.name)}</b></span>
+            <span class="tw-lab"><b>${esc(m.name)}</b><small>${esc(m.role)}</small></span>
           </button></li>`;
   };
   const teamWheel = `<section class="tw wrap" id="team" aria-labelledby="tw-h">
@@ -4606,7 +4606,7 @@ exports.team = (ctx) => {
   ${pageHeader('team', 'Our Team', 'The people who collect, check and publish Liberia’s ICT data.')}
   <div class="tm">
     ${studio({ id: 'pc', kind: 'patron', list: PATRONS, folder: 'patrons', mark: MEDAL, words: [], extra: 'is-patrons', anchor: 'patrons',
-      title: 'National ICT System<br>Patrons', label: 'Patrons', note: '' })}
+      title: 'National ICT Patrons', label: 'Patrons', note: '' })}
 
     ${teamWheel}
 

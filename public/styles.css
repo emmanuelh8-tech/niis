@@ -5584,9 +5584,15 @@ a.lg-submit.pearl { text-decoration: none; }
   overflow: visible; scroll-snap-type: none; cursor: default; }
 .tc.is-patrons .tc-card { order: var(--o); }
 .tc.is-patrons .tc-ctrl, .tc.is-patrons .tc-progress { display: none; }
+.tc.is-patrons .tc-title { white-space: nowrap; }   /* "National ICT Patrons" on one line (owner, 3 Nov 2026) */
 @media (max-width: 640px) {
+  .tc.is-patrons .tc-title { font-size: calc((100vw - 60px) / 12.1); }   /* the line is 11.65em wide; the panel's inside is 100vw - 54px */
   .tc.is-patrons .tc-card .tc-name { font-size: .62rem; }
 }
+/* names and titles are never hyphenated or justified (owner, 3 Nov 2026): the team's cards sit in list items, which
+   the site sets justified and hyphenated, and the profile window's lines are paragraphs */
+.tw-slot { -webkit-hyphens: manual; hyphens: manual; }
+#pm :is(p, li) { -webkit-hyphens: manual; hyphens: manual; text-align: left; }
 
 /* ============ NEWS & UPDATES, IN THE BBC NEWS FORMAT ============
    After the BBC News front page the owner chose: white, near-black text, a serif close to BBC Reith

@@ -4627,7 +4627,7 @@ exports.team = (ctx) => {
             <li data-field="${esc(t.field)}"><button type="button" data-person="talent" data-i="${i}">${esc(t.name)}, ${esc(t.role)}, ${esc(t.county)}</button></li>`).join('')}
           </ul>
         </div>
-        <p class="tp-note-s ts-note">Sample profiles with AI-generated placeholder photos.</p>
+        <p class="tp-note-s ts-note">Sample profiles.</p>
       </div>
     </section>
   </div>
@@ -5346,7 +5346,6 @@ exports.media = (ctx, items) => {
           : `<div class="media-thumb video-placeholder"><div>${nodeMark(28)}<p>Hosted on ${esc(m.video_provider || 'external service')}</p><p class="mono muted">Embed ID pending admin configuration</p></div></div>`)) : ''}
       <h3>${esc(m.title)}</h3><p>${esc(m.description || '')}</p>
       <div class="media-meta"><span class="tag">${esc(m.access_level)}</span>
-      ${m.video_provider === 'NICTD AI (Seedance)' ? '<span class="tag" style="background:#1C5BB8;color:#fff">AI-generated</span>' : ''}
       ${m.file_path && !m.file_path.endsWith('.mp4') ? `<a href="${esc(m.file_path)}">${kind === 'paper' ? 'Download' : 'Open'}</a>` : ''}</div>
     </div>`).join('')}</div>`;
   };

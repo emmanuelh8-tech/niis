@@ -417,6 +417,8 @@ exports.home = (ctx, { headlines, papers, keyStats, dashboards, indicatorsForSea
 
   ${nationalReports()}
 
+  ${homeBanner('hope')}
+
   ${homeVideoSection(homeVideo, homeVideoTitle, homeVideoCaption, homeVideoPlaylist)}
 
   ${latestUpdates(headlines)}
@@ -431,15 +433,23 @@ exports.home = (ctx, { headlines, papers, keyStats, dashboards, indicatorsForSea
   });
 };
 
-// The owner's banner, edge to edge between the featured papers and the reports and shown whole (never
-// cropped): the wide picture on a screen wider than a phone, the tall one on a phone. Both are Image
-// Library slots (Home page banner). The words are in the picture, so its alt text carries them.
-function homeBanner() {
-  return `<section class="home-banner" aria-label="Quality data makes you stand out">
+// The owner's banners, edge to edge and shown whole (never cropped): the wide picture on a screen wider
+// than a phone, the tall one on a phone. Quality Data sits between the featured papers and the reports,
+// Hope (3 Nov 2026) between the reports and the video. Each picture is an Image Library slot (Home page
+// banners). The words are in the picture, so its alt text carries them.
+const HOME_BANNERS = {
+  quality: { slot: 'home', label: 'Quality data makes you stand out',
+    alt: 'Quality data makes you stand out. Collecting Liberia’s ICT data. A blue pawn steps out of a row of black pawns, beside the National ICT Intelligence Program seal. www.niip.org, info@niip.org, 0888 771 973 / 0777 129 261.' },
+  hope: { slot: 'hope', label: 'Our future has hope',
+    alt: 'Our future has hope. NIIP is telling our story with every indicator. Two smiling children carry water containers along a path through green fields, beside the National ICT Intelligence Program seal. For enquiries: 0888 771 973 / 0777 129 261, info@niip.org, www.niip.org.' },
+};
+function homeBanner(id = 'quality') {
+  const b = HOME_BANNERS[id];
+  return `<section class="home-banner home-banner-${id}" aria-label="${esc(b.label)}">
     <picture>
-      <source media="(max-width: 760px)" srcset="${esc(imgs.url('banners', 'home-mobile'))}" width="1600" height="2000">
-      <img src="${esc(imgs.url('banners', 'home-desktop'))}" width="1920" height="1080" loading="lazy" decoding="async"
-        alt="Quality data makes you stand out. Collecting Liberia’s ICT data. A blue pawn steps out of a row of black pawns, beside the National ICT Intelligence Program seal. www.niip.org, info@niip.org, 0888 771 973 / 0777 129 261.">
+      <source media="(max-width: 760px)" srcset="${esc(imgs.url('banners', b.slot + '-mobile'))}" width="1600" height="2000">
+      <img src="${esc(imgs.url('banners', b.slot + '-desktop'))}" width="1920" height="1080" loading="lazy" decoding="async"
+        alt="${esc(b.alt)}">
     </picture>
   </section>`;
 }

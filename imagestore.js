@@ -76,11 +76,13 @@ const COLLECTIONS = {
     ],
   },
   banners: {
-    label: 'Home page banner',
-    note: 'The full-width banner between Featured Research Papers and National ICT Reports: one picture for wide screens, one for phones.',
+    label: 'Home page banners',
+    note: 'The two full-width banners on the home page, each with one picture for wide screens and one for phones: the first between Featured Research Papers and National ICT Reports, the second between National ICT Reports and the video.',
     slots: [
-      { key: 'home-desktop', label: 'Wide screens', hint: '1920 × 1080 (16:9)', def: '/img/banners/quality-data-desktop.webp' },
-      { key: 'home-mobile', label: 'Phones', hint: '1600 × 2000 (4:5)', def: '/img/banners/quality-data-mobile.webp' },
+      { key: 'home-desktop', label: 'First banner: wide screens', hint: '1920 × 1080 (16:9)', def: '/img/banners/quality-data-desktop.webp' },
+      { key: 'home-mobile', label: 'First banner: phones', hint: '1600 × 2000 (4:5)', def: '/img/banners/quality-data-mobile.webp' },
+      { key: 'hope-desktop', label: 'Second banner: wide screens', hint: '1920 × 1080 (16:9)', def: '/img/banners/hope-desktop.webp' },
+      { key: 'hope-mobile', label: 'Second banner: phones', hint: '1600 × 2000 (4:5)', def: '/img/banners/hope-mobile.webp' },
     ],
   },
   researchGroup: {

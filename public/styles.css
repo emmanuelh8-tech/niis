@@ -213,7 +213,7 @@ ul.plain, ol.plain { list-style: none; }
   .nav-shell > .nav-find { grid-column: 1; grid-row: 1; }
   .nav-shell > .nav-mapblock { grid-column: 2; grid-row: 1; justify-self: center; }
   .nav-shell > .nav-burger { grid-column: 3; grid-row: 1; }
-  .nav-search, .gov-navlinks.dock, .nav-cta-wrap { display: none; }
+  .nav-search, .gov-navlinks.dock, .shot-wrap.nav-cta-wrap { display: none; }   /* the bar's pill: the menu has its own */
   .nav-mapblock { gap: .6rem; margin: 0; padding: 0; }
   .nav-mapblock .liberia-flag { width: 34px; height: auto; }
   .nav-logo { width: 44px; height: 44px; }
@@ -6399,4 +6399,5 @@ html:has(#paper-pdf) { scroll-behavior: smooth; }
 .home-banner { margin: 1.5rem 0 0; padding: 0; line-height: 0; background: #f4f4f5; }
 .home-banner picture, .home-banner img { display: block; inline-size: 100%; block-size: auto; }
 .home-banner + #natReports { padding-top: 2.5rem !important; }
-@media (max-width: 760px) { .home-banner { margin-top: 1rem; } .home-banner + #natReports { padding-top: 1.75rem !important; } }
+.home-banner + #homeVideo { padding-top: 2.5rem; }   /* the Hope banner (3 Nov 2026), above the video */
+@media (max-width: 760px) { .home-banner { margin-top: 1rem; } .home-banner + #natReports, .home-banner + #homeVideo { padding-top: 1.75rem !important; } }

@@ -645,6 +645,7 @@
     function fill(kind, i) {
       var list = P[kind], p = list[i];
       cur = { kind: kind, i: i };
+      pm.setAttribute('data-kind', kind);
       qs('.pm-photo img', pm).src = p.img;
       qs('.pm-kind', pm).textContent = KIND[kind](p);
       qs('#pm-name', pm).textContent = p.name;

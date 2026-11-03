@@ -4234,10 +4234,10 @@ exports.reportPage = (ctx, { slug, indicators = [], domainLabels = {} }) => {
 
 // ============ OUR TEAM ============
 // A carousel of team members, the National ICT Patrons, then the National ICT Talent Pool. The members are the
-// program's real team, names and positions as the owner gave them (3 Nov 2026), in the owner's order. Until their
-// photographs arrive, each card shows a monogram tile (public/img/team/<slug>.jpg: initials on navy, the seal
-// behind), never a made-up face. The bios say only what each position covers: nothing personal is invented.
-// img is the slug of the picture in public/img/team; swap in a photograph under the same name when it comes
+// program's real team, names and positions as the owner gave them (3 Nov 2026), in the owner's order, with the
+// photographs the owner sent and matched (square crops held from the top). One without a matched photograph shows a
+// monogram tile (initials on navy, the seal behind), never a made-up face. The bios say only what each position
+// covers: nothing personal is invented. img is the slug of the picture in public/img/team
 const TEAM_MEMBERS = [
   { name: 'Emmanuel D. Harris', img: 'emmanuel-harris', role: 'Program Manager', bio: 'Manages the National ICT Intelligence Program.' },
   { name: 'Madam Jarsea Burphy', img: 'jarsea-burphy', role: 'Program Coordinator', bio: 'Coordinates the work of the program across its teams and partners.' },

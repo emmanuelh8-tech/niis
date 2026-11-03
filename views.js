@@ -4233,24 +4233,19 @@ exports.reportPage = (ctx, { slug, indicators = [], domainLabels = {} }) => {
 };
 
 // ============ OUR TEAM ============
-// A carousel of team members, the National ICT Patrons, then the National ICT Talent Pool. The members are sample
-// profiles (the owner asked for twelve mock Liberian staff until real appointments, names and
-// photographs are supplied). Their photographs in public/img/team are AI-generated portraits of
-// people who do not exist, never photographs of real people, and the page says so.
-// sample members; img is the slug of their photograph in public/img/team
+// A carousel of team members, the National ICT Patrons, then the National ICT Talent Pool. The members are the
+// program's real team, names and positions as the owner gave them (3 Nov 2026), in the owner's order. Until their
+// photographs arrive, each card shows a monogram tile (public/img/team/<slug>.jpg: initials on navy, the seal
+// behind), never a made-up face. The bios say only what each position covers: nothing personal is invented.
+// img is the slug of the picture in public/img/team; swap in a photograph under the same name when it comes
 const TEAM_MEMBERS = [
-  { name: 'Musu Kollie', img: 'musu-kollie', role: 'Survey / Project Director', bio: 'Leads the data mining phase from the first county wave to the national release, and answers for the whole programme.' },
-  { name: 'Emmanuel Kpadeh', img: 'emmanuel-kpadeh', role: 'Data Team Lead', bio: 'Runs the processing pipeline and signs off every dataset before it is published in NIIS.' },
-  { name: 'Comfort Wesseh', img: 'comfort-wesseh', role: 'Sampling Statistician', bio: 'Designs the samples and the weights that turn field interviews into county estimates.' },
-  { name: 'Prince Flomo', img: 'prince-flomo', role: 'Database / CAPI Engineer', bio: 'Builds the tablet questionnaires and the sync service that carries uploads in from the field.' },
-  { name: 'Siafa Kamara', img: 'siafa-kamara', role: 'Database / CAPI Engineer', bio: 'Keeps the upload pipeline quick and the database in order, wave after wave.' },
-  { name: 'Hawa Kromah', img: 'hawa-kromah', role: 'GIS / Mapping Analyst', bio: 'Draws the enumeration areas and turns county figures into the maps on this site.' },
-  { name: 'Jartu Dolo', img: 'jartu-dolo', role: 'Data Quality Analyst', bio: 'Writes the validation rules that catch an outlier before anyone else sees it.' },
-  { name: 'Saye Zuo', img: 'saye-zuo', role: 'Data Quality Analyst', bio: 'Reviews every flagged record with the field teams until the numbers hold.' },
-  { name: 'Korto Nyumah', img: 'korto-nyumah', role: 'Data Processing Clerk', bio: 'Codes the open answers and reconciles records, so nothing collected in the field is lost.' },
-  { name: 'Momo Konneh', img: 'momo-konneh', role: 'County Research Lead, Bong', bio: 'Owns sampling and data quality in Bong County, and leads its key-informant interviews.' },
-  { name: 'Decontee Tarpeh', img: 'decontee-tarpeh', role: 'Field Supervisor, Nimba', bio: 'Leads an enumerator team in Nimba, running spot checks and clearing the daily uploads.' },
-  { name: 'Varney Kanneh', img: 'varney-kanneh', role: 'Field Enumerator, Montserrado', bio: 'Collects household ICT data on a tablet across his enumeration areas in Montserrado.' },
+  { name: 'Emmanuel D. Harris', img: 'emmanuel-harris', role: 'Program Manager', bio: 'Manages the National ICT Intelligence Program.' },
+  { name: 'Madam Jarsea Burphy', img: 'jarsea-burphy', role: 'Program Coordinator', bio: 'Coordinates the work of the program across its teams and partners.' },
+  { name: 'Willie B. Tingba', img: 'willie-tingba', role: 'ICT Systems and Cybersecurity Lead', bio: 'Leads the program’s ICT systems and their cybersecurity.' },
+  { name: 'Mohammed D. Newton', img: 'mohammed-newton', role: 'Public Relations Lead', bio: 'Leads the program’s public relations and communications.' },
+  { name: 'Prince Cooper', img: 'prince-cooper', role: 'Training Coordinator', bio: 'Coordinates the program’s training.' },
+  { name: 'John S. Nyumah', img: 'john-nyumah', role: 'Monitoring & Evaluation Lead', bio: 'Leads the monitoring and evaluation (M&E) of the program.' },
+  { name: 'John T. Wilson', img: 'john-wilson', role: 'Finance Manager', bio: 'Manages the program’s finances.' },
 ];
 // The National ICT Talent Pool: young Liberians the programme has found building, designing and
 // securing the country's digital future. Sample profiles (the owner asked for mock talents until
@@ -4401,18 +4396,6 @@ const TALENTS = [
 // Education and experience behind each sample profile (mock, as the profiles are), shown in the
 // details window that opens from a card. experience: [role, where, when]
 const PERSON_MORE = {
-  'Musu Kollie': { edu: ['MSc Development Statistics, University of Liberia', 'BSc Economics, Cuttington University'], exp: [['Survey / Project Director', 'NIIP data mining phase', '2026 to now'], ['Survey manager', 'National household survey programme', '2019 to 2025'], ['Statistician', 'County planning office, Bong', '2014 to 2019']] },
-  'Emmanuel Kpadeh': { edu: ['BSc Computer Science, University of Liberia', 'Certificate in Data Engineering'], exp: [['Data Team Lead', 'NIIP', '2026 to now'], ['Database administrator', 'Ministry IT unit', '2018 to 2025']] },
-  'Comfort Wesseh': { edu: ['MSc Applied Statistics, University of Ghana', 'BSc Mathematics, University of Liberia'], exp: [['Sampling Statistician', 'NIIP', '2026 to now'], ['Research statistician', 'Health survey programme', '2021 to 2025']] },
-  'Prince Flomo': { edu: ['BSc Software Engineering, Stella Maris Polytechnic'], exp: [['Database / CAPI Engineer', 'NIIP', '2026 to now'], ['Mobile developer', 'Software studio, Monrovia', '2022 to 2025']] },
-  'Siafa Kamara': { edu: ['BSc Information Technology, African Methodist Episcopal University'], exp: [['Database / CAPI Engineer', 'NIIP', '2026 to now'], ['Systems administrator', 'Bank IT department', '2020 to 2025']] },
-  'Hawa Kromah': { edu: ['BSc Geography, University of Liberia', 'Diploma in GIS'], exp: [['GIS / Mapping Analyst', 'NIIP', '2026 to now'], ['GIS officer', 'County land-use mapping project', '2019 to 2025']] },
-  'Jartu Dolo': { edu: ['BSc Statistics, University of Liberia'], exp: [['Data Quality Analyst', 'NIIP', '2026 to now'], ['Monitoring and evaluation officer', 'Education programme', '2018 to 2025']] },
-  'Saye Zuo': { edu: ['BA Economics, Cuttington University'], exp: [['Data Quality Analyst', 'NIIP', '2026 to now'], ['Field data supervisor', 'Agriculture census', '2016 to 2025']] },
-  'Korto Nyumah': { edu: ['Associate Degree in Computer Science, Grand Bassa Community College'], exp: [['Data Processing Clerk', 'NIIP', '2026 to now'], ['Data entry officer', 'County health office', '2023 to 2025']] },
-  'Momo Konneh': { edu: ['MA Sociology, University of Liberia', 'BA Sociology, Cuttington University'], exp: [['County Research Lead, Bong', 'NIIP', '2026 to now'], ['Researcher', 'Community research programme, Bong', '2017 to 2025']] },
-  'Decontee Tarpeh': { edu: ['BSc Public Health, Mother Patern College of Health Sciences'], exp: [['Field Supervisor, Nimba', 'NIIP', '2026 to now'], ['Enumerator team lead', 'Demographic survey', '2021 to 2025']] },
-  'Varney Kanneh': { edu: ['Certificate in Information Technology, Booker Washington Institute'], exp: [['Field Enumerator, Montserrado', 'NIIP', '2026 to now'], ['Mobile money agent', 'Paynesville', '2022 to 2025']] },
   'Blessing Gbessay': { edu: ['BSc Computer Science (in progress), Stella Maris Polytechnic'], exp: [['Flutter developer, freelance', 'Monrovia', '2024 to now'], ['Volunteer coding coach', 'Community tech hub', '2023 to now']] },
   'Abraham Tamba': { edu: ['BSc Statistics, University of Liberia'], exp: [['Data analyst', 'Development research programme', '2023 to now'], ['Research intern', 'Margibi County planning office', '2022']] },
   'Patience Sumo': { edu: ['BA Mass Communication, Cuttington University'], exp: [['UX designer, freelance', 'Gbarnga', '2024 to now'], ['Design fellow', 'Inclusive tech programme', '2023']] },
@@ -4631,11 +4614,11 @@ exports.team = (ctx) => {
           <p class="tw-words" aria-hidden="true">Collect<i></i>Check<i></i>Publish</p>
         </div>
       </div>
-      <p class="tw-note">Sample profiles with AI-generated placeholder photos, shown until appointments are confirmed. Drag or swipe the wheel to turn it either way.</p>
+      <p class="tw-note">Drag or swipe the wheel to turn it either way.</p>
     </section>`;
   // what the profile window shows
   const people = {
-    team: TEAM_MEMBERS.map((m) => ({ name: m.name, role: m.role, img: `/img/team/${m.img}.jpg?v=${ASSET_V}`, bio: m.bio, ...(PERSON_MORE[m.name] || {}) })),
+    team: TEAM_MEMBERS.map((m) => ({ name: m.name, role: m.role, real: true, img: `/img/team/${m.img}.jpg?v=${ASSET_V}`, bio: m.bio })),
     patron: PATRONS.map((m) => ({ name: m.name, role: m.role, real: !!m.real, img: `/img/patrons/${m.img}.jpg?v=${ASSET_V}`, bio: m.bio, edu: m.edu, exp: m.exp })),
     talent: TALENTS.map((t) => ({ name: t.name, role: t.role, img: `/img/talent/${t.img}.jpg?v=${ASSET_V}`, bio: t.note, county: t.county, field: t.field, skills: t.skills, ...(PERSON_MORE[t.name] || {}) })),
   };

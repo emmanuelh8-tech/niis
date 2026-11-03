@@ -4583,8 +4583,8 @@ exports.team = (ctx) => {
           </button></li>`;
   };
   const teamWheel = `<section class="tw wrap" id="team" aria-labelledby="tw-h">
-      <h2 id="tw-h" class="sr-only">The people behind NIIP</h2>
       <div class="tw-panel">
+        <div class="tw-head"><h2 id="tw-h" class="tc-title tw-title">Program Management Team</h2></div>
         <div class="tw-stage" data-wheel role="group" aria-label="Team members, ${TEAM_MEMBERS.length} in all. Use the arrow keys or drag to turn the wheel.">
           <div class="tw-hub">
             ${TW_TYRE}

@@ -5870,6 +5870,11 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 .tc + .tw { margin-top: 1.4rem; }
 .tw-panel { position: relative; overflow: hidden; border-radius: var(--ui-r);
   background: radial-gradient(130% 95% at 50% 16%, #FCFCFD 0%, #F2F3F5 46%, #E2E5E9 100%); }
+/* the team's heading (owner, 3 Nov 2026): "Program Management Team" on one line, in the patrons' heading style, set
+   in the panel's top left with the patrons' padding. The line is 15.6em wide and its box is 100vw - 87px inside on a
+   phone, so on a narrow screen the size steps down to fit; wide screens keep the patrons' clamp */
+.tw-head { padding: clamp(1.3rem, 3vw, 2.6rem) clamp(1.3rem, 3vw, 2.6rem) 0; }
+.tw-title { white-space: nowrap; font-size: min(clamp(2.2rem, 1.4rem + 3.2vw, 4rem), calc((100vw - 95px) / 16.3)); }
 .tw-stage { --tw-cw: .18; --tw-rc: .472; --tw-lift: .038; --tw-step: 27; --tw-cy: .655; --tw-rt: .345; --tw-h: .57;
   container-type: inline-size; position: relative; overflow: hidden; aspect-ratio: 1 / var(--tw-h);
   touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: grab; }

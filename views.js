@@ -4235,9 +4235,9 @@ exports.reportPage = (ctx, { slug, indicators = [], domainLabels = {} }) => {
 // ============ OUR TEAM ============
 // A carousel of team members, the National ICT Patrons, then the National ICT Talent Pool. The members are the
 // program's real team, names and positions as the owner gave them (3 Nov 2026), in the owner's order, with the
-// photographs the owner sent and matched (square crops held from the top). One without a matched photograph shows a
-// monogram tile (initials on navy, the seal behind), never a made-up face. The bios say only what each position
-// covers: nothing personal is invented. img is the slug of the picture in public/img/team
+// photographs the owner sent and matched (square crops held from the top); Madam Burphy's is the one she had as a
+// patron. Anyone without a photograph gets a monogram tile (initials on navy, the seal behind), never a made-up
+// face. The bios say only what each position covers: nothing personal is invented. img is the slug in public/img/team
 const TEAM_MEMBERS = [
   { name: 'Emmanuel D. Harris', img: 'emmanuel-harris', role: 'Program Manager', bio: 'Manages the National ICT Intelligence Program.' },
   { name: 'Madam Jarsea Burphy', img: 'jarsea-burphy', role: 'Program Coordinator', bio: 'Coordinates the work of the program across its teams and partners.' },
@@ -4434,12 +4434,10 @@ const SOCIAL = {
 const SOCIAL_ORDER = ['gh', 'ig', 'fb', 'in', 'x'];
 // the sample profiles have no accounts yet, so every link is a placeholder
 const socialLinks = (name, focusable) => SOCIAL_ORDER.map((k) => `<a href="#" aria-label="${esc(name)} on ${SOCIAL[k].label}"${focusable ? '' : ' tabindex="-1"'}><svg viewBox="${SOCIAL[k].vb}" aria-hidden="true"><path d="${SOCIAL[k].d}"/></svg></a>`).join('');
-// National ICT System Patrons: people who support ICT in Liberia. The first four are real (below);
-// the rest are sample profiles (the owner asked for mock patrons), with AI-generated portraits in
-// public/img/patrons of people who do not exist; the page says so.
-// The first four are the patrons the owner has named, with what the Executive Mansion, the Ministry
-// of Foreign Affairs and the press record, or (Director Burphy) what the owner gave: no social links,
-// nothing that sources disagree on. The rest are sample profiles. Photographs: the President's from
+// National ICT System Patrons: the President, the Vice President and Morocco's Chargé d'Affaires, the only
+// three the owner keeps here (3 Nov 2026: Madam Jarsea Burphy moved to the team as Program Coordinator, and
+// the sample patrons were removed). With what the Executive Mansion, the Ministry of Foreign Affairs and
+// the press record: no social links, nothing that sources disagree on. Photographs: the President's from
 // the Executive Mansion (the home slider); the others as the owner sent them.
 const PATRONS = [
   { name: 'H.E. Joseph Nyuma Boakai, Sr.', img: 'joseph-boakai', role: 'President of the Republic of Liberia', real: true,
@@ -4454,25 +4452,6 @@ const PATRONS = [
     bio: 'Leads the Embassy of the Kingdom of Morocco in Monrovia as Chargé d’Affaires.',
     edu: [],
     exp: [['Chargé d’Affaires', 'Embassy of the Kingdom of Morocco, Monrovia', 'Now']] },
-  { name: 'Director Jarsea Burphy', img: 'jarsea-burphy', role: 'Communications Pioneer', real: true,
-    bio: 'Director, and a pioneer in communications.',
-    edu: [], exp: [] },
-  { name: 'Dr. Fatumata Jalloh', img: 'fatumata-jalloh', role: 'Patron, Digital Health',
-    bio: 'Advocates for digital patient records in county hospitals.',
-    edu: ['MD, A.M. Dogliotti College of Medicine', 'MPH, University of Liberia'],
-    exp: [['Patron, Digital Health', 'NIIP', '2026 to now'], ['Physician', 'County referral hospital', '2008 to now']] },
-  { name: 'Thomas Gweh', img: 'thomas-gweh', role: 'Patron, Coding Clubs',
-    bio: 'Sponsors after-school coding clubs in Montserrado and Bong.',
-    edu: ['BSc Electrical Engineering, University of Liberia'],
-    exp: [['Patron, Coding Clubs', 'NIIP', '2026 to now'], ['Chief executive', 'Engineering services company', '2005 to now']] },
-  { name: 'Christiana Nimely', img: 'christiana-nimely', role: 'Patron, Women in Tech',
-    bio: 'Mentors young women starting careers in ICT.',
-    edu: ['BSc Computer Science, Cuttington University', 'Certificate in Entrepreneurship'],
-    exp: [['Patron, Women in Tech', 'NIIP', '2026 to now'], ['Founder', 'Software studio, Monrovia', '2016 to now']] },
-  { name: 'Joseph Gbeh', img: 'joseph-gbeh', role: 'Patron, Open Data',
-    bio: 'Supports open public access to Liberia’s ICT statistics.',
-    edu: ['MA Public Administration, University of Liberia'],
-    exp: [['Patron, Open Data', 'NIIP', '2026 to now'], ['Civil servant', 'Public administration', '1985 to 2022']] },
 ];
 // a medal in its own colours: gold, on a ribbon in the flag's red and blue
 const MEDAL = `<svg class="tc-laptop" viewBox="0 0 40 40" aria-hidden="true">
@@ -4583,7 +4562,7 @@ exports.team = (ctx) => {
         </div>
         <div class="tc-foot">
           <div class="tc-progress" aria-hidden="true"><i></i></div>
-          <p class="tc-note">${esc(note)}</p>
+          ${note ? `<p class="tc-note">${esc(note)}</p>` : ''}
         </div>
       </div>
     </section>`;
@@ -4627,7 +4606,7 @@ exports.team = (ctx) => {
   ${pageHeader('team', 'Our Team', 'The people who collect, check and publish Liberia’s ICT data.')}
   <div class="tm">
     ${studio({ id: 'pc', kind: 'patron', list: PATRONS, folder: 'patrons', mark: MEDAL, words: [], extra: 'is-patrons', anchor: 'patrons',
-      title: 'National ICT System<br>Patrons', label: 'Patrons', note: 'The first four are the patrons named so far; the others are sample profiles with AI-generated placeholder photos.' })}
+      title: 'National ICT System<br>Patrons', label: 'Patrons', note: '' })}
 
     ${teamWheel}
 

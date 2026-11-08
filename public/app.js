@@ -646,7 +646,10 @@
       var list = P[kind], p = list[i];
       cur = { kind: kind, i: i };
       pm.setAttribute('data-kind', kind);
-      qs('.pm-photo img', pm).src = p.img;
+      // a photograph, or (the talents) the person's initials in their field's colour
+      var ph = qs('.pm-photo', pm), im = qs('img', ph), mono = qs('.pm-mono', ph);
+      if (p.img) { im.hidden = false; im.src = p.img; if (mono) mono.hidden = true; }
+      else { im.hidden = true; im.removeAttribute('src'); if (mono) { mono.hidden = false; mono.textContent = p.ini || ''; } ph.style.setProperty('--c', p.mark || '#0B2C63'); }
       qs('.pm-kind', pm).textContent = KIND[kind](p);
       qs('#pm-name', pm).textContent = p.name;
       qs('.pm-role', pm).textContent = p.role;
@@ -921,7 +924,7 @@
     var box = stage.parentNode, list = qsa('.ts-list li', box);
     var cap = qs('.ts-cap', box), capName = cap && qs('b', cap), capLine = cap && qs('span', cap);
     var TOUCH = window.matchMedia && matchMedia('(hover: none)').matches;
-    var hint = TOUCH ? 'Tap a face to see who it is' : (capLine ? capLine.textContent : '');
+    var hint = TOUCH ? 'Tap a person to see who it is' : (capLine ? capLine.textContent : '');
     if (capLine) capLine.textContent = hint;
     var P = (window.__PEOPLE__ && window.__PEOPLE__.talent) || [];
     var VB = [-26, 36, 812, 828], CX = VB[0] + VB[2] / 2, CY = VB[1] + VB[3] / 2;      // the map's frame, in its own units

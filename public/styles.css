@@ -40,6 +40,7 @@
   --red: #C8102E;
   --nav-h: 3.75rem;
   --serif: 'Besley', Georgia, serif;
+  --tall: 'Big Shoulders', 'Arial Narrow', sans-serif;   /* tall condensed capitals, as in the booklet */
   --sans: 'Public Sans', 'Segoe UI', system-ui, sans-serif;
   --digits: 'NIIS Digits', 'Public Sans', 'Segoe UI', system-ui, sans-serif;
   --radius: 10px;
@@ -347,7 +348,7 @@ ul.plain, ol.plain { list-style: none; }
 .hs-quote footer { display: flex; flex-direction: column; gap: .18rem; border-left: 3px solid #C8102E; padding-left: .85rem; }
 .hs-who { font-size: 1rem; font-weight: 800; color: #fff; letter-spacing: .01em; }
 .hs-role { font-size: .86rem; color: #DCE6EE; }
-.hs-qmeta { font-size: .75rem; color: #A9BEDA; margin-top: .15rem; }
+.hs-qmeta { font-size: .86rem; color: #A9BEDA; margin-top: .15rem; }   /* the same face as the role above it */
 .hs-text h1 { color: #fff; font-size: clamp(2.1rem, 4.6vw, 3.5rem); line-height: 1.05; max-width: 15em; margin-bottom: .8rem; text-shadow: 0 2px 24px rgba(0,0,0,.4); }
 .hs-text .lede { color: #DCE6EE; max-width: 42em; font-size: 1.05rem; text-shadow: 0 1px 14px rgba(0,0,0,.45); }
 .hs-content .hero-selector-wrap { margin-top: 1.6rem; position: relative; z-index: 3; }
@@ -3900,7 +3901,7 @@ html { -webkit-text-size-adjust: 100%; }
   .hero-slider .hs-quote p { font-size: 1.16rem; line-height: 1.32; margin-bottom: .8rem; }
   .hero-slider .hs-who { font-size: .9rem; }
   .hero-slider .hs-role { font-size: .8rem; }
-  .hero-slider .hs-qmeta { font-size: .7rem; }
+  .hero-slider .hs-qmeta { font-size: .8rem; }
   .hero-slider .hs-text h1 { font-size: 1.6rem; margin-bottom: .5rem; }
   .hero-slider .hv-cue { display: none; }
   /* careers and about: the film is a 4:3 box (it grows only if the words need more) */
@@ -4618,7 +4619,7 @@ html.ui-locked { overflow: hidden; }
 /* "National ICT Talent Pool" on one line (owner, 3 Nov 2026): the line is 12.6em wide and a phone's panel is 100vw - 54px
    inside, so on a narrow screen the size steps down to fit; wider screens keep the clamp */
 .tp-title { white-space: nowrap; font-size: min(clamp(2rem, 1.3rem + 2.8vw, 3.4rem), calc((100vw - 60px) / 13.1)); }
-.tp-lede { max-width: 46ch; margin-top: .8rem; color: #4A5160; text-align: left; -webkit-hyphens: manual; hyphens: manual; }
+.tp-lede { max-width: 46ch; margin-top: .8rem; color: #4A5160; text-align: justify; text-align-last: left; -webkit-hyphens: manual; hyphens: manual; }
 .tp-chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: 1.5rem; }
 .tp-chips button { height: 32px; padding: 0 .85rem; border: 1px solid rgba(14,20,32,.2); border-radius: 999px; background: rgba(255,255,255,.55); font: 600 .78rem var(--sans); color: #2B2F36; cursor: pointer; white-space: nowrap; transition: background-color .2s, border-color .2s, color .2s; }
 .tp-chips button b { font-weight: 600; opacity: .5; }
@@ -4668,6 +4669,8 @@ html.ui-locked { overflow: hidden; }
 .pm-photo { position: relative; min-height: 0; background: #ECEEF1; }
 .pm-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 25%; }
 #pm[data-kind="team"] .pm-photo img { object-position: 50% 0%; }   /* the team's photographs keep their heads */
+.pm-mono { position: absolute; inset: 0; display: grid; place-items: center; background: var(--c, #0B2C63); color: #fff; font: 700 clamp(4rem, 3rem + 4vw, 6.5rem)/1 var(--sans); letter-spacing: .03em; }
+.pm-mono[hidden] { display: none; }
 .pm-body { display: flex; flex-direction: column; gap: .4rem; min-height: 0; overflow-y: auto; padding: 2rem 2.2rem 1.6rem; }
 .pm-kind { font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
 .pm-body h2 { margin: 0; font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2.1rem); line-height: 1.1; }
@@ -4987,8 +4990,8 @@ html:has(.ab-hero) { background-image: linear-gradient(rgb(255 255 255 / .5), rg
   100% { transform: none; }
 }
 
-/* the hero quotes' source line ("State House, Nairobi · president.go.ke") in Righteous */
-.hs-qmeta { font-family: 'Righteous', var(--sans); letter-spacing: .03em; }
+/* the hero quotes' source line in the same face as the role above it (the owner, 8 Nov 2026) */
+.hs-qmeta { font-family: var(--sans); letter-spacing: normal; }
 
 /* ============ PROGRAMS ============ */
 .pg { padding: 2.6rem 0 4.5rem; }
@@ -5334,13 +5337,15 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
 /* a fine grain over the card stock */
 .tk-main::after, .tk-stub::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: var(--grain, .2); mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
-.tk-photo { position: absolute; top: 0; right: 0; bottom: 0; width: 46%; background-size: cover; background-position: center 30%;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 52%); mask-image: linear-gradient(90deg, transparent 0%, #000 52%); }
+/* the kind in tall condensed capitals down the ticket's right side, reading upwards, sized to its length (--n letters) */
+.tk-art { position: absolute; top: 0; right: 0; bottom: 0; z-index: 1; width: 34%; display: grid; place-items: center; overflow: hidden; border-left: 1px dashed var(--rule); pointer-events: none; container-type: size; }
+.tk-art span { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; text-transform: uppercase;
+  font: 900 min(6rem, 78cqw, calc(86cqh / var(--n, 8) / .6))/.8 var(--tall); letter-spacing: .01em; }
 .tk-content { position: relative; z-index: 1; display: flex; flex-direction: column; gap: .5rem; width: 64%; padding: 1.2rem 1.1rem 1.15rem 1.35rem; }
 .tk-top { display: flex; align-items: center; flex-wrap: wrap; gap: .55rem; margin: 0; }
 .tk-org { font-family: var(--font-label); font-size: .62rem; letter-spacing: .18em; text-transform: uppercase; opacity: .75; }
 .tk-kind { padding: .22rem .6rem .2rem; border: 1.5px solid currentColor; border-radius: 999px; font-family: var(--font-label); font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; line-height: 1; }
-.tk-title { margin: .15rem 0 0; font: 800 clamp(1.15rem, .95rem + .55vw, 1.45rem)/1 var(--sans); letter-spacing: -.005em; text-transform: uppercase; text-wrap: balance; color: inherit; }
+.tk-title { margin: .15rem 0 0; font: 800 clamp(1.6rem, 1.3rem + .8vw, 2.05rem)/.94 var(--tall); letter-spacing: .01em; text-transform: uppercase; text-wrap: balance; color: inherit; }
 .tk-body { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 0; font-size: .78rem; line-height: 1.45; text-align: left; hyphens: manual; opacity: .78; }
 .tk-info { display: flex; flex-wrap: wrap; gap: .3rem 1.1rem; margin: auto 0 0; padding-top: .7rem; border-top: 1px dashed var(--rule); }
 .tk-info div { display: grid; gap: .15rem; }
@@ -5357,14 +5362,15 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
 .tk.is-paper .tk-main { --rule: rgba(11,44,99,.28); background: #FBFBF9; color: #0E1420; }
 .tk.is-paper .tk-main::after { mix-blend-mode: multiply; opacity: .1; }
 .tk.is-paper .tk-title, .tk.is-paper .tk-kind { color: #0B2C63; }
+.tk.is-paper .tk-art span { color: #C8102E; }
 .tk.is-paper .tk-stub { --perf: rgba(255,255,255,.55); background: #0B2C63; color: #fff; }
 .tk.is-vip .tk-main { --rule: rgba(255,255,255,.35); background: linear-gradient(118deg, #0B2C63 0%, #1747A6 46%, #13A27E 100%); color: #fff; }
-.tk.is-vip .tk-photo { mix-blend-mode: luminosity; opacity: .55; }
+.tk.is-vip .tk-art span { color: #fff; }
 .tk.is-vip .tk-kind { background: #fff; border-color: #fff; color: #0B2C63; }
 .tk.is-vip .tk-stub { --perf: rgba(7,42,58,.45); background: linear-gradient(165deg, #17B88B 0%, #7FE3BF 100%); color: #072A3A; }
 .tk.is-pass .tk-main { --rule: rgba(255,255,255,.3); color: #fff;
   background: repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 2px, transparent 2px 9px), radial-gradient(120% 90% at 0% 0%, #163E86 0%, #0B2C63 45%, #071A3E 100%); }
-.tk.is-pass .tk-photo { opacity: .75; }
+.tk.is-pass .tk-art span { color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,.92); }
 .tk.is-pass .tk-kind { color: #FFCC00; }
 .tk.is-pass .tk-stub { --perf: rgba(255,255,255,.55); background: linear-gradient(165deg, #D7193A 0%, #A30B24 100%); color: #fff; }
 /* lift, and the stub starts to tear */
@@ -5376,8 +5382,9 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
   .tk-main { flex-direction: column; border-radius: var(--rad) var(--rad) 0 0;
     -webkit-mask: radial-gradient(circle at 0 100%, #0000 var(--r), #000 calc(var(--r) + .5px)) left / 51% 100% no-repeat, radial-gradient(circle at 100% 100%, #0000 var(--r), #000 calc(var(--r) + .5px)) right / 51% 100% no-repeat;
             mask: radial-gradient(circle at 0 100%, #0000 var(--r), #000 calc(var(--r) + .5px)) left / 51% 100% no-repeat, radial-gradient(circle at 100% 100%, #0000 var(--r), #000 calc(var(--r) + .5px)) right / 51% 100% no-repeat; }
-  .tk-photo { position: relative; width: auto; height: 150px; flex: none; -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent); mask-image: linear-gradient(180deg, #000 45%, transparent); }
-  .tk-content { width: auto; margin-top: -2.4rem; padding: 0 1.15rem 1.1rem; }
+  .tk-art { position: relative; width: auto; display: block; place-items: normal; padding: 1.1rem 1.15rem 0; border-left: 0; overflow: hidden; text-align: left; container-type: inline-size; }
+  .tk-art span { display: block; writing-mode: horizontal-tb; transform: none; font-size: min(5rem, calc(100cqw / var(--n, 8) / .6)); line-height: .82; }
+  .tk-content { width: auto; margin-top: 0; padding: .7rem 1.15rem 1.1rem; }
   .tk-stub { flex: none; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto auto; column-gap: 1rem; padding: 1rem 1.15rem 1.05rem; border-radius: 0 0 var(--rad) var(--rad); transform-origin: 0 0;
     -webkit-mask: radial-gradient(circle at 0 0, #0000 var(--r), #000 calc(var(--r) + .5px)) left / 51% 100% no-repeat, radial-gradient(circle at 100% 0, #0000 var(--r), #000 calc(var(--r) + .5px)) right / 51% 100% no-repeat;
             mask: radial-gradient(circle at 0 0, #0000 var(--r), #000 calc(var(--r) + .5px)) left / 51% 100% no-repeat, radial-gradient(circle at 100% 0, #0000 var(--r), #000 calc(var(--r) + .5px)) right / 51% 100% no-repeat; }
@@ -5598,9 +5605,9 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 /* the rows */
 .bbc-list { margin: 2.6rem 15px 0; padding: 0; list-style: none; border-top: 1px solid var(--bbc-grey); }
 .bbc-item { margin: 0; text-align: left; border-bottom: 1px solid var(--bbc-line); }
-.bbc-row { display: grid; grid-template-columns: minmax(0, 36%) minmax(0, 1fr); gap: 1rem; align-items: start; padding: 1.4rem 0; }
+.bbc-row { display: grid; grid-template-columns: minmax(0, 40%) minmax(0, 1fr); gap: 1rem; align-items: start; padding: 1.4rem 0; }
 .bbc-thumb > img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: #EEF0F2; }
-.bbc-txt { display: grid; gap: 1rem; min-width: 0; }
+.bbc-txt { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; min-width: 0; }
 .bbc-h { font: 600 1.5rem/1.2 var(--bbc-serif); color: var(--bbc-ink); }
 .bbc-row:hover .bbc-h, .bbc-row:focus-visible .bbc-h { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
 .bbc-row:focus-visible { outline: 2px solid var(--bbc-ink); outline-offset: 4px; }
@@ -5612,7 +5619,7 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
   .bbc { padding-top: 1.6rem; }
   .bbc-lead-in, .bbc-list { padding-left: 0; padding-right: 0; margin-left: 0; margin-right: 0; }
   .bbc-lead-h { font-size: 2.6rem; }
-  .bbc-row { grid-template-columns: 240px minmax(0, 1fr); gap: 1.4rem; }
+  .bbc-row { grid-template-columns: 200px minmax(0, 1fr); gap: 1.6rem; }
 }
 @media (max-width: 640px) {
   .bbc-lead-h { font-size: 1.75rem; line-height: 1.17; }
@@ -5621,7 +5628,7 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
   .bbc-row { gap: .9rem; padding: 1.25rem 0; }
   .bbc-h { font-size: 1.25rem; line-height: 1.2; }
   .bbc-txt { gap: .8rem; }
-  .bbc-meta { font-size: .82rem; }
+  .bbc-meta { font-size: .82rem; white-space: normal; }
   .bbc-sep { margin: 0 .5rem; }
 }
 
@@ -5819,6 +5826,10 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 .bbc-cover .pc { height: 86%; transition: transform .6s cubic-bezier(.16,1,.3,1); transform-origin: 0 50%; }
 .bbc-row:hover .bbc-cover .pc, .bbc-lead:hover .bbc-cover .pc { transform: rotateY(-12deg) translateY(-4px); }
 .bbc-cover { perspective: 900px; }
+/* in the rows the cover itself fills its column (the owner: bigger, filling the space) */
+.bbc-thumb .bbc-cover { display: block; aspect-ratio: auto; background: none; overflow: visible; }
+.bbc-thumb .bbc-cover .pc { width: 100%; height: auto; }
+.bbc-item { -webkit-hyphens: manual; hyphens: manual; }   /* headlines are never hyphenated */
 @media (max-width: 900px) {
   .rs-cmd-in { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: .75rem 12px; }
   .rs-q { grid-column: 1 / -1; }
@@ -6054,7 +6065,8 @@ html:has(#about-niip) { scroll-behavior: smooth; }
 /* the photo band shows the middle of its picture (the analysts), not the top; the rows sit over the numbers */
 .cs-people--mid img { top: 50%; transform: translateY(-50%); }
 .ab-rows { margin-bottom: clamp(2.5rem, 6vh, 3.5rem); }
-.ab-rows dd { text-align: left; hyphens: manual; }
+/* the rows' text justified to straight edges (the owner's rule for body text), the last line flush left */
+.cs-row dd { text-align: justify; text-align-last: left; -webkit-hyphens: auto; hyphens: auto; hyphenate-limit-chars: 8 3 3; }
 .ab-rows b { font-weight: 600; }
 .ab-stat p { text-align: left; hyphens: manual; }   /* the labels under the numbers stay flush left on a phone */
 
@@ -6074,7 +6086,8 @@ html:has(#about-niip) { scroll-behavior: smooth; }
 .ts-node { position: absolute; left: 50%; top: 50%; width: var(--ts-node); height: var(--ts-node); padding: 0; overflow: hidden; border: 2px solid #fff; border-radius: 50%;
   background: #E3E7EC; cursor: pointer; visibility: hidden; transform: translate(-50%, -50%) scale(0);
   box-shadow: 0 6px 12px -7px rgb(11 30 69 / .6), 0 0 0 1px rgb(11 30 69 / .06); will-change: transform; transition: box-shadow .2s ease, filter .3s ease; -webkit-tap-highlight-color: transparent; }
-.ts-node img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; -webkit-user-drag: none; }
+.ts-node { background: var(--c, #0B2C63); }   /* a talent is their initials in their field's colour (no portraits) */
+.ts-ini { display: grid; place-items: center; width: 100%; height: 100%; color: #fff; font: 700 calc(var(--ts-node) * .38)/1 var(--sans); letter-spacing: .03em; pointer-events: none; -webkit-user-select: none; user-select: none; }
 .ts-node.is-lift { box-shadow: 0 0 0 3px var(--c), 0 18px 32px -12px rgb(11 30 69 / .6); }
 .ts-node.is-match { box-shadow: 0 0 0 2.5px var(--c), 0 6px 12px -7px rgb(11 30 69 / .6); }
 .ts-node.is-dim { filter: grayscale(1); pointer-events: none; }

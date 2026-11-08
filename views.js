@@ -455,10 +455,12 @@ function homeBanner(id = 'quality') {
 }
 
 // Scroll-triggered image slider hero. Seven slides cross-fade as the visitor scrolls through a tall
-// sticky band, opening with the program's name over its building, then the President, and closing with
-// Kenya. Each carries either the NIIP intro or one quotation (verified against its source, except where a
-// note says the owner supplied it). Images live at /img/hero/slide-{1..7}, named by slot rather than by
-// place in the order, and are overridable per slot from the image admin screen.
+// sticky band: the program's name over its building, the President, Liberia's Minister of Posts and
+// Telecommunications and the LTA's Chairperson, then UNECA and Kenya's envoy, closing with Morocco's
+// Chargé d'Affaires (the owner's order, 8 Nov 2026; Ghana and Kenya's presidents removed). Each carries
+// either the NIIP intro or one quotation (verified against its source, except where a note says the owner
+// supplied it). Images live at /img/hero/slide-N, named by slot rather than by place in the order, and are
+// overridable per slot from the image admin screen.
 const HERO_SLIDES = [
   { img: 'slide-2', title: 'National ICT\nIntelligence Program', sub: 'Liberia’s Data, owned by Liberia.' },
   // His infrastructure pledge at the Liberia Technology Summit. The Executive Mansion release
@@ -468,30 +470,31 @@ const HERO_SLIDES = [
     pos: 'center 22%',
     who: 'H.E. Joseph Nyuma Boakai, Sr.', role: 'President of the Republic of Liberia',
     meta: 'Liberia Technology Summit 2026, 21 July · emansion.gov.lr' },
-  // Supplied by the owner (28 October 2026), spelling corrected and the words unchanged; no published
-  // source was found, so it carries no source line. His title is the one on his patron card.
-  { img: 'slide-7', pos: '57% 24%',
-    quote: 'As Africans, if we prioritize taking ownership, that is when full sovereignty will be achieved.',
-    who: 'Hon. Lahoucine Rahmouni', role: 'Chargé d’Affaires, Embassy of the Kingdom of Morocco in Liberia' },
+  // Verified against AllAfrica's report of the summit's opening (22 July 2026), word for word. The photo
+  // is the owner's (640 px, doubled for wide screens).
+  { img: 'slide-8', pos: 'center 26%',
+    quote: 'Our underlying purpose is singular: to build a Liberia that owns its digital infrastructure rather than rents it.',
+    who: 'Hon. Sekou M. Kromah', role: 'Minister of Posts and Telecommunications, Republic of Liberia',
+    meta: 'Liberia Technology Summit 2026 · allafrica.com' },
+  // Verified against the LTA's own report of his meeting with UNDP (28 August 2025), word for word. His
+  // title is the one on the LTA's biography of him (earlier he was its Commissioner for Engineering and
+  // Technology). The photo is the owner's.
+  { img: 'slide-9', pos: '55% 20%',
+    quote: 'The collaboration between the LTA and UNDP presents an opportunity to drive innovation and build a more inclusive digital economy.',
+    who: 'Hon. Clarence K. Massaquoi', role: 'Chairperson, Liberia Telecommunications Authority',
+    meta: 'With UNDP, August 2025 · lta.gov.lr' },
   { img: 'slide-3', quote: 'If we cannot measure the contribution of technology to GDP, we cannot monetize it.',
     pos: 'center 20%',
     who: 'Mr. Claver Gatete', role: 'UN Under-Secretary-General · Executive Secretary, UNECA',
     meta: 'UN Economic Commission for Africa · uneca.org' },
-  // Verified against the Ghana News Agency report of the National AI Strategy launch.
-  { img: 'slide-4',
-    quote: 'Ghana cannot build a meaningful AI future using systems that do not understand our Ghanaian realities.',
-    pos: 'center 18%',
-    who: 'H.E. John Dramani Mahama', role: 'President of the Republic of Ghana',
-    meta: 'National AI Strategy launch, April 2026 · Accra' },
-  // Verified against president.go.ke, 11th Huawei ICT Competition. Trimmed between his two
-  // sentences; the ellipsis marks the cut.
-  { img: 'slide-5',
-    quote: 'The future … will belong to those who imagine, invent and build the technologies that the world has not yet conceived.',
-    pos: 'center 32%',
-    who: 'H.E. William Ruto', role: 'President of the Republic of Kenya',
-    meta: 'State House, Nairobi · president.go.ke' },
   { img: 'slide-6', quote: 'Africa must prioritize local data processing and systems that reflect its realities.',
     who: 'Ambassador Philip Thigo', role: 'Kenya’s Special Envoy on Technology', meta: 'April 2026 · Tangier, Morocco' },
+  // Supplied by the owner (28 October 2026), spelling corrected and the words unchanged; no published
+  // source was found, so it carries no source line. His title is the one on his patron card. Last, as
+  // the owner asked (8 Nov 2026).
+  { img: 'slide-7', pos: '57% 24%',
+    quote: 'As Africans, if we prioritize taking ownership, that is when full sovereignty will be achieved.',
+    who: 'Hon. Lahoucine Rahmouni', role: 'Chargé d’Affaires, Embassy of the Kingdom of Morocco in Liberia' },
 ];
 // Each built-in slide also has a 5-6 s shot cut from it (public/media/home/<slot>.mp4, plus -720 for
 // phones), longer than a slide stays, so the cross-fades always move. The leaders' shots are camera moves over the original photo, so nobody in them is

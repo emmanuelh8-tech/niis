@@ -27,10 +27,10 @@ const COLLECTIONS = {
       { key: 'slide-1', label: 'Slide 1', hint: 'President Joseph Boakai, Liberia', def: '/img/hero/slide-1.jpg' },
       { key: 'slide-2', label: 'Slide 2', hint: 'Liberia’s National ICT Database Project', def: '/img/hero/slide-2.png' },
       { key: 'slide-3', label: 'Slide 3', hint: 'Claver Gatete quote', def: '/img/hero/slide-3.jpg' },
-      { key: 'slide-4', label: 'Slide 4', hint: 'President John Mahama, Ghana', def: '/img/hero/slide-4.jpg' },
-      { key: 'slide-5', label: 'Slide 5', hint: 'President William Ruto, Kenya', def: '/img/hero/slide-5.jpg' },
       { key: 'slide-6', label: 'Slide 6', hint: 'Amb. Philip Thigo quote', def: '/img/hero/slide-6.png' },
-      { key: 'slide-7', label: 'Slide 7', hint: 'Hon. Lahoucine Rahmouni, Morocco (shown third)', def: '/img/hero/slide-7.jpg' },
+      { key: 'slide-7', label: 'Slide 7', hint: 'Hon. Lahoucine Rahmouni, Morocco (shown last)', def: '/img/hero/slide-7.jpg' },
+      { key: 'slide-8', label: 'Slide 8', hint: 'Hon. Sekou M. Kromah, Minister of Posts and Telecommunications (shown third)', def: '/img/hero/slide-8.jpg' },
+      { key: 'slide-9', label: 'Slide 9', hint: 'Hon. Clarence K. Massaquoi, LTA Chairperson (shown fourth)', def: '/img/hero/slide-9.jpg' },
     ],
   },
   papers: {

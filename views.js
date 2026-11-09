@@ -476,15 +476,15 @@ const HERO_SLIDES = [
     who: 'H.E. Joseph Nyuma Boakai, Sr.', role: 'President of the Republic of Liberia',
     meta: 'Liberia Technology Summit 2026, 21 July · emansion.gov.lr' },
   // Verified against AllAfrica's report of the summit's opening (22 July 2026), word for word. The photo
-  // is the owner's (640 px, doubled for wide screens).
-  { img: 'slide-8', pos: 'center 26%',
+  // is the owner's (the two photos were swapped onto the right people at the owner's word, 9 Nov 2026).
+  { img: 'slide-8', pos: '55% 20%',
     quote: 'Our underlying purpose is singular: to build a Liberia that owns its digital infrastructure rather than rents it.',
     who: 'Hon. Sekou M. Kromah', role: 'Minister of Posts and Telecommunications, Republic of Liberia',
     meta: 'Liberia Technology Summit 2026 · allafrica.com' },
   // Verified against the LTA's own report of his meeting with UNDP (28 August 2025), word for word. His
   // title is the one on the LTA's biography of him (earlier he was its Commissioner for Engineering and
-  // Technology). The photo is the owner's.
-  { img: 'slide-9', pos: '55% 20%',
+  // Technology). The photo is the owner's (640 px, doubled for wide screens).
+  { img: 'slide-9', pos: 'center 26%',
     quote: 'The collaboration between the LTA and UNDP presents an opportunity to drive innovation and build a more inclusive digital economy.',
     who: 'Hon. Clarence K. Massaquoi', role: 'Chairperson, Liberia Telecommunications Authority',
     meta: 'With UNDP, August 2025 · lta.gov.lr' },

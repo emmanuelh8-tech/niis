@@ -249,6 +249,10 @@ async function start() {
   let state = perch ? S.PERCHED : S.AWAY;
   let everSeen = false, seenFor = 0, scrolled = false, now = 0, lastScroll = 0, lastAct = 0, scrollDir = 1, lastY = scrollY;
   let flight = null, pending = null, awayT = 0, awayWait = 1.4, launchT = 0, roll = 0, modeHold = 0, busyT = 0, startleCool = 0;
+  // a rest (the owner, 9 Nov 2026): after 40 seconds with the reader the bird flies off the screen, stays
+  // away for 10 and comes back, and so on for as long as they stay. The clock only runs while the page shows.
+  const REST_AFTER = 40, REST_FOR = 10;
+  let nextRest = REST_AFTER, rest = null;
   if (!perch) root.visible = false;
   let lastBehaviour = '', behaviours = 0, mYaw = 0, mLook = 0;
   let ep = null, epWait = null, epName = '', epStart = 0, nextWorm = Infinity, wormHole = null, lastMiss = '', misses = 0;
@@ -338,7 +342,7 @@ async function start() {
   function launchFrom(from, opts = {}, midAir = false) {
     from = { x: from.x, y: from.y, z: from.z || 0 };
     let target = opts.target || null, pt = target ? perchPoint(target) : null;
-    if (!target) {
+    if (!target && !opts.exit) {
       const t = targets(perch && perch.role !== 'ground' && (state === S.PERCHED || state === S.TAKEOFF) ? perch : null);
       if (t.length) { const o = pick(t); target = o.p; pt = o.pt; }
     }
@@ -564,6 +568,13 @@ async function start() {
     if (covered) { scrolled = false; return; }
     let draw = true;
     busyT -= dt; startleCool -= dt;
+    // time for a rest: off the screen by the shortest way (never in the middle of a worm hunt or a slip)
+    if (!rest && now >= nextRest && !ep && !slip) {
+      rest = { until: Infinity };
+      if (state === S.PERCHED) takeOff({ exit: true });
+      else if (state === S.TAKEOFF) pending = { exit: true };
+      else if (state === S.FLY) launchFrom(birdAt(), { exit: true }, true);
+    }
     // a scroll ends a worm hunt: the worm is gone in an instant and the bird gets on with its day
     if (scrolled && ep) {
       stopWorm();
@@ -669,7 +680,12 @@ async function start() {
       }
     } else if (state === S.AWAY) {
       awayT += dt; draw = false;
-      if (awayT > awayWait && now - lastScroll > 0.25) {
+      // resting out of sight: ten seconds from the moment it left, then back, and the next rest in forty
+      if (rest) {
+        if (rest.until === Infinity) rest.until = now + REST_FOR;
+        if (now >= rest.until) { rest = null; nextRest = now + REST_AFTER; awayT = awayWait; }
+      }
+      if (!rest && awayT > awayWait && now - lastScroll > 0.25) {
         if (!comeBack()) {
           awayWait = awayT + 0.5;
           if (idleFor() > 10 && now - lastAct > 12) passBy();          // nowhere to land: fly past now and then
@@ -705,7 +721,7 @@ async function start() {
   // read-only status for testing in the console
   window.__roboTuraco = {
     get state() { return state; }, get perch() { return perch && (perch.el ? perch.role + ': ' + perch.el.textContent.trim().replace(/\s+/g, ' ').slice(0, 40) : perch.role); }, get route() { return flight && flight.name; },
-    get perches() { return perches.length; },
+    get perches() { return perches.length; }, get resting() { return rest ? (rest.until === Infinity ? 'leaving' : 'away') : ''; }, get clock() { return +now.toFixed(1); },
     get behaviour() { return lastBehaviour; }, get behaviours() { return behaviours; }, get hunt() { return ep ? epName || 'spotting' : ''; },
     get misses() { return misses; }, get wormOut() { return worm.out; }, startWorm, root, get slipping() { return slip ? +slip.t.toFixed(2) : 0; },
   };

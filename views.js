@@ -1875,7 +1875,7 @@ exports.dashboardTopic = (ctx, { slug, label, description, counties, narrative }
 // scrolls. [alt text, link]
 const SLIDES = [
   ['What we do. 15 counties, collected, validated, published. We collect, validate and publish Liberia’s ICT statistics for all 15 counties, and we build the infrastructure that keeps them at home.'],
-  ['Why we do it. For Liberia’s national commitments, and to create jobs for young Liberians in tech: 174 positions across eight role types, from enumerators and supervisors in every county to research leads, data engineers, GIS and sampling specialists, quality analysts and developers, recruited from Liberian STEM graduates and trained locally. See open roles.', '/careers'],
+  ['Why we do it. For Liberia’s national commitments, and to create jobs for young Liberians in tech: 174+ positions across eight role types, from enumerators and supervisors in every county to research leads, data engineers, GIS and sampling specialists, quality analysts and developers, recruited from Liberian STEM graduates and trained locally. See open roles.', '/careers'],
   ['Commitment 1 of 6: ARREST Agenda for Inclusive Development, 2025 to 2029. ICT modernization sits in the Infrastructure pillar. NIIS is built to measure it.'],
   ['Commitment 2 of 6: National Digital Strategy, 2025 to 2029, of the Ministry of Posts and Telecommunications. Cybersecurity and data sovereignty is one of its eight priorities. NIIS is built to serve it.'],
   ['Commitment 3 of 6: Data Protection Act, enacted 2026. Built to Liberia’s first personal-data law: aggregate, anonymized statistics only.'],
@@ -1897,7 +1897,7 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
     [15, 'Counties measured', 'Every indicator, nationwide'],
     [indicatorCount, 'Indicators in the catalogue', 'Published and documented'],
     [domainCount, 'Indicator domains', 'From connectivity to sustainability'],
-    [174, 'Programme positions', 'Created for Liberian staff'],
+    [174, 'Programme positions', 'Created for Liberian staff', '+'],   // never exact: always 174+ (the owner, 9 Nov 2026)
   ].filter(([n]) => n > 0);
 
   // the mission, the problem and the answer, cut short for the kinetic type (the owner asked for few
@@ -1934,7 +1934,6 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
   return shell(ctx, {
     title: 'About', active: '/about', workspaceActive: 'about', extraHead: CAREERS_HEAD + `<script src="/assets/glass-folder.js?v=${ASSET_V}" defer></script>`, body: `
   <div class="cs ab" id="abPage">
-    <canvas class="cs-star" id="csStar" aria-hidden="true" data-seal="${esc(sealArt())}"></canvas>
     <section class="cs-hero cs-hero--film ab-hero" data-star="film" aria-labelledby="abTitle">
       <video class="cs-film" autoplay muted loop playsinline preload="auto" poster="/media/about-hero-poster.jpg" aria-hidden="true">
         <source src="/media/about-hero-720.mp4" type="video/mp4" media="(max-width: 760px)">
@@ -1965,9 +1964,9 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
           <div class="cs-row"><dt><span class="cs-tag">The access</span></dt><dd data-fill>We provide training and boot camps in partnership with international and local universities. And anyone who wants more data, a particular dataset or a new indicator can open a secure account on the platform, to search and save papers and reports, submit their research, and search for a job.</dd></div>
           <div class="cs-row"><dt><span class="cs-tag">The reason</span></dt><dd data-fill>For Liberia’s national commitments, and to create jobs for young Liberians in tech.</dd></div>
         </dl>
-        ${stats.length ? `<div class="ab-stats" role="list" aria-label="NIIP in numbers">${stats.map(([n, l, s], i) => `
+        ${stats.length ? `<div class="ab-stats" role="list" aria-label="NIIP in numbers">${stats.map(([n, l, s, plus = ''], i) => `
           <div class="ab-stat" role="listitem"${rise(i)}>
-            <p class="ab-stat-n" data-count="${n}">${n}</p>
+            <p class="ab-stat-n" data-count="${n}">${n}${plus}</p>
             <p class="ab-stat-l">${esc(l)}</p>
             <p class="ab-stat-s">${esc(s)}</p>
           </div>`).join('')}
@@ -2638,9 +2637,10 @@ const rsMeta = (p) => `<span class="bbc-meta"><time datetime="${esc(p.published_
 // The photos are slots in the Image Library (researchGroup). The site keeps no sign-up list yet, so the
 // form writes the request out as an email to the program.
 const RG_CONTACT = { email: 'info@niip.org', phones: ['0888 771 973', '0777 129 261'], office: 'Monrovia, Liberia' };
-// The six research areas (from the program deck), each with its own page. The GROUPS AND MEMBERS ARE
-// SAMPLES, written at the owner's request (29 October 2026) to show the page until the first real groups
-// form; the page says so. The rest follows international practice and is real: each group is classed by
+// The six research areas (from the program deck), each with its own page. The groups were written at the
+// owner's request (29 October 2026) to show the page until the first real groups form; their invented
+// members and contacts were deleted when the site went live (9 Nov 2026), and each group reads "Under
+// Review" until its real members are named. The rest follows international practice and is real: each group is classed by
 // the OECD Fields of Research and Development (Frascati Manual 2015) and a UN SDG target; each member's
 // contribution uses CRediT, the Contributor Roles Taxonomy (ANSI/NISO Z39.104-2022); each area lists the
 // published international standards its research works to. Members are named without institutions, so
@@ -2658,7 +2658,6 @@ const RG_SDG = { '1.4': 'Equal rights to economic resources, including financial
   '11.3': 'Inclusive, sustainable urbanization and participatory planning', '16.6': 'Effective, accountable and transparent institutions',
   '16.9': 'Legal identity for all', '16.10': 'Public access to information and fundamental freedoms', '16.a': 'National capacity to prevent violence and combat crime',
   '17.18': 'High-quality, timely and reliable data' };
-// a member: [name, role, expertise, country (and "visiting" for a visiting researcher), CRediT roles]
 const RG_AREAS = [
   { slug: 'ai', name: 'Artificial intelligence', key: 'AI',
     lede: 'Machine learning, language technology and responsible AI, built on Liberian data and Liberian questions.',
@@ -2672,29 +2671,15 @@ const RG_AREAS = [
       { slug: 'liberian-languages-nlp', name: 'Liberian Languages NLP Group', status: 'Recruiting',
         topic: 'Speech and text tools for Kpelle, Bassa and Liberian English',
         sum: 'Building open datasets and models so that digital services can listen and answer in the languages Liberians speak.',
-        tags: ['Natural language processing', 'Speech recognition', 'Low-resource languages'], ford: ['1.2', '6.2'], sdg: '10.2', std: 'UNESCO AI Ethics · FAIR data',
-        people: [['Dr. Garmai Kollie', 'Principal Investigator', 'Computational linguistics', 'Liberia', 'con sup fun'],
-          ['Dr. Kwame Owusu-Ansah', 'Co-Investigator', 'Speech recognition', 'Ghana, visiting', 'met sof'],
-          ['Siatta Flomo', 'Doctoral Researcher', 'Kpelle text corpora', 'Liberia', 'dat inv'],
-          ['Varney Kpoto', 'Research Software Engineer', 'Model training pipelines', 'Liberia', 'sof val'],
-          ['Yassah Gbatu', 'Research Assistant', 'Bassa transcription', 'Liberia', 'dat inv']] },
+        tags: ['Natural language processing', 'Speech recognition', 'Low-resource languages'], ford: ['1.2', '6.2'], sdg: '10.2', std: 'UNESCO AI Ethics · FAIR data' },
       { slug: 'responsible-ai-public-services', name: 'Responsible AI & Public Services', status: 'Active',
         topic: 'Where can AI help Liberia’s ministries, and under what safeguards?',
         sum: 'Testing small, explainable AI tools against real public-service tasks, with a risk assessment before any of them is used.',
-        tags: ['AI governance', 'Public sector', 'Risk assessment'], ford: ['1.2', '5.6'], sdg: '16.6', std: 'ISO/IEC 42001 · OECD AI Principles',
-        people: [['Dr. Augustine Sumo', 'Principal Investigator', 'AI governance', 'Liberia', 'con sup pro'],
-          ['Dr. Wanjiru Kamau', 'Co-Investigator', 'Algorithmic risk assessment', 'Kenya, visiting', 'met for'],
-          ['Patience Togba', 'Research Fellow', 'Public administration', 'Liberia', 'inv wri'],
-          ['Moses Zinnah', 'Doctoral Researcher', 'Explainable models', 'Liberia', 'sof for'],
-          ['Hawa Kanneh', 'Research Assistant', 'Stakeholder interviews', 'Liberia', 'inv']] },
+        tags: ['AI governance', 'Public sector', 'Risk assessment'], ford: ['1.2', '5.6'], sdg: '16.6', std: 'ISO/IEC 42001 · OECD AI Principles' },
       { slug: 'agri-vision-lab', name: 'Agri-Vision Lab', status: 'Active',
         topic: 'Crop disease detection from smartphone photos for smallholder farmers',
         sum: 'Training vision models on photos taken with farmers in the field, small enough to run offline on an ordinary phone.',
-        tags: ['Computer vision', 'Agriculture', 'Edge AI'], ford: ['1.2', '4.1'], sdg: '2.3', std: 'ISO/IEC 22989 · FAIR data',
-        people: [['Dr. Comfort Wesseh', 'Principal Investigator', 'Computer vision', 'Liberia', 'con sup fun'],
-          ['Dr. Tunde Adeyemi', 'Co-Investigator', 'Edge AI on smartphones', 'Nigeria, visiting', 'sof met'],
-          ['Prince Kerkula', 'Doctoral Researcher', 'Crop disease datasets', 'Liberia', 'dat inv'],
-          ['Musu Dolo', 'Research Assistant', 'Field photography with farmers', 'Liberia', 'inv res']] },
+        tags: ['Computer vision', 'Agriculture', 'Edge AI'], ford: ['1.2', '4.1'], sdg: '2.3', std: 'ISO/IEC 22989 · FAIR data' },
     ] },
   { slug: 'data-science', name: 'Data science', key: 'Data',
     lede: 'Statistics, surveys and methods that turn the national ICT record into figures people can trust.',
@@ -2708,28 +2693,15 @@ const RG_AREAS = [
       { slug: 'survey-methods-unit', name: 'Survey Methods Unit', status: 'Active',
         topic: 'Small-area estimates of internet use for all 15 counties',
         sum: 'Combining household surveys with administrative data to give every county a reliable figure, with its margin of error beside it.',
-        tags: ['Survey sampling', 'Small-area estimation', 'Official statistics'], ford: ['1.1'], sdg: '17.18', std: 'UN Fundamental Principles · DDI',
-        people: [['Prof. Samuel Tarr', 'Principal Investigator', 'Survey statistics', 'Liberia', 'con met sup'],
-          ['Dr. Fatmata Sesay', 'Co-Investigator', 'Small-area estimation', 'Sierra Leone, visiting', 'met for'],
-          ['Korto Mulbah', 'Research Fellow', 'Sampling frames', 'Liberia', 'dat val'],
-          ['Isaac Gono', 'Doctoral Researcher', 'Bayesian models', 'Liberia', 'for sof'],
-          ['Oretha Saah', 'Research Assistant', 'Field supervision', 'Liberia', 'inv']] },
+        tags: ['Survey sampling', 'Small-area estimation', 'Official statistics'], ford: ['1.1'], sdg: '17.18', std: 'UN Fundamental Principles · DDI' },
       { slug: 'open-data-fair-practice', name: 'Open Data & FAIR Practice', status: 'Active',
         topic: 'Making NIIS indicators findable, accessible, interoperable and reusable',
         sum: 'Writing the metadata, identifiers and open licences that let anyone reuse the national indicators with confidence.',
-        tags: ['Metadata', 'SDMX', 'Open data'], ford: ['1.2'], sdg: '17.18', std: 'FAIR · ISO 17369 (SDMX)',
-        people: [['Dr. Martha Karpeh', 'Principal Investigator', 'Research data management', 'Liberia', 'con dat sup'],
-          ['Jean-Paul Habimana', 'Visiting Researcher', 'SDMX and metadata', 'Rwanda, visiting', 'met sof'],
-          ['Arthur Kromah', 'Data Steward', 'Indicator metadata', 'Liberia', 'dat val'],
-          ['Elfreda Jallah', 'Research Assistant', 'Open licensing', 'Liberia', 'res rev']] },
+        tags: ['Metadata', 'SDMX', 'Open data'], ford: ['1.2'], sdg: '17.18', std: 'FAIR · ISO 17369 (SDMX)' },
       { slug: 'data-literacy-lab', name: 'Data Literacy Lab', status: 'Recruiting',
         topic: 'Helping county officers read and use ICT indicators',
         sum: 'Designing short courses and plain charts, then measuring whether officers use the figures in their own planning.',
-        tags: ['Data literacy', 'Visualization', 'Capacity building'], ford: ['5.3'], sdg: '4.4', std: 'UN Fundamental Principles',
-        people: [['Dr. Benedict Tokpa', 'Principal Investigator', 'Statistics education', 'Liberia', 'con sup'],
-          ['Esther Gbollie', 'Research Fellow', 'Visualization design', 'Liberia', 'vis wri'],
-          ['Abena Boateng', 'Visiting Researcher', 'Learning evaluation', 'Ghana, visiting', 'met for'],
-          ['Lawrence Wleh', 'Research Assistant', 'County workshops', 'Liberia', 'inv pro']] },
+        tags: ['Data literacy', 'Visualization', 'Capacity building'], ford: ['5.3'], sdg: '4.4', std: 'UN Fundamental Principles' },
     ] },
   { slug: 'cybersecurity', name: 'Cybersecurity', key: 'Cyber',
     lede: 'Protecting networks, services and personal data as more of Liberia’s life moves online.',
@@ -2743,28 +2715,15 @@ const RG_AREAS = [
       { slug: 'threat-intelligence-group', name: 'Threat Intelligence Group', status: 'Active',
         topic: 'Mapping phishing and mobile-money fraud patterns in Liberia',
         sum: 'Collecting reported incidents into one anonymised dataset, so patterns can be seen and warnings given early.',
-        tags: ['Threat intelligence', 'Fraud', 'Incident data'], ford: ['1.2'], sdg: '16.a', std: 'NIST CSF 2.0 · ITU-T X.1205',
-        people: [['Dr. Jerome Kamara', 'Principal Investigator', 'Threat intelligence', 'Liberia', 'con sup pro'],
-          ['Dr. Chiamaka Okafor', 'Co-Investigator', 'Fraud analytics', 'Nigeria, visiting', 'for met'],
-          ['Kebeh Tweh', 'Doctoral Researcher', 'Phishing detection', 'Liberia', 'sof inv'],
-          ['Stephen Sackie', 'Research Assistant', 'Incident data collection', 'Liberia', 'dat inv']] },
+        tags: ['Threat intelligence', 'Fraud', 'Incident data'], ford: ['1.2'], sdg: '16.a', std: 'NIST CSF 2.0 · ITU-T X.1205' },
       { slug: 'critical-infrastructure-security', name: 'Critical Infrastructure Security', status: 'Active',
         topic: 'How resilient are the networks and data centres Liberia depends on?',
         sum: 'Assessing single points of failure and recovery plans, and setting out what a minimum standard should be.',
-        tags: ['Critical infrastructure', 'Resilience', 'Risk assessment'], ford: ['2.2'], sdg: '9.1', std: 'ISO/IEC 27001 · NIST CSF 2.0',
-        people: [['Prof. Alfred Nimely', 'Principal Investigator', 'Network resilience', 'Liberia', 'con sup fun'],
-          ['Dr. Ibrahim Kargbo', 'Co-Investigator', 'Industrial control systems', 'Sierra Leone, visiting', 'met val'],
-          ['Mercy Paye', 'Research Fellow', 'Information security risk', 'Liberia', 'inv wri'],
-          ['Daniel Kpadeh', 'Research Software Engineer', 'Monitoring tools', 'Liberia', 'sof'],
-          ['Princess Teah', 'Research Assistant', 'Asset inventories', 'Liberia', 'dat']] },
+        tags: ['Critical infrastructure', 'Resilience', 'Risk assessment'], ford: ['2.2'], sdg: '9.1', std: 'ISO/IEC 27001 · NIST CSF 2.0' },
       { slug: 'privacy-data-protection-clinic', name: 'Privacy & Data Protection Clinic', status: 'Recruiting',
         topic: 'Putting data protection into practice for Liberia’s small businesses',
         sum: 'Plain guidance and simple checklists, tested with real shops, schools and clinics that keep customer data.',
-        tags: ['Privacy', 'Compliance', 'Personal data'], ford: ['5.5'], sdg: '16.10', std: 'Malabo Convention · ISO/IEC 27001',
-        people: [['Dr. Teta Zubah', 'Principal Investigator', 'Data protection law', 'Liberia', 'con sup wri'],
-          ['Aminata Diallo', 'Visiting Researcher', 'Privacy engineering', 'Senegal, visiting', 'met rev'],
-          ['Edwin Karmo', 'Doctoral Researcher', 'Compliance for small firms', 'Liberia', 'inv for'],
-          ['Fatu Konneh', 'Research Assistant', 'Case studies', 'Liberia', 'inv']] },
+        tags: ['Privacy', 'Compliance', 'Personal data'], ford: ['5.5'], sdg: '16.10', std: 'Malabo Convention · ISO/IEC 27001' },
     ] },
   { slug: 'connectivity', name: 'Connectivity', key: 'Net',
     lede: 'Coverage, quality, price and use: who is online in Liberia, how well, and at what cost.',
@@ -2778,28 +2737,15 @@ const RG_AREAS = [
       { slug: 'broadband-quality-observatory', name: 'Broadband Quality Observatory', status: 'Active',
         topic: 'Measuring mobile broadband speed and latency county by county',
         sum: 'Pairing drive tests with measurements from volunteers’ phones to map real network quality across the 15 counties.',
-        tags: ['Quality of service', 'Network measurement', 'Crowdsourced data'], ford: ['2.2'], sdg: '9.c', std: 'ITU-T E.800 · ITU Handbook',
-        people: [['Dr. Christopher Gaye', 'Principal Investigator', 'Network measurement', 'Liberia', 'con met sup'],
-          ['Otieno Ochieng', 'Visiting Researcher', 'Crowdsourced QoS data', 'Kenya, visiting', 'sof for'],
-          ['Kula Siaffa', 'Doctoral Researcher', 'Speed and latency analysis', 'Liberia', 'for vis'],
-          ['Momo Kiazolu', 'Research Software Engineer', 'Measurement app', 'Liberia', 'sof'],
-          ['Mamie Dunbar', 'Research Assistant', 'County drive tests', 'Liberia', 'inv dat']] },
+        tags: ['Quality of service', 'Network measurement', 'Crowdsourced data'], ford: ['2.2'], sdg: '9.c', std: 'ITU-T E.800 · ITU Handbook' },
       { slug: 'affordability-access', name: 'Affordability & Access', status: 'Active',
         topic: 'What does 1 GB cost a Liberian household, and who is priced out?',
         sum: 'Tracking data prices against household budgets, measured against the “1 for 2” target.',
-        tags: ['Affordability', 'Pricing', 'Household budgets'], ford: ['5.2'], sdg: '9.c', std: '“1 for 2” target · ITU Manual',
-        people: [['Dr. Elizabeth Nyan', 'Principal Investigator', 'Telecom economics', 'Liberia', 'con sup fun'],
-          ['Dr. Kofi Mensah', 'Co-Investigator', 'Price benchmarking', 'Ghana, visiting', 'met for'],
-          ['Joseph Dahn', 'Research Fellow', 'Household budgets', 'Liberia', 'inv for'],
-          ['Massa Gweh', 'Research Assistant', 'Price collection', 'Liberia', 'dat']] },
+        tags: ['Affordability', 'Pricing', 'Household budgets'], ford: ['5.2'], sdg: '9.c', std: '“1 for 2” target · ITU Manual' },
       { slug: 'rural-connectivity-models', name: 'Rural Connectivity Models', status: 'Recruiting',
         topic: 'Community networks and satellite backhaul for unconnected towns',
         sum: 'Costing the ways a town without coverage could get online, and who would run and pay for each.',
-        tags: ['Community networks', 'Satellite', 'Last mile'], ford: ['2.2'], sdg: '9.c', std: 'ITU Manual · ITU Handbook',
-        people: [['Dr. Peter Kun', 'Principal Investigator', 'Last-mile networks', 'Liberia', 'con sup'],
-          ['Thandiwe Nkosi', 'Visiting Researcher', 'Community networks', 'South Africa, visiting', 'met res'],
-          ['Saye Dweh', 'Doctoral Researcher', 'Satellite backhaul costs', 'Liberia', 'for inv'],
-          ['Ruth Wreh', 'Research Assistant', 'Town surveys', 'Liberia', 'inv']] },
+        tags: ['Community networks', 'Satellite', 'Last mile'], ford: ['2.2'], sdg: '9.c', std: 'ITU Manual · ITU Handbook' },
     ] },
   { slug: 'digital-finance', name: 'Digital finance', key: 'Fin',
     lede: 'Mobile money, digital payments and the inclusion they bring, or leave out.',
@@ -2813,28 +2759,15 @@ const RG_AREAS = [
       { slug: 'mobile-money-inclusion', name: 'Mobile Money Inclusion Group', status: 'Active',
         topic: 'Who uses mobile money in Liberia, and who is left out?',
         sum: 'Survey and agent interviews on use, trust and cost, broken down by gender, age and county.',
-        tags: ['Financial inclusion', 'Gender gap', 'Surveys'], ford: ['5.2'], sdg: '8.10', std: 'G20 Principles · DDI',
-        people: [['Dr. Yatta Morris', 'Principal Investigator', 'Financial inclusion', 'Liberia', 'con sup fun'],
-          ['Dr. Akosua Asare', 'Co-Investigator', 'Gender and finance', 'Ghana, visiting', 'met wri'],
-          ['Abraham Juah', 'Doctoral Researcher', 'Survey analysis', 'Liberia', 'for vis'],
-          ['Rebecca Kpaan', 'Research Assistant', 'Agent interviews', 'Liberia', 'inv']] },
+        tags: ['Financial inclusion', 'Gender gap', 'Surveys'], ford: ['5.2'], sdg: '8.10', std: 'G20 Principles · DDI' },
       { slug: 'payments-interoperability', name: 'Payments Interoperability', status: 'Active',
         topic: 'Linking mobile wallets and bank accounts on ISO 20022 messaging',
         sum: 'A working prototype of a switch, and the rules it would need, so money moves between any wallet and any bank.',
-        tags: ['Interoperability', 'ISO 20022', 'Payments'], ford: ['5.2', '1.2'], sdg: '8.10', std: 'ISO 20022 · CPMI–IOSCO PFMI',
-        people: [['Dr. Francis Varney', 'Principal Investigator', 'Payment systems', 'Liberia', 'con sup'],
-          ['Aline Uwase', 'Visiting Researcher', 'ISO 20022 messaging', 'Rwanda, visiting', 'met sof'],
-          ['George Kulah', 'Research Software Engineer', 'Switch prototype', 'Liberia', 'sof val'],
-          ['Sarah Gbozee', 'Research Fellow', 'Payments regulation', 'Liberia', 'inv wri'],
-          ['Matthew Sayeh', 'Research Assistant', 'Transaction data', 'Liberia', 'dat']] },
+        tags: ['Interoperability', 'ISO 20022', 'Payments'], ford: ['5.2', '1.2'], sdg: '8.10', std: 'ISO 20022 · CPMI–IOSCO PFMI' },
       { slug: 'digital-credit-consumer-protection', name: 'Digital Credit & Consumer Protection', status: 'Forming',
         topic: 'Fair rules for app-based loans',
         sum: 'What borrowers are told, what they pay and what happens when they fall behind, and what fair disclosure should look like.',
-        tags: ['Digital credit', 'Consumer protection', 'Regulation'], ford: ['5.5', '5.2'], sdg: '1.4', std: 'G20 Principles · FATF',
-        people: [['Dr. Victoria Yancy', 'Principal Investigator', 'Consumer finance law', 'Liberia', 'con sup'],
-          ['Yao Kouassi', 'Visiting Researcher', 'Credit scoring', 'Côte d’Ivoire, visiting', 'met for'],
-          ['Cecelia Kpehe', 'Doctoral Researcher', 'Borrower experience', 'Liberia', 'inv wri'],
-          ['Thomas Tamba', 'Research Assistant', 'Loan-app reviews', 'Liberia', 'dat']] },
+        tags: ['Digital credit', 'Consumer protection', 'Regulation'], ford: ['5.5', '5.2'], sdg: '1.4', std: 'G20 Principles · FATF' },
     ] },
   { slug: 'emerging-tech', name: 'Emerging tech', key: 'Tech',
     lede: 'The Internet of Things, drones, digital identity and other new technologies, tested against Liberian needs.',
@@ -2848,28 +2781,15 @@ const RG_AREAS = [
       { slug: 'iot-public-services', name: 'IoT for Public Services', status: 'Active',
         topic: 'Low-cost sensors for water points and clinic cold chains',
         sum: 'Solar-powered sensors that report when a pump fails or a vaccine fridge warms, over low-power radio.',
-        tags: ['Internet of Things', 'Sensors', 'LoRaWAN'], ford: ['2.2'], sdg: '6.1', std: 'ISO/IEC 30141 · ITU-T Y.4000',
-        people: [['Dr. Aaron Mator', 'Principal Investigator', 'Embedded systems', 'Liberia', 'con sup fun'],
-          ['Dr. Nkechi Eze', 'Co-Investigator', 'LoRaWAN networks', 'Nigeria, visiting', 'met sof'],
-          ['Bendu Gbeh', 'Doctoral Researcher', 'Water-point sensors', 'Liberia', 'inv dat'],
-          ['Eric Nyumah', 'Research Software Engineer', 'Monitoring dashboards', 'Liberia', 'sof vis']] },
+        tags: ['Internet of Things', 'Sensors', 'LoRaWAN'], ford: ['2.2'], sdg: '6.1', std: 'ISO/IEC 30141 · ITU-T Y.4000' },
       { slug: 'drones-geospatial-lab', name: 'Drones & Geospatial Lab', status: 'Active',
         topic: 'Drone mapping to update settlement and road data',
         sum: 'Flying and processing aerial surveys so planners and the census have current maps of fast-growing towns.',
-        tags: ['Drones', 'GIS', 'Mapping'], ford: ['1.5', '2.11'], sdg: '11.3', std: 'ISO 56002 · FAIR data',
-        people: [['Dr. Rita Cooper', 'Principal Investigator', 'Remote sensing', 'Liberia', 'con sup'],
-          ['Brian Mwangi', 'Visiting Researcher', 'Drone photogrammetry', 'Kenya, visiting', 'met sof'],
-          ['Amos Dennis', 'Research Fellow', 'GIS', 'Liberia', 'for vis'],
-          ['Josephine Freeman', 'Research Assistant', 'Ground truthing', 'Liberia', 'inv'],
-          ['Nathaniel Gartor', 'Research Assistant', 'Flight operations', 'Liberia', 'inv res']] },
+        tags: ['Drones', 'GIS', 'Mapping'], ford: ['1.5', '2.11'], sdg: '11.3', std: 'ISO 56002 · FAIR data' },
       { slug: 'digital-identity-trust', name: 'Digital Identity & Trust', status: 'Forming',
         topic: 'Verifiable credentials for certificates and licences',
         sum: 'Certificates that a school, employer or clinic can check in seconds, without a phone call and without a forgery.',
-        tags: ['Digital identity', 'Verifiable credentials', 'Cryptography'], ford: ['1.2'], sdg: '16.9', std: 'W3C Verifiable Credentials',
-        people: [['Dr. Dorothy Siryon', 'Principal Investigator', 'Digital identity', 'Liberia', 'con sup'],
-          ['Moussa Traoré', 'Visiting Researcher', 'Verifiable credentials', 'Mali, visiting', 'met sof'],
-          ['James Tuan', 'Doctoral Researcher', 'Applied cryptography', 'Liberia', 'for sof'],
-          ['Hannah Wesley', 'Research Assistant', 'User studies', 'Liberia', 'inv']] },
+        tags: ['Digital identity', 'Verifiable credentials', 'Cryptography'], ford: ['1.2'], sdg: '16.9', std: 'W3C Verifiable Credentials' },
     ] },
 ];
 // standards that hold across every group, whatever the area
@@ -2992,28 +2912,18 @@ ${body}
 };
 
 // An area's own page (/research/group/<area>), in the same design: the area lettered on one great key,
-// its groups (research question, classification, members), the standards it works to, and the graphite
+// its groups (research question and classification; members under review), the standards it works to, and the graphite
 // band with the way to join and the areas either side. Null for an unknown area, so the server can 404.
 exports.researchArea = (slug) => {
   const area = rgArea(slug);
   if (!area) return null;
   const i = RG_AREAS.indexOf(area), n = RG_AREAS.length;
   const prev = RG_AREAS[(i - 1 + n) % n], next = RG_AREAS[(i + 1) % n];
-  const members = area.groups.reduce((t, g) => t + g.people.length, 0);
   const no = String(i + 1).padStart(2, '0');
   const ford = (codes) => codes.map((c) => `${c} ${RG_FORD[c]}`).join('; ');
-  // each member's email at the program's domain, and the program's line with their own extension
-  // (dialled as RFC 3966 has it), so no sample number can ring a stranger's phone
-  const email = (name) => name.replace(/^(Dr|Prof)\.\s+/, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/\s+/).filter(Boolean).join('.') + '@niip.org';
-  const person = ([name, role, expertise, country, credit], k, gi) => `<li class="ra-person">
-              ${rgKey(`ra-face${k === 0 ? ' is-on' : ''}`, esc(rgInitials(name))).replace('<span class="m-key ', '<span aria-hidden="true" class="m-key ')}
-              <div><b>${esc(name)}</b><span class="m-text-8">${esc(role)} · ${esc(expertise)} · ${esc(country)}</span>
-                <p class="ra-credit"><span class="sr-only">Contribution roles: </span>${credit.split(' ').map((c) => esc(RG_CREDIT[c])).join(' · ')}</p>
-                <p class="ra-reach"><a class="m-link" href="mailto:${email(name)}">${email(name)}</a><a class="m-link" href="tel:+231888771973;ext=${(i + 1) * 100 + gi * 20 + k + 1}">0888 771 973 ext. ${(i + 1) * 100 + gi * 20 + k + 1}</a></p></div>
-            </li>`;
   const group = (g, gi) => `<article class="m-surface ra-group" id="${g.slug}" data-8b-motion="rise" aria-labelledby="${g.slug}-name">
         <div class="ra-about">
-          <span class="m-text-4 ra-status">${rgKey(g.status === 'Active' ? 'is-on' : '', '').replace('<span class="m-key ', '<span aria-hidden="true" class="m-key ')}${esc(g.status)}</span>
+          <span class="m-text-4 ra-status">${rgKey('', '').replace('<span class="m-key ', '<span aria-hidden="true" class="m-key ')}Under Review</span>
           <h3 class="m-text-5" id="${g.slug}-name">${esc(g.name)}</h3>
           <p class="m-text-7 ra-topic">${esc(g.topic)}</p>
           <p class="m-text-8 ra-sum">${esc(g.sum)}</p>
@@ -3022,19 +2932,16 @@ exports.researchArea = (slug) => {
             <div><dt class="m-text-4">Field (OECD FORD)</dt><dd>${esc(ford(g.ford))}</dd></div>
             <div><dt class="m-text-4">SDG target</dt><dd>${esc(g.sdg)} · ${esc(RG_SDG[g.sdg])}</dd></div>
             <div><dt class="m-text-4">Standards</dt><dd>${esc(g.std)}</dd></div>
-            <div><dt class="m-text-4">Members</dt><dd>${g.people.length}, led by ${esc(g.people[0][0])}</dd></div>
           </dl>
         </div>
         <div class="ra-people">
           <h4 class="m-text-4">Members</h4>
-          <ul>
-            ${g.people.map((p, k) => person(p, k, gi)).join('\n            ')}
-          </ul>
+          <p class="m-text-5 ra-review">Under Review</p>
         </div>
       </article>`;
   const std = ([code, name, what]) => `<li><span class="m-text-4">${esc(code)}</span><h3 class="m-text-5">${esc(name)}</h3><p class="m-text-8">${esc(what)}</p></li>`;
   const step = (a, dir) => `<a class="ra-step" href="/research/group/${a.slug}">${rgKey3('', dir === 'prev' ? RG_G.left : RG_G.right).replace('<span class="m-key-3 ', '<span aria-hidden="true" class="m-key-3 ')}<span><span class="m-text-9">${dir === 'prev' ? 'Previous area' : 'Next area'}</span><b>${esc(a.name)}</b></span></a>`;
-  const desc = `${area.name}: NIIP’s research groups in this area, the questions they are working on and the people in them.`;
+  const desc = `${area.name}: NIIP’s research groups in this area, the questions they are working on.`;
   const body = `<!-- hero: the area's name, its line, and the area lettered on one great key -->
 <section id="hero" class="hero is-area" data-8b-section="hero" aria-labelledby="hero-title">
   ${rgSeal('hero', 'light', true)}
@@ -3047,7 +2954,7 @@ exports.researchArea = (slug) => {
         ${rgBtn(`${RG_JOIN}?area=${area.slug}#contact`, 'Join this area')}
         <a class="m-link" href="#groups">Meet the groups</a>
       </div>
-      <p class="m-text-8 hero__note">${area.groups.length} groups · ${members} members · <a class="m-link" href="/research/group#states">All six areas</a></p>
+      <p class="m-text-8 hero__note">${area.groups.length} groups · Members under review · <a class="m-link" href="/research/group#states">All six areas</a></p>
     </div>
     <div class="hero__stage">
       <div class="ra-stage">
@@ -4762,7 +4669,6 @@ exports.careers = (ctx) => {
   return shell(ctx, {
     title: 'Careers', active: '/careers', workspaceActive: 'careers', extraHead: CAREERS_HEAD, body: `
   <div class="cs" id="csPage">
-    <canvas class="cs-star" id="csStar" aria-hidden="true" data-seal="${esc(sealArt())}"></canvas>
 
     <section class="cs-hero cs-hero--film" data-star="film" aria-labelledby="csTitle">
       <video class="cs-film" autoplay muted loop playsinline preload="auto" poster="/media/careers-hero-poster.jpg" aria-hidden="true">

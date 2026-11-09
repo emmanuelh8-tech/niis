@@ -171,7 +171,7 @@ function mainNav(active, q) {
     ['/', 'Home', 'home', null, 'Home'],
     ['/data', 'Data Explorer', 'bars', [['/landscape', 'Data Landscape', 'layers']], 'Data'],
     ['/reports', 'ICT Reports', 'chart', [['/updates', 'News & Updates', 'doc']], 'Reports'],
-    ['/research', 'Research', 'doc', [['/research/submit', 'Submit Paper', 'plus'], ['/research/group', 'Research Group', 'users']], 'Research'],
+    ['/research', 'Research', 'doc', [['/research/submit', 'Submit Paper', 'plus'], ['/research/group', 'Research Groups', 'users']], 'Research'],
     ['/partners', 'Our Partners', 'globe', null, 'Partners'],
     ['/careers', 'Careers', 'briefcase', [['/careers/programs', 'Programs', 'calendar']], 'Careers'],
     ['/about', 'About', 'info', [['/about/team#team', 'Our Team', 'users', '/about/team'], ['/about/team#patrons', 'ICT Patrons', 'sparkle'], ['/about/team#talent', 'ICT Talent Pool', 'code']], 'About'],
@@ -251,7 +251,7 @@ function footerDh() {
       <div><h4>Links</h4>
         <a href="/about">Harris &amp; Associates LLC</a>
         <a href="/research">Research Papers</a>
-        <a href="/research/group">Research Group</a>
+        <a href="/research/group">Research Groups</a>
         <a href="/updates">Updates</a>
       </div>
     </div>
@@ -3014,7 +3014,7 @@ exports.researchArea = (slug) => {
     </nav>
   </div>
 </section>`;
-  return rgPage({ title: area.name + ' · Research Group', desc,
+  return rgPage({ title: area.name + ' · Research Groups', desc,
     links: RG_NAV, current: '/research/group#states', cta: [`${RG_JOIN}?area=${area.slug}#contact`, 'Join this area'], body });
 };
 
@@ -3352,7 +3352,7 @@ const rgPromote = (html) => html.replace('<h2 ', '<h1 ').replace('</h2>', '</h1>
 
 exports.researchGroup = () => {
   const S = rgSections();
-  return rgPage({ title: 'Research Group', desc: 'Explore diverse research projects: NIIP’s research groups in six areas, with the reports of government and operators alongside.',
+  return rgPage({ title: 'Research Groups', desc: 'Explore diverse research projects: NIIP’s research groups in six areas, with the reports of government and operators alongside.',
     links: RG_NAV, current: '/research/group', cta: [RG_JOIN + '#contact', 'Join a group'], body: [S.hero, S.states, S.scenes].join('\n\n') });
 };
 const RG_PAGES = {
@@ -3369,7 +3369,7 @@ exports.researchGroupPage = (slug, areaSlug = '') => {
   if (!pg) return null;
   const area = areaSlug ? rgArea(areaSlug) : null;
   const S = rgSections(area ? area.name : '');
-  return rgPage({ title: pg.title + ' · Research Group', desc: pg.desc, links: RG_NAV, current: '/research/group/' + slug,
+  return rgPage({ title: pg.title + ' · Research Groups', desc: pg.desc, links: RG_NAV, current: '/research/group/' + slug,
     cta: [RG_JOIN + '#contact', 'Join a group'], body: rgPromote(pg.parts.map((p) => S[p]).join('\n\n')) });
 };
 

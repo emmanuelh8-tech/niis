@@ -411,6 +411,8 @@ exports.home = (ctx, { headlines, papers, keyStats, dashboards, indicatorsForSea
     title: 'Home', active: '/', body: `
   ${heroSlider()}
 
+  ${homeBanner('collect')}
+
   ${featuredPapers()}
 
   ${homeBanner()}
@@ -438,6 +440,9 @@ exports.home = (ctx, { headlines, papers, keyStats, dashboards, indicatorsForSea
 // Hope (3 Nov 2026) between the reports and the video. Each picture is an Image Library slot (Home page
 // banners). The words are in the picture, so its alt text carries them.
 const HOME_BANNERS = {
+  // the owner's, 9 Nov 2026, right under the hero slider; one wide picture, which phones show too until a tall one is added
+  collect: { slot: 'collect', label: 'Collecting Liberia’s ICT data across 15 counties for the first time ever', mw: 1920, mh: 1080,
+    alt: 'Collecting Liberia’s ICT data across 15 counties for the first time ever. Every day we dedicate our lives to owning our data, to step into the future of data-driven decisions with NIIP. A man leans out of a blue minibus beside a red car on a misty road, under the National ICT Intelligence Program seal. www.niip.org, info@niip.org, 0888 771 973 / 0777 129 261.' },
   quality: { slot: 'home', label: 'Quality data makes you stand out',
     alt: 'Quality data makes you stand out. Collecting Liberia’s ICT data. A blue pawn steps out of a row of black pawns, beside the National ICT Intelligence Program seal. www.niip.org, info@niip.org, 0888 771 973 / 0777 129 261.' },
   hope: { slot: 'hope', label: 'Our future has hope',
@@ -447,7 +452,7 @@ function homeBanner(id = 'quality') {
   const b = HOME_BANNERS[id];
   return `<section class="home-banner home-banner-${id}" aria-label="${esc(b.label)}">
     <picture>
-      <source media="(max-width: 760px)" srcset="${esc(imgs.url('banners', b.slot + '-mobile'))}" width="1600" height="2000">
+      <source media="(max-width: 760px)" srcset="${esc(imgs.url('banners', b.slot + '-mobile'))}" width="${b.mw || 1600}" height="${b.mh || 2000}">
       <img src="${esc(imgs.url('banners', b.slot + '-desktop'))}" width="1920" height="1080" loading="lazy" decoding="async"
         alt="${esc(b.alt)}">
     </picture>

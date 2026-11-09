@@ -77,12 +77,14 @@ const COLLECTIONS = {
   },
   banners: {
     label: 'Home page banners',
-    note: 'The two full-width banners on the home page, each with one picture for wide screens and one for phones: the first between Featured Research Papers and National ICT Reports, the second between National ICT Reports and the video.',
+    note: 'The three full-width banners on the home page, each with one picture for wide screens and one for phones: Collecting ICT Data right under the hero slider, Quality Data between Featured Research Papers and National ICT Reports, and Hope between National ICT Reports and the video.',
     slots: [
-      { key: 'home-desktop', label: 'First banner: wide screens', hint: '1920 × 1080 (16:9)', def: '/img/banners/quality-data-desktop.webp' },
-      { key: 'home-mobile', label: 'First banner: phones', hint: '1600 × 2000 (4:5)', def: '/img/banners/quality-data-mobile.webp' },
-      { key: 'hope-desktop', label: 'Second banner: wide screens', hint: '1920 × 1080 (16:9)', def: '/img/banners/hope-desktop.webp' },
-      { key: 'hope-mobile', label: 'Second banner: phones', hint: '1600 × 2000 (4:5)', def: '/img/banners/hope-mobile.webp' },
+      { key: 'collect-desktop', label: 'Collecting ICT Data banner: wide screens', hint: '1920 × 1080 (16:9)', def: '/img/banners/collect-desktop.webp' },
+      { key: 'collect-mobile', label: 'Collecting ICT Data banner: phones', hint: '1600 × 2000 (4:5); until one is added, phones show the wide picture', def: '/img/banners/collect-desktop.webp' },
+      { key: 'home-desktop', label: 'Quality Data banner: wide screens', hint: '1920 × 1080 (16:9)', def: '/img/banners/quality-data-desktop.webp' },
+      { key: 'home-mobile', label: 'Quality Data banner: phones', hint: '1600 × 2000 (4:5)', def: '/img/banners/quality-data-mobile.webp' },
+      { key: 'hope-desktop', label: 'Hope banner: wide screens', hint: '1920 × 1080 (16:9)', def: '/img/banners/hope-desktop.webp' },
+      { key: 'hope-mobile', label: 'Hope banner: phones', hint: '1600 × 2000 (4:5)', def: '/img/banners/hope-mobile.webp' },
     ],
   },
   researchGroup: {

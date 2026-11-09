@@ -118,7 +118,7 @@ if (form) {
   };
   const checks = [
     ['full_name', (v) => (!v.trim() ? 'Your full name is required.' : '')],
-    ['email', (v) => (!v.trim() ? 'An email address is required, so the Unit can reply.' : !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? 'That email address does not look right.' : '')],
+    ['email', (v) => (!v.trim() ? 'An email address is required, so we can reply.' : !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? 'That email address does not look right.' : '')],
     ['phone', (v) => (v.trim() && !/^[0-9+()\-\s]{6,40}$/.test(v.trim()) ? 'Use digits, spaces and + only, or leave it empty.' : '')],
     ['county', (v) => (!v ? 'Choose your county.' : '')],
   ];
@@ -131,7 +131,7 @@ if (form) {
     checks.forEach(([name, test]) => { const el = form.elements[name]; if (setErr(el, name, test(el.value)) && !first) first = el; });
     if (setErr(input, 'cv', fileProblem(input.files && input.files[0])) && !first) first = input;
     const consent = form.elements.consent;
-    if (setErr(consent, 'consent', consent.checked ? '' : 'Please agree so the Unit can keep and assess your application.') && !first) first = consent;
+    if (setErr(consent, 'consent', consent.checked ? '' : 'Please agree so we can keep and assess your application.') && !first) first = consent;
     if (first) { e.preventDefault(); first.focus(); return; }
     const btn = form.querySelector('button[type="submit"]');
     btn.disabled = true;

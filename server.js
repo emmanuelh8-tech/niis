@@ -166,6 +166,10 @@ const ADDED_PARTNERS = [
   { slug: 'gonet', name: 'Gonet Academy' },
   { slug: 'ul', name: 'University of Liberia' },
 ];
+// Government bodies are not shown on Our Partners: NIIP intends to work with the Government of Liberia and
+// is in talks ahead of its official launch in 2027, so no ministry or agency is presented as a partner (the
+// owner, 9 Nov 2026). Their rows and logos stay in the database and the Image Library, for when that changes.
+const GOVERNMENT_BODIES = new Set(['mopt', 'lta', 'lisgis', 'cbl', 'moe', 'moh', 'moa', 'epa', 'lra', 'nic', 'moys', 'nir', 'cert']);
 const notSeeded = (kind, rows) => (rows || []).filter((r) => !SEEDED[kind].has(String(r.title || '').trim()));
 const APPLY_DIR = path.join(__dirname, 'data', 'applications');
 const CV_MAX = 4 * 1024 * 1024;   // under the 4.5 MB request limit of a hosted function (Vercel)
@@ -718,7 +722,8 @@ async function handler(req, res) {
       if (p === '/partners') {
         logEvent('page_view', p, user);
         const listed = await sdb.sel('partners?select=*&visible=eq.true&order=sort_order,name');
-        const partners = listed.concat(ADDED_PARTNERS.filter((a) => !listed.some((p) => p.slug === a.slug)));
+        const partners = listed.concat(ADDED_PARTNERS.filter((a) => !listed.some((p) => p.slug === a.slug)))
+          .filter((p) => !GOVERNMENT_BODIES.has(p.slug));
         return send(res, 200, views.partners(ctx, { partners }));
       }
       // Dashboards was replaced by Our Partners in the navigation. The page itself is kept
@@ -752,7 +757,7 @@ async function handler(req, res) {
         return send(res, 401, views.login(ctx, { error: 'Invalid email or password.' }));
       }
       if (u.status === 'pending') return send(res, 403, views.login(ctx, { error: 'Your account is awaiting verification by an administrator.' }));
-      if (u.status === 'suspended') return send(res, 403, views.login(ctx, { error: 'This account is suspended. Contact the ICT Statistics & Policy Unit.' }));
+      if (u.status === 'suspended') return send(res, 403, views.login(ctx, { error: 'This account is suspended. Contact the NIIP team.' }));
       const token = crypto.randomBytes(32).toString('hex');
       await sdb.ins('sessions', [{ token, user_id: u.id, expires_at: new Date(Date.now() + SESSION_HOURS * 3600 * 1000).toISOString() }]);
       cache.sessions.set(token, { user: u, expiresAt: Date.now() + 60 * 1000 });
@@ -858,7 +863,7 @@ async function handler(req, res) {
 
       const errors = [];
       if (!f.full_name) errors.push({ field: 'full_name', message: 'Your full name is required.' });
-      if (!f.email) errors.push({ field: 'email', message: 'An email address is required, so the Unit can reply.' });
+      if (!f.email) errors.push({ field: 'email', message: 'An email address is required, so we can reply.' });
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email)) errors.push({ field: 'email', message: 'That email address does not look right.' });
       if (f.phone && !/^[0-9+()\-\s]{6,40}$/.test(f.phone)) errors.push({ field: 'phone', message: 'Use digits, spaces and + only, or leave it empty.' });
       if (!counties.includes(f.county)) errors.push({ field: 'county', message: 'Choose your county.' });
@@ -866,7 +871,7 @@ async function handler(req, res) {
       if (!file) errors.push({ field: 'cv', message: 'Attach your CV as a PDF or Word file.' });
       else if (file.data.length > CV_MAX) errors.push({ field: 'cv', message: 'That CV is larger than 4 MB. Please send a smaller file.' });
       else if (!cv) errors.push({ field: 'cv', message: 'The CV must be a PDF or Word document (.pdf, .doc or .docx).' });
-      if (!f.consent) errors.push({ field: 'consent', message: 'Please agree so the Unit can keep and assess your application.' });
+      if (!f.consent) errors.push({ field: 'consent', message: 'Please agree so we can keep and assess your application.' });
       if (errors.length) return back(400, role, { errors, values: { ...f, cv_lost: !!file } });
 
       const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
@@ -1301,7 +1306,7 @@ async function handler(req, res) {
         if (p === '/admin/papers/create') {
           if (!hasPerm(user, 'manage_content')) return send(res, 403, views.forbidden(ctx));
           if (f.title && f.abstract) await sdb.ins('papers', [{
-            title: f.title.trim(), authors: (f.authors || 'ICT Statistics & Policy Unit').trim(), abstract: f.abstract.trim(),
+            title: f.title.trim(), authors: (f.authors || 'NIIP').trim(), abstract: f.abstract.trim(),
             published_on: new Date().toISOString().slice(0, 10), tag: f.tag || 'Report', body: f.body || '',
             status: 'published', visible: true, deleted: false, downloadable: f.downloadable !== '0',
           }]);

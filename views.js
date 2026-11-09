@@ -249,8 +249,6 @@ function footerDh() {
         <div class="footer-social"><a class="s-fb" href="#" aria-label="Facebook"><svg viewBox="0 0 320 512" aria-hidden="true"><path d="M80 299.3V512H196V299.3h86.5l18-97.8H196V166.9c0-51.7 20.3-71.5 72.7-71.5c16.3 0 29.4 .4 37 1.2V7.9C291.4 4 256.4 0 236.2 0C129.3 0 80 50.5 80 159.4v42.1H14v97.8H80z"/></svg></a><a class="s-x" href="#" aria-label="X"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg></a><a class="s-li" href="#" aria-label="LinkedIn"><svg viewBox="0 0 448 512" aria-hidden="true"><path d="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z"/></svg></a><a class="s-ig" href="#" aria-label="Instagram"><svg viewBox="0 0 448 512" aria-hidden="true"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg></a></div>
       </div>
       <div><h4>Links</h4>
-        <a href="/about">Liberia Telecommunications Authority</a>
-        <a href="/about">Ministry of Posts &amp; Telecommunications</a>
         <a href="/about">Harris &amp; Associates LLC</a>
         <a href="/research">Research Papers</a>
         <a href="/research/group">Research Group</a>
@@ -1587,7 +1585,7 @@ exports.dataExplorer = (ctx, { indicators, indicatorsByDomain, domainOrder, doma
     </div>
     <div class="dx-fs-body" id="dx-fs-body"></div>
   </div>
-  <script>window.__NICTD_PAGE__='explorer';window.__EXPLORER_STATE__=${JSON.stringify({ indicator: meta.code, year: meta.year || 2025, focus: focus || '', compare: compare || '', indicators, counties: counties.map((c) => ({ name: c.name })) })};</script>`,
+  <script>window.__NICTD_PAGE__='explorer';window.__EXPLORER_STATE__=${JSON.stringify({ indicator: meta.code, year: meta.year || 2025, focus: focus || '', compare: compare || '', indicators: indicators.map(({ agencyOriginal, ...i }) => i), counties: counties.map((c) => ({ name: c.name })) })};</script>`,
 });
 
 
@@ -1878,8 +1876,8 @@ exports.dashboardTopic = (ctx, { slug, label, description, counties, narrative }
 const SLIDES = [
   ['What we do. 15 counties, collected, validated, published. We collect, validate and publish Liberia’s ICT statistics for all 15 counties, and we build the infrastructure that keeps them at home.'],
   ['Why we do it. For Liberia’s national commitments, and to create jobs for young Liberians in tech: 174 positions across eight role types, from enumerators and supervisors in every county to research leads, data engineers, GIS and sampling specialists, quality analysts and developers, recruited from Liberian STEM graduates and trained locally. See open roles.', '/careers'],
-  ['Commitment 1 of 6: ARREST Agenda for Inclusive Development, 2025 to 2029. ICT modernization sits in the Infrastructure pillar. NIIS is the measurement layer it is judged against.'],
-  ['Commitment 2 of 6: National Digital Strategy, 2025 to 2029, of the Ministry of Posts and Telecommunications. Cybersecurity and data sovereignty is one of its eight priorities. This is that pillar, made operational.'],
+  ['Commitment 1 of 6: ARREST Agenda for Inclusive Development, 2025 to 2029. ICT modernization sits in the Infrastructure pillar. NIIS is built to measure it.'],
+  ['Commitment 2 of 6: National Digital Strategy, 2025 to 2029, of the Ministry of Posts and Telecommunications. Cybersecurity and data sovereignty is one of its eight priorities. NIIS is built to serve it.'],
   ['Commitment 3 of 6: Data Protection Act, enacted 2026. Built to Liberia’s first personal-data law: aggregate, anonymized statistics only.'],
   ['Commitment 4 of 6: AU Data Policy Framework, adopted 2022. Continental policy since 2022: member states are expected to hold and govern their own data.'],
   ['Commitment 5 of 6: United Nations Sustainable Development Goals, Target 17.18. Increase significantly the availability of high-quality, timely and reliable data disaggregated by income, gender, age, race, ethnicity, migratory status, disability, geographic location and other characteristics relevant in national contexts. County-level is the target, verbatim.'],
@@ -1905,9 +1903,9 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
   // the mission, the problem and the answer, cut short for the kinetic type (the owner asked for few
   // words); the words between asterisks are set in blue
   const story = [
-    ['“THE MISSION”', 'Liberia’s *official* source of ICT data. All *fifteen counties.* One *trusted* system.'],
+    ['“THE MISSION”', 'Liberia’s *own* source of ICT data. All *fifteen counties.* One *trusted* system.'],
     ['“THE PROBLEM”', 'For two decades, Liberia’s digital story was told with numbers from *somewhere else.*'],
-    ['“THE ANSWER”', 'President Boakai wants to *modernize* ICT in Liberia. NIIS gives him the data he needs in *real time.*'],
+    ['“THE ANSWER”', 'Liberia wants to *modernize* its ICT. NIIS will give it the data it needs in *real time.*'],
   ];
 
   const bench = [
@@ -1920,14 +1918,14 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
   ];
 
   const faqs = [
-    ['How is NIIS data licensed?', 'All open data published through NIIS is available under an open licence for research, journalism and policy use, with attribution to the ICT Statistics & Policy Unit, Ministry of Posts and Telecommunications. Open by default is a design principle, not a concession.'],
+    ['How is NIIS data licensed?', 'All open data published through NIIS is available under an open licence for research, journalism and policy use, with attribution to the National ICT Intelligence Program (NIIP). Open by default is a design principle, not a concession.'],
     ['How often is the data updated?', 'Most indicators refresh annually following the national survey wave; a subset fed by operator data-sharing agreements refreshes biennially. Each indicator’s periodicity is shown in the Indicator Catalogue.'],
     ['How is this different from the data international agencies already publish on Liberia?', 'International datasets are indispensable and we use them. But where national returns are incomplete they are modelled or trend-projected, and they report Liberia as one national figure. NIIS collects observed values, disaggregates them to all 15 counties, and publishes the method alongside the number.'],
-    ['Is NIIP a government body or a private initiative?', 'NIIP is a private-sector-led initiative delivering a national public good, working with the Ministry of Posts and Telecommunications and contributing agencies under data-sharing cooperation. The platform is built to be handed to, and sustained by, Liberian institutions.'],
+    ['Is NIIP a government body or a private initiative?', 'NIIP is a private-sector-led initiative delivering a national public good. We intend to work with the Government of Liberia, and have been holding very progressive talks ahead of our official launch in 2027. The platform is built to be handed to, and sustained by, Liberian institutions.'],
     ['What happens when donor funding ends?', 'The programme is designed for transition, not dependency: infrastructure hosted in-country, methodology documented and published, staff recruited and trained locally, and a services and licensing model intended to carry recurring costs after the establishment phase.'],
     ['How do you protect personal data?', 'NIIS publishes aggregate, anonymized statistics only. It collects no individual-level personal data beyond what is required to produce those aggregates, in line with Liberia’s Data Protection Act.'],
-    ['How do I request a new indicator?', 'Registered users can reach the ICT Statistics & Policy Unit directly through the platform’s messaging system once logged in.'],
-    ['Can I use this data in a publication?', 'Yes, cite NIIS and the ICT Statistics & Policy Unit. Values are demonstration data pending production feeds; check the methodology note on each indicator before publication.'],
+    ['How do I request a new indicator?', 'Registered users can reach the NIIP team directly through the platform’s messaging system once logged in.'],
+    ['Can I use this data in a publication?', 'Yes, cite NIIS and the National ICT Intelligence Program (NIIP). Values are demonstration data pending production feeds; check the methodology note on each indicator before publication.'],
   ];
 
   const rise = (i = 0) => ` data-rise style="--i:${i}"`;
@@ -1961,7 +1959,7 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
           <img src="/img/about/analysts.jpg?v=${ASSET_V}" alt="Liberian analysts at their screens, maps of the country open in front of them" loading="lazy" decoding="async">
         </figure>
         <dl class="cs-rows ab-rows">
-          <div class="cs-row"><dt><span class="cs-tag">The program</span></dt><dd data-fill><b>NIIP</b> is the acronym for the National ICT Intelligence Program: a private-sector project, funded by the Government of Liberia, international agencies, private-sector stakeholders and institutions, to collect and continuously maintain Liberia’s ICT data, disaggregated across all 15 counties.</dd></div>
+          <div class="cs-row"><dt><span class="cs-tag">The program</span></dt><dd data-fill><b>NIIP</b> is the acronym for the National ICT Intelligence Program: a private-sector project, funded by international agencies, private-sector stakeholders and institutions, to collect and continuously maintain Liberia’s ICT data, disaggregated across all 15 counties.</dd></div>
           <div class="cs-row"><dt><span class="cs-tag">The software</span></dt><dd data-fill>Its data system, <b>NIIS</b> (the National ICT Intelligence System), runs on three tiers of software. Secured databases store the ICT data we collect; a data-analytics algorithm draws on them; and the platform it feeds gives the public, anywhere in the world, access to ICT data across ${indicatorCount || 168} indicators.</dd></div>
           <div class="cs-row"><dt><span class="cs-tag">The research</span></dt><dd data-fill>NIIP is also an accelerator of ICT research. We have built a repository of all publicly available Liberian ICT research papers, we collect and host papers by Liberian ICT researchers, and we help researchers get published. We are also bringing together in one place, for the public, the ICT reports of government institutions, regulators and service providers.</dd></div>
           <div class="cs-row"><dt><span class="cs-tag">The access</span></dt><dd data-fill>We provide training and boot camps in partnership with international and local universities. And anyone who wants more data, a particular dataset or a new indicator can open a secure account on the platform, to search and save papers and reports, submit their research, and search for a job.</dd></div>
@@ -2043,11 +2041,11 @@ exports.submitPaper = (ctx, { errors = [], values = {}, done = false } = {}) => 
   if (done) {
     return shell(ctx, {
       title: 'Submission received', active: '/research', workspaceActive: 'research', body: `
-    ${pageHeader('research', 'Submission received', 'Thank you, your paper is now with the ICT Statistics & Policy Unit.')}
+    ${pageHeader('research', 'Submission received', 'Thank you, your paper is now with the NIIP team.')}
     <div class="wrap section narrow">
       <div class="panel sp-done">
         <h2>${icon('shield')} Your paper has been submitted for review</h2>
-        <p>The ICT Statistics &amp; Policy Unit reviews every submission before publication. We will contact you at the
+        <p>The NIIP team reviews every submission before publication. We will contact you at the
            email address you provided with the outcome. Review normally takes ten working days.</p>
         <p class="muted">Nothing is published until a reviewer approves it, and your contact details are never published
            alongside the paper, they are used only to reach you about this submission.</p>
@@ -3494,7 +3492,7 @@ exports.research = (ctx, { papers = [], canManage = false, canSubmit = false, no
     <div id="rsLib">${bbcLayout({ h1: 'Research papers', tag: 'h2', lead: paperRow(papers[0]), rows: papers.slice(1).map(paperRow) })}</div>
     <div class="rs-empty" hidden><p>No paper matches that search.</p><button type="button" class="ui-btn" data-rs-reset>Show all papers</button></div>
     <script>window.__RS__=${JSON.stringify({ years, types }).replace(/</g, '\\u003c')};</script>
-  </section>` : '<div class="wrap section"><div class="rp-empty"><p class="rp-empty-t">No research papers are published yet.</p><p>New papers appear here as soon as the Unit publishes them.</p></div></div>';
+  </section>` : '<div class="wrap section"><div class="rp-empty"><p class="rp-empty-t">No research papers are published yet.</p><p>New papers appear here as soon as NIIP publishes them.</p></div></div>';
 
   if (canManage) return shell(ctx, { title: 'Research Papers', workspaceActive: 'research', body: researchAdminBody(papers, notice) });
 
@@ -3509,7 +3507,7 @@ exports.research = (ctx, { papers = [], canManage = false, canSubmit = false, no
   <div class="wrap section page-black">
     ${canSubmit ? `<div class="panel" style="margin-top:2rem">
       <h2>Submit your research</h2>
-      <p class="muted">Submit a paper or report for the ICT Statistics &amp; Policy Unit to review. Approved submissions are published to this library.</p>
+      <p class="muted">Submit a paper or report for the NIIP team to review. Approved submissions are published to this library.</p>
       <form method="post" action="/research/submit" class="grid-form">
         <label>Title *<input name="title" required maxlength="240"></label>
         <label>Author(s) *<input name="authors" required maxlength="200" placeholder="Your name / institution"></label>
@@ -3580,7 +3578,7 @@ function researchAdminBody(papers, notice) {
       <h2>Upload a paper</h2>
       <form method="post" action="/admin/papers/create" class="grid-form">
         <label>Title *<input name="title" required maxlength="240"></label>
-        <label>Author(s)<input name="authors" maxlength="200" placeholder="ICT Statistics &amp; Policy Unit"></label>
+        <label>Author(s)<input name="authors" maxlength="200" placeholder="NIIP"></label>
         <label>Category<select name="tag"><option>Report</option><option>Working Paper</option><option>Policy Brief</option><option>Dataset Note</option><option>Article</option></select></label>
         <label>Downloadable<select name="downloadable"><option value="1">Yes, users can download</option><option value="0">No, read only</option></select></label>
         <label style="grid-column:1/-1">Abstract *<textarea name="abstract" rows="3" required maxlength="1200"></textarea></label>
@@ -4064,7 +4062,7 @@ exports.updatePage = (ctx, { items, index }) => {
         <h1 id="updTitle" aria-label="${esc(title)}"><span aria-hidden="true">${riseWords(title)}</span></h1>
         <p class="upd-lead">${esc(body)}</p>
         ${shareBar(ctx, '/updates/' + updateSlug(u), title)}
-        ${demo ? `<p class="upd-demo" role="note">${icon('info')}<span><strong>Demonstration data.</strong> The figures in this update come from NIIS's demonstration dataset. Live Ministry feeds are not public yet, so they are not official statistics.</span></p>` : ''}
+        ${demo ? `<p class="upd-demo" role="note">${icon('info')}<span><strong>Demonstration data.</strong> The figures in this update come from NIIS's demonstration dataset. Live data feeds are not public yet, so they are not official statistics.</span></p>` : ''}
         <figure class="upd-figure">
           <img src="${esc(photo)}" alt="" width="1200" height="675" decoding="async">
           <figcaption>Illustrative photo from the NIIP image library.</figcaption>
@@ -4753,7 +4751,7 @@ exports.careers = (ctx) => {
     ['What happens after I apply?', 'Shortlisted applicants are contacted for a short interview, plus a practical exercise for data and platform roles.'],
     monrovia.length ? ['Where are the data roles based?', `${monrovia.join(' and ')} ${monrovia.length > 1 ? 'are full-time roles' : 'is a full-time role'} in Monrovia.`] : null,
     ['What do I need to apply?', 'Your CV as a PDF or Word file, up to 4 MB, and your county. A cover note is optional.'],
-    ['Who handles applications?', 'The ICT Statistics & Policy Unit at the Ministry of Posts & Telecommunications.'],
+    ['Who handles applications?', 'The NIIP team.'],
   ].filter(Boolean);
   const steps = [
     ['search', 'Find a role', 'Read the open roles above and pick the one that fits your team, type and place.'],
@@ -4811,7 +4809,7 @@ exports.careers = (ctx) => {
       <div class="cs-wrap cs-dark-in">
         <span class="cs-frame" aria-hidden="true"></span>
         <h2 id="csDarkTitle" class="cs-h2 cs-h2-lg" aria-label="Recruited county by county, as each data-collection wave opens.">${csDecode('Recruited county by county,')}${csDecode('as each data-collection wave opens.', 'cs-dim')}</h2>
-        <div class="cs-ctas">${csBtn('/about', 'Contact the Unit')}</div>
+        <div class="cs-ctas">${csBtn('/about', 'Contact us')}</div>
       </div>
     </section>
 
@@ -4828,7 +4826,7 @@ exports.careers = (ctx) => {
         <div class="cs-faq-head">
           <span class="cs-mark" aria-hidden="true"></span>
           <h2 id="csFaqTitle" class="cs-h2 cs-h2-xl">FAQ</h2>
-          <p class="cs-faq-more"><span>Got more questions?</span> ${csBtn('/about', 'Contact the Unit', 'cs-btn-light')}</p>
+          <p class="cs-faq-more"><span>Got more questions?</span> ${csBtn('/about', 'Contact us', 'cs-btn-light')}</p>
         </div>
         <div class="cs-faq-list">${faq.map(([q, a], i) => `<details class="cs-q"><summary><span class="cs-q-n" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span><span class="cs-q-t">${esc(q)}</span><span class="cs-q-x" aria-hidden="true"></span></summary><div class="cs-q-a"><p>${esc(a)}</p></div></details>`).join('')}</div>
       </div>
@@ -4857,14 +4855,14 @@ function careerSent(ctx, role, reference) {
           <svg viewBox="0 0 48 48" class="cs-ok-check"><polyline points="13 25 21 33 36 16"/></svg>
         </div>
         <h1 id="csOkTitle" class="cs-h1 cs-ok-h" aria-label="Congratulations! Application sent.">${csDecode('Congratulations!')}${csDecode('Application sent.', 'cs-dim')}</h1>
-        <p class="cs-ok-sub" role="status">Your application for <strong>${esc(role.title)}</strong> is with the ICT Statistics &amp; Policy Unit.</p>
+        <p class="cs-ok-sub" role="status">Your application for <strong>${esc(role.title)}</strong> is with the NIIP team.</p>
         <dl class="cs-ap-meta cs-ok-meta">
           ${reference ? `<div><dt>Your reference</dt><dd class="cs-ok-ref">${esc(reference)}</dd></div>` : ''}
           <div><dt>Role</dt><dd>${esc(role.title)}</dd></div>
           <div><dt>Team</dt><dd>${esc(role.unit)}</dd></div>
           ${sentOn ? `<div><dt>Sent</dt><dd>${esc(sentOn)}</dd></div>` : ''}
         </dl>
-        ${reference ? '<p class="cs-ok-keep">Keep this reference. Quote it if you contact the Unit about your application.</p>' : ''}
+        ${reference ? '<p class="cs-ok-keep">Keep this reference. Quote it if you contact us about your application.</p>' : ''}
       </div>
     </section>
     <section class="cs-ap-body cs-ok-body" aria-labelledby="csNextTitle">
@@ -4872,7 +4870,7 @@ function careerSent(ctx, role, reference) {
         <span class="cs-mark" aria-hidden="true"></span>
         <h2 id="csNextTitle" class="cs-h2">What happens next</h2>
         <ol class="cs-ok-steps">
-          <li><span aria-hidden="true">${icon('check')}</span><div><h3>Application sent</h3><p>Your details and CV have reached the Unit.</p></div></li>
+          <li><span aria-hidden="true">${icon('check')}</span><div><h3>Application sent</h3><p>Your details and CV have reached the NIIP team.</p></div></li>
           <li><span aria-hidden="true">${icon('chat')}</span><div><h3>Screening</h3><p>Shortlisted applicants are contacted for a short interview${role.unit === 'Data Team' ? ', plus a practical exercise' : ''}.</p></div></li>
           ${field ? `<li><span aria-hidden="true">${icon('book')}</span><div><h3>Training</h3><p>Field roles begin with paid training before a county wave opens.</p></div></li>` : ''}
         </ol>
@@ -4899,7 +4897,7 @@ exports.careerApply = (ctx, { role, counties = [], errors = [], values = {}, fai
   const field = role.unit === 'Data Collection';
   const panel = `
         ${notice ? `<p class="cs-alert" role="alert">${esc(notice)}</p>` : ''}
-        ${failed ? `<p class="cs-alert" role="alert">We could not receive applications online just now, so nothing was sent. Please try again later, or <a href="/about">contact the Unit</a>.</p>` : ''}
+        ${failed ? `<p class="cs-alert" role="alert">We could not receive applications online just now, so nothing was sent. Please try again later, or <a href="/about">contact us</a>.</p>` : ''}
         ${errors.length ? `<p class="cs-alert" role="alert">Please check the highlighted fields.${values.cv_lost ? ' Choose your CV again: a file is never kept when the form comes back.' : ''}</p>` : ''}
         <form class="cs-form" id="csForm" method="post" action="/careers/apply" enctype="multipart/form-data" novalidate>
           <input type="hidden" name="role" value="${esc(role.title)}">
@@ -5074,7 +5072,7 @@ const WS_SERVICES = [
   ['research', '/research', 'book', 'Research library', 'The papers on Liberia’s ICT sector, each with NIIS’s own summary.', () => true],
   ['media', '/media', 'image', 'Media library', 'Images, research papers and video from the program.', () => true],
   ['analytics', '/analytics', 'chart', 'Platform analytics', 'Usage and trends across the stored data.', (r, has) => has('analytics')],
-  ['messages', '/messages', 'chat', 'Messages', 'Your direct line to the ICT Statistics & Policy Unit.', (r, has) => has('messaging')],
+  ['messages', '/messages', 'chat', 'Messages', 'Your direct line to the NIIP team.', (r, has) => has('messaging')],
   ['admin', '/admin', 'shield', 'Admin panel', 'Accounts, the review queue, content and platform settings.', (r, has) => has('manage_users')],
   ['inbox', '/admin/inbox', 'inbox', 'Team inbox', 'Every conversation, shared across the administration team.', (r, has) => has('admin_inbox')],
   ['images', '/admin/images', 'image', 'Image library', 'Every photo slot on the site: upload, replace, restore.', (r, has) => has('manage_content')],
@@ -5179,7 +5177,7 @@ exports.requestIndicator = (ctx, { sent = false, error = '', values = {}, indica
     ${wsSeal}
     <p class="kicker">Services</p>
     <h1>Request an indicator.</h1>
-    <p class="lede-sm">Ask the team to measure something NIIS does not track yet. The request goes to the ICT Statistics &amp; Policy Unit’s inbox, and the reply comes to your <a href="/messages">Messages</a>. ${indicatorCount ? `NIIS tracks ${fmt(indicatorCount)} indicators today; see them in the <a href="/data">Data Explorer</a>.` : 'See what NIIS tracks today in the <a href="/data">Data Explorer</a>.'}</p>
+    <p class="lede-sm">Ask the team to measure something NIIS does not track yet. The request goes to the NIIP team’s inbox, and the reply comes to your <a href="/messages">Messages</a>. ${indicatorCount ? `NIIS tracks ${fmt(indicatorCount)} indicators today; see them in the <a href="/data">Data Explorer</a>.` : 'See what NIIS tracks today in the <a href="/data">Data Explorer</a>.'}</p>
     ${sent ? '<div class="alert alert-ok">Sent to the team. The reply comes to your Messages.</div>' : ''}
     ${error ? `<div class="alert alert-error" role="alert">${esc(error)}</div>` : ''}
     <div class="panel">
@@ -5300,7 +5298,7 @@ function messageThread(msgs) {
   if (!msgs.length) return '<p class="muted">No messages yet. Start the conversation below.</p>';
   return `<div class="thread">${msgs.map((m) => `
     <div class="msg ${m.from_admin_team ? 'msg-admin' : 'msg-user'}">
-      <div class="msg-head mono">${m.from_admin_team ? 'ICT Statistics & Policy Unit' : esc(m.sender_name)} · ${esc(fmtTs(m.created_at))}</div>
+      <div class="msg-head mono">${m.from_admin_team ? 'NIIP team' : esc(m.sender_name)} · ${esc(fmtTs(m.created_at))}</div>
       <div class="msg-body">${esc(m.body)}</div>
     </div>`).join('')}</div>`;
 }
@@ -5308,7 +5306,7 @@ exports.messages = (ctx, { conv, msgs }) => appLayout(ctx, {
   title: 'Messages', active: 'messages', body: `
   <p class="kicker">Messaging</p>
   <h1>Message box</h1>
-  <p class="lede-sm">A direct line between your account and the ICT Statistics &amp; Policy Unit, no outside email needed. Messages are answered from a shared team inbox (checked regularly, not real-time chat).</p>
+  <p class="lede-sm">A direct line between your account and the NIIP team, no outside email needed. Messages are answered from a shared team inbox (checked regularly, not real-time chat).</p>
   ${conv && conv.subject ? `<p class="mono muted">Subject: ${esc(conv.subject)}</p>` : ''}
   ${messageThread(msgs)}
   <form method="post" action="/messages" class="msg-form">
@@ -5337,7 +5335,7 @@ exports.adminConversation = (ctx, { conv, msgs }) => appLayout(ctx, {
   ${conv.subject ? `<p class="mono muted">Subject: ${esc(conv.subject)}</p>` : ''}
   ${messageThread(msgs)}
   <form method="post" action="/admin/inbox/${conv.id}" class="msg-form">
-    <label>Reply as ICT Statistics &amp; Policy Unit<textarea name="body" rows="4" required maxlength="4000"></textarea></label>
+    <label>Reply as the NIIP team<textarea name="body" rows="4" required maxlength="4000"></textarea></label>
     <button class="btn btn-teal" type="submit" style="margin-top:.8rem">Send reply</button>
   </form>`,
 });
@@ -5716,6 +5714,6 @@ exports.apiDocs = (ctx) => shell(ctx, { title: 'API Documentation', workspaceAct
 
 // ============ misc ============
 const wrapMisc = (ctx, title, inner) => shell(ctx || { user: null, perms: [] }, { title, body: `<div class="wrap section narrow">${inner}</div>` });
-exports.forbidden = (ctx) => wrapMisc(ctx, 'Access restricted', `<h1>Access restricted</h1><p class="muted">Your role does not include permission for this area. Contact the ICT Statistics &amp; Policy Unit via <a href="/messages">messaging</a> if you believe this is an error.</p>`);
+exports.forbidden = (ctx) => wrapMisc(ctx, 'Access restricted', `<h1>Access restricted</h1><p class="muted">Your role does not include permission for this area. Contact the NIIP team via <a href="/messages">messaging</a> if you believe this is an error.</p>`);
 exports.notFound = (ctx) => wrapMisc(ctx, 'Not found', `<h1>Page not found</h1><p class="muted">The page you requested does not exist. <a href="/">Return home</a>.</p>`);
 exports.errorPage = (ctx, msg) => wrapMisc(ctx, 'Error', `<h1>Something went wrong</h1><p class="muted">${esc(msg)}</p>`);

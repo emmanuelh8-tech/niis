@@ -459,8 +459,8 @@ function homeBanner(id = 'quality') {
 
 // Scroll-triggered image slider hero. Seven slides cross-fade as the visitor scrolls through a tall
 // sticky band: the program's name over its building, the President, Liberia's Minister of Posts and
-// Telecommunications and the LTA's Chairperson, then UNECA and Kenya's envoy, closing with Morocco's
-// Chargé d'Affaires (the owner's order, 8 Nov 2026; Ghana and Kenya's presidents removed). Each carries
+// Telecommunications and the LTA's Chairperson, then UNECA, closing with Kenya's envoy (the owner's
+// order, 8 Nov 2026; Ghana and Kenya's presidents removed; Morocco's Chargé d'Affaires removed 10 Nov 2026). Each carries
 // either the NIIP intro or one quotation (verified against its source, except where a note says the owner
 // supplied it). Images live at /img/hero/slide-N, named by slot rather than by place in the order, and are
 // overridable per slot from the image admin screen.
@@ -492,12 +492,6 @@ const HERO_SLIDES = [
     meta: 'UN Economic Commission for Africa · uneca.org' },
   { img: 'slide-6', quote: 'Africa must prioritize local data processing and systems that reflect its realities.',
     who: 'Ambassador Philip Thigo', role: 'Kenya’s Special Envoy on Technology', meta: 'April 2026 · Tangier, Morocco' },
-  // Supplied by the owner (28 October 2026), spelling corrected and the words unchanged; no published
-  // source was found, so it carries no source line. His title is the one on his patron card. Last, as
-  // the owner asked (8 Nov 2026).
-  { img: 'slide-7', pos: '57% 24%',
-    quote: 'As Africans, if we prioritize taking ownership, that is when full sovereignty will be achieved.',
-    who: 'Hon. Lahoucine Rahmouni', role: 'Chargé d’Affaires, Embassy of the Kingdom of Morocco in Liberia' },
 ];
 // Each built-in slide also has a 5-6 s shot cut from it (public/media/home/<slot>.mp4, plus -720 for
 // phones), longer than a slide stays, so the cross-fades always move. The leaders' shots are camera moves over the original photo, so nobody in them is
@@ -4247,24 +4241,16 @@ const SOCIAL = {
 const SOCIAL_ORDER = ['gh', 'ig', 'fb', 'in', 'x'];
 // the sample profiles have no accounts yet, so every link is a placeholder
 const socialLinks = (name, focusable) => SOCIAL_ORDER.map((k) => `<a href="#" aria-label="${esc(name)} on ${SOCIAL[k].label}"${focusable ? '' : ' tabindex="-1"'}><svg viewBox="${SOCIAL[k].vb}" aria-hidden="true"><path d="${SOCIAL[k].d}"/></svg></a>`).join('');
-// National ICT Patrons: the President, the Vice President and Morocco's Chargé d'Affaires, the only
-// three the owner keeps here (3 Nov 2026: Madam Jarsea Burphy moved to the team as Program Coordinator, and
-// the sample patrons were removed). With what the Executive Mansion, the Ministry of Foreign Affairs and
-// the press record: no social links, nothing that sources disagree on. Photographs: the President's from
-// the Executive Mansion (the home slider); the others as the owner sent them.
+// National ICT Patrons: the President and the Vice President, the only two the owner keeps here (3 Nov 2026:
+// Madam Jarsea Burphy moved to the team as Program Coordinator and the sample patrons were removed; 10 Nov 2026:
+// Morocco's Chargé d'Affaires removed, and no patron shows education or experience, only the bio). No social
+// links. Photographs: the President's from the Executive Mansion (the home slider); the Vice President's as the
+// owner sent it.
 const PATRONS = [
   { name: 'H.E. Joseph Nyuma Boakai, Sr.', img: 'joseph-boakai', role: 'President of the Republic of Liberia', real: true,
-    bio: 'President of Liberia since 22 January 2024, and Vice President from 2006 to 2018. At the Liberia Technology Summit 2026 he set out investment in digital infrastructure, connectivity and cybersecurity.',
-    edu: ['University of Liberia', 'Kansas State University, 1976'],
-    exp: [['President of the Republic of Liberia', 'Government of Liberia', '2024 to now'], ['Vice President of Liberia', 'Government of Liberia', '2006 to 2018'], ['Minister of Agriculture', 'Government of Liberia', 'From 1983'], ['Managing Director', 'Liberia Produce Marketing Corporation', 'From 1980']] },
+    bio: 'President of Liberia since 22 January 2024, and Vice President from 2006 to 2018. At the Liberia Technology Summit 2026 he set out investment in digital infrastructure, connectivity and cybersecurity.', },
   { name: 'H.E. Jeremiah Kpan Koung', img: 'jeremiah-koung', role: 'Vice President of the Republic of Liberia', real: true,
-    bio: 'Vice President of Liberia since 22 January 2024, and President of the Senate. Earlier a Senator and a Representative for Nimba County.',
-    edu: ['BA Business Administration, Cuttington University'],
-    exp: [['Vice President of Liberia', 'Government of Liberia', '2024 to now'], ['Senator, Nimba County', 'Senate of Liberia', '2021 to 2024'], ['Representative, Nimba County District 1', 'House of Representatives', 'From 2012']] },
-  { name: 'Lahoucine Rahmouni', img: 'lahoucine-rahmouni', role: 'Chargé d’Affaires, Embassy of the Kingdom of Morocco in Liberia', real: true,
-    bio: 'Leads the Embassy of the Kingdom of Morocco in Monrovia as Chargé d’Affaires.',
-    edu: [],
-    exp: [['Chargé d’Affaires', 'Embassy of the Kingdom of Morocco, Monrovia', 'Now']] },
+    bio: 'Vice President of Liberia since 22 January 2024, and President of the Senate. Earlier a Senator and a Representative for Nimba County.', },
 ];
 // a medal in its own colours: gold, on a ribbon in the flag's red and blue
 const MEDAL = `<svg class="tc-laptop" viewBox="0 0 40 40" aria-hidden="true">

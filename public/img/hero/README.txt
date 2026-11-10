@@ -7,10 +7,10 @@ The order they show in is set by HERO_SLIDES in views.js, not by the slot number
   4th  slide-9.jpg  Hon. Clarence K. Massaquoi, Chairperson, Liberia Telecommunications Authority
   5th  slide-3.jpg  Claver Gatete, UNECA
   6th  slide-6.png  Ambassador Philip Thigo, Kenya
-  7th  slide-7.jpg  Hon. Lahoucine Rahmouni, Chargé d'Affaires of Morocco in Liberia
 
 slide-4.jpg (President Mahama, Ghana) and slide-5.jpg (President Ruto, Kenya) are no longer shown
-(removed 8 Nov 2026); the files are kept.
+(removed 8 Nov 2026), nor slide-7.jpg (Hon. Lahoucine Rahmouni, Morocco; removed 10 Nov 2026); the
+files are kept.
 
 Each slot except 8 and 9 also has a 6-second shot in public/media/home/<slot>.mp4 (and -720.mp4 for
 phones); slides 8 and 9 show their still.

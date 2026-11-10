@@ -1949,14 +1949,10 @@ exports.about = (ctx, { indicatorCount = 0, domainCount = 0 } = {}) => {
       </div>
     </section>
 
-    <section class="cs-mission ab-story" id="about-niip" data-star="mission" aria-labelledby="abAboutTitle">
+    <!-- the rows straight after the hero: the "About NIIP" heading, the "Data sovereignty, made operational."
+         line and the analysts photo above them were taken out (the owner, 10 Nov 2026) -->
+    <section class="cs-mission ab-story" id="about-niip" data-star="mission" aria-label="About NIIP">
       <div class="cs-wrap">
-        <h2 id="abAboutTitle" class="ab-about-h">About NIIP</h2>
-        <span class="cs-mark" aria-hidden="true"></span>
-        <h2 id="abStoryTitle" class="cs-h2" aria-label="Data sovereignty, made operational.">${csDecode('Data sovereignty, made operational.')}</h2>
-        <figure class="cs-people cs-people--mid">
-          <img src="/img/about/analysts.jpg?v=${ASSET_V}" alt="Liberian analysts at their screens, maps of the country open in front of them" loading="lazy" decoding="async">
-        </figure>
         <dl class="cs-rows ab-rows">
           <div class="cs-row"><dt><span class="cs-tag">The program</span></dt><dd data-fill><b>NIIP</b> is the acronym for the National ICT Intelligence Program: a private-sector project, funded by international agencies, private-sector stakeholders and institutions, to collect and continuously maintain Liberia’s ICT data, disaggregated across all 15 counties.</dd></div>
           <div class="cs-row"><dt><span class="cs-tag">The software</span></dt><dd data-fill>Its data system, <b>NIIS</b> (the National ICT Intelligence System), runs on three tiers of software. Secured databases store the ICT data we collect; a data-analytics algorithm draws on them; and the platform it feeds gives the public, anywhere in the world, access to ICT data across ${indicatorCount || 168} indicators.</dd></div>

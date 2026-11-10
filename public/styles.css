@@ -5999,7 +5999,7 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 .kt-w { position: absolute; left: 0; top: 0; transform-origin: 0 0; white-space: pre; font-family: 'Montserrat', var(--sans); font-weight: 800; line-height: .86; letter-spacing: 0; color: #262626; }
 .kt-w b { font-weight: inherit; color: #2F66D8; }
 /* the section ends with the stage: the slides follow straight under it, on the same grey */
-.cs .cs-mission.ab-story { padding-bottom: 0; }
+.cs .cs-mission.ab-story { padding-top: clamp(2.5rem, 6vh, 4rem); padding-bottom: 0; }   /* no heading above the rows now, so no tall gap */
 
 /* ---- About: the slides (public/img/about/slides). Each card holds still in the middle of the screen
    while the next rises over it; the one beneath sinks back a little and darkens (app.js sets --p).
@@ -6061,9 +6061,7 @@ html:has(.bbc):not(:has(.rs)) { background-image: none; background-color: #fff; 
 html:has(#about-niip) { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html:has(#about-niip) { scroll-behavior: auto; } }
 #about-niip, #what-we-do { scroll-margin-top: var(--nav-real, var(--nav-h)); }   /* the bar's own height (app.js) */
-.ab-about-h { margin: 0 0 clamp(2rem, 5vh, 3rem); text-align: center; font: 600 clamp(2.1rem, 1.4rem + 2.6vw, 3.4rem)/1.05 var(--sans); letter-spacing: -.02em; color: var(--cs-ink); }
-/* the photo band shows the middle of its picture (the analysts), not the top; the rows sit over the numbers */
-.cs-people--mid img { top: 50%; transform: translateY(-50%); }
+/* the rows sit over the numbers */
 .ab-rows { margin-bottom: clamp(2.5rem, 6vh, 3.5rem); }
 /* the rows' text justified to straight edges (the owner's rule for body text), the last line flush left */
 .cs-row dd { text-align: justify; text-align-last: left; -webkit-hyphens: auto; hyphens: auto; hyphenate-limit-chars: 8 3 3; }

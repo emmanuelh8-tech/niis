@@ -4672,7 +4672,9 @@ html.ui-locked { overflow: hidden; }
 .pm-mono { position: absolute; inset: 0; display: grid; place-items: center; background: var(--c, #0B2C63); color: #fff; font: 700 clamp(4rem, 3rem + 4vw, 6.5rem)/1 var(--sans); letter-spacing: .03em; }
 .pm-mono[hidden] { display: none; }
 .pm-body { display: flex; flex-direction: column; gap: .4rem; min-height: 0; overflow-y: auto; padding: 2rem 2.2rem 1.6rem; }
-.pm-kind { font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+/* the line over the name (kind · field · county) in the face of the position line under it, words capitalised
+   as written, not set in the label face (the owner, 10 Nov 2026) */
+.pm-kind { font-family: var(--sans); font-size: .9rem; font-weight: 650; letter-spacing: 0; text-transform: none; color: var(--gold); }
 .pm-body h2 { margin: 0; font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2.1rem); line-height: 1.1; }
 .pm-role { font-weight: 650; color: #464B53; }
 .pm-bio { margin-top: .3rem; color: var(--muted); }
@@ -5454,7 +5456,7 @@ body:has(.lg-brand) .footer-dh { margin-top: 0; }
 .bk-hint, .m-eyebrow, .m-hero-fig figcaption, .m-quote figcaption, .m-zig-meta, .m-tag, .m-logo span, .m-contact h4, .m-flow-chip,
 .m-pol-meta, .m-polbox-meta, .lsc-nat i, .lsc-natnote i, .lsc-an-pair label, .ui-eyebrow, .ui-k, .ui-stats dt, .ic-rail-h, .ic-flag,
 .ic-sheet-cat, .ic-facts dt, .ic-method li span, .qb-table th, .rx-tag, .tc-eyebrow b, .tc-name, .tc-bio-head b, .tp-eyebrow, .tp-field,
-.pm-kind, .pm-sec h3, .tc-badge, .pg-date span, .pg-facts dt { font-family: var(--font-label); font-weight: 400; }
+.pm-sec h3, .tc-badge, .pg-date span, .pg-facts dt { font-family: var(--font-label); font-weight: 400; }
 
 /* the profile hides an empty section (a patron with no education on record) and the social links of a real person */
 .pm-sec[hidden], .pm-social[hidden] { display: none; }

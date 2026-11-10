@@ -637,9 +637,9 @@
     if (!wrap || !pm || !P) return null;
     var tpl = qs('#pmSocial'), cur = null, from = null, hideT = 0;
     var KIND = {
-      team: function () { return 'NIIP team'; },
+      team: function () { return 'NIIP Team'; },
       patron: function () { return 'National ICT Patron'; },
-      talent: function (p) { return 'ICT talent · ' + p.field + ' · ' + p.county; },
+      talent: function (p) { return 'ICT Talent · ' + p.field + ' · ' + p.county; },
     };
     function li(text) { var l = document.createElement('li'); l.textContent = text; return l; }
     function fill(kind, i) {

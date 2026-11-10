@@ -1,0 +1,51 @@
+/* A NIIS report (niis/report.js): one article, the same on screen, in the console's preview and on paper.
+   The program's colours (navy, royal blue, red) and its tall condensed face for headings. */
+.rpt-frame { max-inline-size: 900px; margin-inline: auto; }
+.rpt { --r-ink: #10203f; --r-navy: #0B2C63; --r-blue: #00608f; --r-red: #C8102E; --r-muted: #4f5f78; --r-line: rgba(11, 44, 99, .16);
+  padding: clamp(24px, 5vw, 64px); border-radius: 18px; background: #fff; color: var(--r-ink);
+  box-shadow: 0 2px 6px rgba(11, 44, 99, .06), 0 24px 52px -26px rgba(11, 44, 99, .32);
+  font-family: 'Public Sans', 'Mozilla Text', 'Segoe UI', system-ui, sans-serif; font-size: 16px; line-height: 1.56; }
+.rpt h1, .rpt h2, .rpt-key-v { font-family: 'Big Shoulders', 'Mozilla Headline', 'Arial Narrow', sans-serif; font-stretch: 75%; -webkit-hyphens: manual; hyphens: manual; text-align: left; }
+.rpt-cover { margin-bottom: 30px; padding-bottom: 26px; border-bottom: 4px solid var(--r-navy); }
+.rpt-kicker { margin: 0 0 14px; font-size: 12px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--r-red); text-align: left; }
+.rpt h1 { margin: 0 0 16px; font-size: clamp(40px, 5.6vw, 68px); font-weight: 800; line-height: .94; letter-spacing: .005em; text-transform: uppercase; color: var(--r-navy); text-wrap: balance; }
+.rpt-lede { max-inline-size: 44em; margin: 0 0 14px; font-size: 18px; color: var(--r-ink); }
+.rpt-meta { margin: 0; font-size: 13px; color: var(--r-muted); text-align: left; }
+.rpt-demo { margin: 18px 0 0; padding: 12px 16px; border-left: 4px solid var(--r-red); background: #fbeef0; font-size: 14px; text-align: left; }
+.rpt-keys { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin: 0 0 30px; border-block: 1px solid var(--r-line); }
+.rpt-key { display: grid; align-content: start; gap: 6px; padding: 16px 18px 16px 0; }
+.rpt-key + .rpt-key { padding-left: 18px; border-left: 1px solid var(--r-line); }
+.rpt-key-v { font-size: 38px; font-weight: 800; line-height: 1; color: var(--r-navy); overflow-wrap: anywhere; }
+.rpt-key-l { font-size: 12.5px; line-height: 1.35; color: var(--r-muted); }
+.rpt h2 { margin: 36px 0 12px; font-size: 27px; font-weight: 800; line-height: 1; letter-spacing: .02em; text-transform: uppercase; color: var(--r-navy); }
+.rpt h3 { margin: 24px 0 8px; font-size: 15px; font-weight: 700; color: var(--r-blue); -webkit-hyphens: manual; hyphens: manual; }
+.rpt section { break-inside: avoid-page; }
+.rpt-findings { display: grid; gap: 9px; margin: 0; padding-left: 1.2em; }
+.rpt-findings li::marker { color: var(--r-red); }
+.rpt-table { inline-size: 100%; margin: 12px 0; border-collapse: collapse; font-size: 14px; }
+.rpt-table th { padding: 8px 12px 6px 0; border-bottom: 2px solid var(--r-navy); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-align: left; text-transform: uppercase; color: var(--r-muted); }
+.rpt-table td { padding: 7px 12px 7px 0; border-bottom: 1px solid var(--r-line); vertical-align: middle; text-align: left; }
+.rpt-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rpt-table .muted { font-size: 12.5px; color: var(--r-muted); }
+.rpt-dl { display: grid; gap: 12px; margin: 0; }
+.rpt-dl div { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 16px; }
+.rpt-dl dt { font-size: 13px; font-weight: 700; color: var(--r-muted); }
+.rpt-dl dd { margin: 0; }
+.rpt .an-chart { display: block; inline-size: 100%; block-size: auto; margin: 10px 0; font-family: inherit; }
+.rpt .an-spark { display: block; }
+.rpt-foot { margin-top: 42px; padding-top: 16px; border-top: 1px solid var(--r-line); font-size: 12.5px; color: var(--r-muted); }
+/* on the public site: the tools above the article */
+.nr-tools { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; margin: 0 0 22px; }
+@media (max-width: 640px) {
+  .rpt { border-radius: 12px; }
+  .rpt-dl div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .rpt-key + .rpt-key { padding-left: 0; border-left: 0; }
+  .rpt-key { border-bottom: 1px solid var(--r-line); }
+  .rpt-table { display: block; overflow-x: auto; }
+}
+@media print {
+  @page { size: A4; margin: 16mm; }
+  body * { visibility: hidden; }
+  .rpt, .rpt * { visibility: visible; }
+  .rpt { position: absolute; inset: 0 auto auto 0; inline-size: 100%; padding: 0; border-radius: 0; box-shadow: none; }
+}

@@ -20,6 +20,17 @@ alter table public.messages          disable row level security;
 alter table public.events            disable row level security;
 alter table public.media_generations disable row level security;
 alter table public.partners          disable row level security;
+-- the NIIS console tables (docs/sql/niis-console.sql, 10 Nov 2026)
+alter table public.niis_batches      disable row level security;
+alter table public.niis_raw_rows     disable row level security;
+alter table public.niis_runs         disable row level security;
+alter table public.niis_staged       disable row level security;
+alter table public.niis_revisions    disable row level security;
+alter table public.niis_denominators disable row level security;
+alter table public.niis_sources      disable row level security;
+alter table public.niis_reports      disable row level security;
+alter table public.niis_audit        disable row level security;
+alter table public.niis_api_keys     disable row level security;
 alter view public.indicator_catalog reset (security_invoker);
 grant execute on all functions in schema public to anon, authenticated;
 alter default privileges in schema public grant execute on functions to anon, authenticated;

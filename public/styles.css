@@ -6408,3 +6408,13 @@ html:has(#paper-pdf) { scroll-behavior: smooth; }
 .home-banner + #natReports { padding-top: 2.5rem !important; }
 .home-banner + #homeVideo { padding-top: 2.5rem; }   /* the Hope banner (3 Nov 2026), above the video */
 @media (max-width: 760px) { .home-banner { margin-top: 1rem; } .home-banner + #natReports, .home-banner + #homeVideo { padding-top: 1.75rem !important; } }
+
+/* ============ NIIS REPORT COVERS ============
+   A report published from the NIIS console has no photograph, so its cover is set in type: the kind in red
+   capitals, the title in the tall face, the period under it, on navy (views.js niisCover) */
+.nr-art { display: grid; align-content: space-between; gap: .6rem; box-sizing: border-box; inline-size: 100%; block-size: 100%; aspect-ratio: 16 / 9; padding: 7% 7% 6%;
+  background: linear-gradient(150deg, #133a7c 0%, #0B2C63 58%, #081f47 100%); color: #fff; container-type: inline-size; text-align: left; }
+.nr-art b { font: 700 max(10px, 4cqw)/1.1 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: #ff9aa8; }
+.nr-art em { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; font: 800 max(16px, 8.6cqw)/.95 var(--tall); font-style: normal; text-transform: uppercase; overflow-wrap: anywhere; -webkit-hyphens: manual; hyphens: manual; }
+.nr-art i { font: 600 max(9px, 3.4cqw)/1 var(--sans); font-style: normal; letter-spacing: .12em; color: rgb(255 255 255 / .78); }
+.paper-cover-lg .nr-art { aspect-ratio: 3 / 4; border-radius: 14px; }

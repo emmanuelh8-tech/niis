@@ -35,6 +35,17 @@ alter table public.messages          enable row level security;
 alter table public.events            enable row level security;
 alter table public.media_generations enable row level security;
 alter table public.partners          enable row level security;
+-- the NIIS console tables (docs/sql/niis-console.sql, 10 Nov 2026)
+alter table public.niis_batches      enable row level security;
+alter table public.niis_raw_rows     enable row level security;
+alter table public.niis_runs         enable row level security;
+alter table public.niis_staged       enable row level security;
+alter table public.niis_revisions    enable row level security;
+alter table public.niis_denominators enable row level security;
+alter table public.niis_sources      enable row level security;
+alter table public.niis_reports      enable row level security;
+alter table public.niis_audit        enable row level security;
+alter table public.niis_api_keys     enable row level security;
 
 -- 2. The view runs with the caller's rights instead of its owner's
 alter view public.indicator_catalog set (security_invoker = true);

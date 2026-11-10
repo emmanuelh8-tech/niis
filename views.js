@@ -328,6 +328,19 @@ ${extraHead}
       <span class="sb-brand-text"><strong>NIIP</strong><span>ICT Intelligence Program</span></span>
     </a>
     <nav class="sb-nav" aria-label="Workspace">
+      <!-- an administrator works in the NIIS console first: its section leads the sidebar -->
+      ${has('manage_users') ? `<span class="sb-section-label">NIIS System</span>
+        ${item('/admin', 'admin', 'shield', 'Console', ctx.consoleBadge || 0)}
+        ${item('/admin/intake', 'intake', 'cloudup', 'Data Intake')}
+        ${item('/admin/process', 'process', 'funnel', 'Process &amp; Publish', ctx.reviewBadge || 0)}
+        ${item('/admin/analytics', 'niisanalytics', 'pie', 'Data Analytics')}
+        ${item('/admin/reports', 'adminreports', 'chart', 'ICT Reports')}
+        ${item('/admin/papers', 'adminpapers', 'book', 'Research Papers', ctx.paperReview || 0)}
+        ${item('/admin/submissions', 'submissions', 'inbox', 'Submissions')}
+        ${item('/admin/users', 'users', 'users', 'Users')}
+        ${item('/admin/studio', 'studio', 'sliders', 'Content Studio')}
+        ${has('manage_content') ? item('/admin/images', 'images', 'image', 'Image Library') : ''}
+        ${item('/admin/settings', 'settings', 'gavel', 'Settings &amp; Audit')}` : ''}
       <span class="sb-section-label">Workspace</span>
       ${item('/portal', 'portal', 'home', 'Overview')}
       ${item('/account', 'account', 'info', 'Account')}
@@ -347,8 +360,6 @@ ${extraHead}
       <span class="sb-section-label">Communication</span>
       ${has('messaging') ? item('/messages', 'messages', 'chat', 'Messages', ctx.unreadMsgs || 0) : ''}
       ${has('admin_inbox') ? item('/admin/inbox', 'inbox', 'inbox', 'Team Inbox', ctx.unreadInbox || 0) : ''}
-      ${has('manage_users') ? `<span class="sb-section-label">Administration</span>${item('/admin', 'admin', 'shield', 'Admin Panel')}` : ''}
-      ${has('manage_content') ? item('/admin/images', 'images', 'image', 'Image Library') : ''}
       <span class="sb-section-label">Resources</span>
       ${item('/', 'site', 'globe', 'Public Website')}
       ${item('/api/docs', 'apidocs', 'code', 'API Documentation')}
@@ -4083,14 +4094,22 @@ const REPORT_MONTH = { Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6, Jul: 7, A
 const reportOrder = (r) => r.year * 100 + (REPORT_MONTH[String(r.date).split(' ')[0]] || 0);
 // ICT Reports in the same BBC News format as News & Updates: the latest report leads, the others
 // follow as rows, each opening the report's own page.
-exports.reports = (ctx) => {
-  const list = NATIONAL_REPORTS.map((r, i) => ({ ...r, i, photo: imgs.url('reports', r.img) }));
-  const ordered = list.slice().sort((a, b) => reportOrder(b) - reportOrder(a));
+// a NIIS report has no photograph: its cover is set in type, the kind over the title, in the tall face
+const niisCover = (r) => `<span class="nr-art"><b>${esc(r.tag)}</b><em>${esc(r.title)}</em><i>NIIS${r.period ? ' · ' + esc(r.period) : ''}</i></span>`;
+exports.builtInReports = () => NATIONAL_REPORTS.map((r) => ({ title: r.title, tag: r.tag, date: r.date }));
+exports.reports = (ctx, { niisReports = [] } = {}) => {
+  const list = NATIONAL_REPORTS.map((r, i) => ({ ...r, i, photo: imgs.url('reports', r.img) }))
+    // reports published from the NIIS console: generated from the data, or uploaded as PDF
+    .concat(niisReports.map((r) => ({ niis: r, title: r.title, tag: r.tag, date: r.period || String(r.published_on || '').slice(0, 4), desc: r.summary || '',
+      year: Number(String(r.published_on || '').slice(0, 4)) || new Date().getFullYear(), slug: r.slug, sortKey: String(r.published_on || '') })));
+  const ord = (r) => (r.niis ? Number(String(r.niis.published_on || '').replace(/-/g, '').slice(0, 6)) || 0 : reportOrder(r));
+  const ordered = list.slice().sort((a, b) => ord(b) - ord(a));
   const meta = (r) => `<span class="bbc-meta"><span>${esc(r.date)}</span><span class="bbc-sep" aria-hidden="true"></span><span>${esc(r.tag)}</span></span>`;
   const [first, ...rest] = ordered;
+  const hrefOf = (r) => '/reports/' + (r.niis ? r.slug : reportSlug(r));
   // each report opens on its own page (/reports/<slug>), with its PDF
-  const lead = first ? { href: '/reports/' + reportSlug(first), img: first.photo, title: first.title, body: first.desc, meta: meta(first) } : null;
-  const rows = rest.map((r) => ({ id: 'report-' + r.i, href: '/reports/' + reportSlug(r), img: r.photo, title: r.title, meta: meta(r) }));
+  const lead = first ? { href: hrefOf(first), img: first.photo, art: first.niis ? niisCover(first.niis) : null, title: first.title, body: first.desc, meta: meta(first) } : null;
+  const rows = rest.map((r, k) => ({ id: 'report-' + (r.niis ? 'n' + r.niis.id : r.i), href: hrefOf(r), img: r.photo, art: r.niis ? niisCover(r.niis) : null, title: r.title, meta: meta(r) }));
   return shell(ctx, {
     title: 'ICT Reports', active: '/reports', workspaceActive: 'reports', body: `
   ${listHero({
@@ -4133,6 +4152,22 @@ exports.reportPage = (ctx, { slug, indicators = [], domainLabels = {} }) => {
   </div>`,
   });
 };
+
+// A report published from the NIIS console: a generated one shows its own article (written from the published
+// figures, with its charts), an uploaded one its PDF.
+exports.niisReportPage = (ctx, r) => shell(ctx, {
+  title: r.title, active: '/reports', workspaceActive: 'reports',
+  extraHead: (r.generated ? '' : PDF_HEAD) + `<link rel="stylesheet" href="/assets/rg/report.css?v=${ASSET_V}">`, body: `
+  <div class="wrap section narrow paper-page nr-page">
+    <p class="kicker"><a href="/reports">← ICT Reports</a></p>
+    ${r.generated ? `<div class="nr-tools"><button class="btn btn-ghost" type="button" onclick="window.print()">${icon('download')} Print or save as PDF</button>${shareBar(ctx, '/reports/' + r.slug, r.title)}</div>
+    <div class="rpt-frame">${r.body || ''}</div>` : `<div class="paper-detail-head"><div class="paper-cover-lg">${niisCover(r)}</div><div>
+      <h1>${esc(r.title)}</h1><p class="authors">${esc(r.tag)}${r.period ? ` · <span class="mono">${esc(r.period)}</span>` : ''}</p>
+      <div class="paper-ctas"><a class="btn btn-teal" href="#paper-pdf">Read the report ${icon('arrow')}</a></div>${shareBar(ctx, '/reports/' + r.slug, r.title)}</div></div>
+      ${r.summary ? `<h2>Summary</h2><p class="muted">${esc(r.summary)}</p>` : ''}
+      ${pdfViewer({ url: r.file_path || '', title: r.title })}`}
+  </div>`,
+});
 
 // ============ OUR TEAM ============
 // A carousel of team members, the National ICT Patrons, then the National ICT Talent Pool. The members are the
@@ -4961,7 +4996,7 @@ const WS_SERVICES = [
   ['media', '/media', 'image', 'Media library', 'Images, research papers and video from the program.', () => true],
   ['analytics', '/analytics', 'chart', 'Platform analytics', 'Usage and trends across the stored data.', (r, has) => has('analytics')],
   ['messages', '/messages', 'chat', 'Messages', 'Your direct line to the NIIP team.', (r, has) => has('messaging')],
-  ['admin', '/admin', 'shield', 'Admin panel', 'Accounts, the review queue, content and platform settings.', (r, has) => has('manage_users')],
+  ['admin', '/admin', 'shield', 'NIIS Console', 'Collect, process, analyse and publish the data; reports, papers, submissions and users.', (r, has) => has('manage_users')],
   ['inbox', '/admin/inbox', 'inbox', 'Team inbox', 'Every conversation, shared across the administration team.', (r, has) => has('admin_inbox')],
   ['images', '/admin/images', 'image', 'Image library', 'Every photo slot on the site: upload, replace, restore.', (r, has) => has('manage_content')],
   ['apidocs', '/api/docs', 'code', 'API documentation', 'The free JSON API over NIIS.', () => true],
@@ -5228,22 +5263,12 @@ exports.adminConversation = (ctx, { conv, msgs }) => appLayout(ctx, {
   </form>`,
 });
 
-exports.admin = (ctx, { users, pending, reviewed, indicators, counties, settings, rolePerms, unreadInbox, accessRequests = [], papersList = [], updatesList = [], mediaList = [], siteContent = {}, notice = '', generations = [], seedanceReady = false }) => {
-  const permHas = (role, perm) => rolePerms.some((r) => r.role === role && r.permission === perm);
-  const editablePerms = ['view_registered_data', 'view_stakeholder_data', 'analytics', 'messaging', 'download_open_data'];
-  const permRoles = (ctx.roles || ['public', 'stakeholder', 'admin']).filter((r) => r !== 'admin');
-  return appLayout(ctx, {
-    title: 'Admin Panel', active: 'admin', body: `
-  ${wsSeal}
-  <p class="kicker">Administration</p>
-  <h1>Platform administration</h1>
-  <p class="lede-sm"><a href="/admin/inbox">Team inbox${unreadInbox ? ` <span class="badge">${unreadInbox} new</span>` : ''}</a> · jump to
-    <a href="#requests">access requests${accessRequests.length ? ` <span class="badge">${accessRequests.length}</span>` : ''}</a> ·
-    <a href="#users">users</a> · <a href="#review">quality review</a> · <a href="#studio">content studio</a> · <a href="#ai-video">AI video</a> · <a href="#settings">settings</a></p>
-  ${notice ? `<div class="alert alert-ok">${esc(notice)}</div>` : ''}
-
-  <h2 id="requests">Access requests</h2>
-  <p class="muted">Submitted through “Request Access” under the login form. Review the applicant's details, set a temporary password, and create the account, then share the credentials with the applicant.</p>
+// The administration's building blocks, used by the NIIS console pages (niis/console-views.js): access
+// requests, the user table and its provisioning form, the Content Studio and the platform settings. The single
+// long admin page they once made up became the console on 10 Nov 2026. The bulk upload that published straight
+// to the live data is gone: every figure now goes through Data Intake and the processing checks.
+const adminParts = {
+  requests: (ctx, accessRequests = []) => `
   ${accessRequests.length ? accessRequests.map((r) => `<div class="panel">
     <div class="two-col" style="grid-template-columns:1.4fr 1fr">
       <div>
@@ -5266,9 +5291,8 @@ exports.admin = (ctx, { users, pending, reviewed, indicators, counties, settings
         </form>
       </div>
     </div>
-  </div>`).join('') : '<p class="muted">No pending requests.</p>'}
-
-  <h2 id="users">User accounts</h2>
+  </div>`).join('') : '<p class="muted">No pending requests.</p>'}`,
+  users: (ctx, users = []) => `
   <table class="data-table"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody>
     ${users.map((u) => `<tr>
       <td>${esc(u.name)}<br><span class="mono muted">${esc(u.email)}</span>${u.organization ? `<br><span class="muted">${esc(u.organization)}</span>` : ''}</td>
@@ -5290,34 +5314,8 @@ exports.admin = (ctx, { users, pending, reviewed, indicators, counties, settings
       <label>Temporary password<input name="password" required minlength="8"></label>
       <button class="btn btn-teal">Create account</button>
     </form>
-  </div>
-
-  <h2 id="review">Data quality review queue</h2>
-  <p class="muted">Submissions from survey tools, operator feeds and manual templates pass automated validation, then await human review here before publication into the database.</p>
-  ${pending.length ? `<table class="data-table"><thead><tr><th>Indicator</th><th>County</th><th class="num">Year</th><th class="num">Value</th><th>Channel</th><th>Validation</th><th>Actions</th></tr></thead><tbody>
-    ${pending.map((s) => `<tr>
-      <td>${esc(s.indicator_name)}</td><td>${esc(s.county_name || 'National')}</td><td class="num mono">${s.year}</td><td class="num mono">${fmt(s.value)}</td>
-      <td><span class="tag">${esc(s.channel)}</span></td>
-      <td class="${String(s.validation_note).startsWith('FLAG') ? 'flag' : 'muted'}">${esc(s.validation_note)}</td>
-      <td><form method="post" action="/admin/review" class="inline-form"><input type="hidden" name="id" value="${s.id}"><input type="hidden" name="action" value="approve"><button class="btn btn-sm btn-teal">Approve</button></form>
-      <form method="post" action="/admin/review" class="inline-form"><input type="hidden" name="id" value="${s.id}"><input type="hidden" name="action" value="reject"><button class="btn btn-sm btn-ghost">Reject</button></form></td></tr>`).join('')}
-  </tbody></table>` : '<p class="muted">Queue is clear, no pending submissions.</p>'}
-  ${reviewed.length ? `<p class="mono muted">Recently reviewed: ${reviewed.map((r) => `${esc(r.indicator_name)} (${esc(r.status)})`).join(' · ')}</p>` : ''}
-  <div class="panel">
-    <h3>Manual upload template (new submission)</h3>
-    <form method="post" action="/admin/submissions/create" class="grid-form">
-      <label>Indicator<select name="indicator_code">${indicators.map((i) => `<option value="${i.code}">${esc(i.name)}</option>`).join('')}</select></label>
-      <label>County<select name="county_id"><option value="">National</option>${counties.map((c) => `<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></label>
-      <label>Year<input name="year" type="number" min="2018" max="2030" value="2026" required></label>
-      <label>Value<input name="value" type="number" step="0.1" required></label>
-      <label>Source<input name="source" placeholder="e.g. 2026 survey wave 1"></label>
-      <button class="btn btn-teal">Submit for validation &amp; review</button>
-    </form>
-  </div>
-
-  <h2 id="studio">Content Studio, front-end data</h2>
-  <p class="muted">Everything the public front end shows is controlled here: hero text, key numbers, datasets, publications, updates and media. Changes go live immediately for all visitors and users.</p>
-
+  </div>`,
+  studio: (ctx, { indicators = [], siteContent = {}, updatesList = [], papersList = [], mediaList = [], generations = [], seedanceReady = false }) => `
   <div class="panel"><h3>Site text &amp; key numbers</h3>
     <form method="post" action="/admin/content" class="grid-form">
       <label>Homepage hero title<input name="hero_title" maxlength="300" value="${esc(siteContent.hero_title || '')}"></label>
@@ -5336,13 +5334,8 @@ exports.admin = (ctx, { users, pending, reviewed, indicators, counties, settings
     <p class="muted mono" style="font-size:.75rem">Available codes: ${indicators.map((i) => esc(i.code)).join(' · ')}</p>
   </div>
 
-  <div class="panel"><h3>Bulk data upload (CSV → published immediately)</h3>
-    <form method="post" action="/admin/data/bulk" class="grid-form">
-      <label>Rows, one per line: <span class="mono">indicator_code, county (or National), year, value[, source]</span>
-        <textarea name="csv" rows="6" class="mono" placeholder="internet_penetration, Nimba, 2026, 32.5, 2026 survey wave 2&#10;internet_penetration, National, 2026, 36.9"></textarea></label>
-      <button class="btn btn-gold">Publish rows</button>
-    </form>
-    <p class="muted">Rows upsert into the published dataset (existing indicator/county/year values are overwritten). Use the quality-review queue below for submissions that need human sign-off instead.</p>
+  <div class="panel"><h3>Data upload</h3>
+    <p class="muted">Figures no longer publish from here. Upload them in <a href="/admin/intake">Data Intake</a>; they are checked when you process them and published when they are approved and released.</p>
   </div>
 
   <div class="two-col">
@@ -5423,8 +5416,12 @@ exports.admin = (ctx, { users, pending, reviewed, indicators, counties, settings
       <td>${g.local_path ? `<a href="${esc(g.local_path)}" target="_blank">view</a>${g.status === 'completed' || g.status === 'published' ? ` · <a href="#" data-sethero="${g.id}">set as hero</a>` : ''}` : ''}</td></tr>`).join('')}
     </tbody></table>` : ''}
   </div>
-
-  <h2 id="settings">Platform settings</h2>
+  <script>${adminVideoScript}</script>`,
+  settings: (ctx, { settings = {}, rolePerms = [] }) => {
+    const permHas = (role, perm) => rolePerms.some((r) => r.role === role && r.permission === perm);
+    const editablePerms = ['view_registered_data', 'view_stakeholder_data', 'analytics', 'messaging', 'download_open_data'];
+    const permRoles = (ctx.roles || ['public', 'stakeholder', 'admin']).filter((r) => r !== 'admin');
+    return `
   <div class="two-col">
     <div class="panel"><h3>Access policies <span class="muted" style="font-weight:400;font-size:.8em">(configurable, not hard-coded)</span></h3>
       <form method="post" action="/admin/settings" class="grid-form">
@@ -5457,10 +5454,11 @@ exports.admin = (ctx, { users, pending, reviewed, indicators, counties, settings
       </form>
       <p class="muted">Administrator permissions are fixed. Changes take effect immediately for all sessions.</p>
     </div>
-  </div>
-  <script>${adminVideoScript}</script>`,
-  });
+  </div>`;
+  },
 };
+exports.adminParts = adminParts;
+exports._kit = { appLayout, esc, icon, fmt, fmtTs, ROLE_LABEL, wsSeal, ASSET_V: () => ASSET_V, sealImg };
 
 // Client-side driver for the Seedance AI video panel: submit → poll → preview → publish.
 const adminVideoScript = `

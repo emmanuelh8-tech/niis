@@ -50,3 +50,15 @@ Data Query builder saves: user_id, name, indicators (CSV codes), counties (CSV n
 ## Analytics
 
 `events` (`kind`: `page_view`|`download`|`api_call`, path, role, created_at) — feeds Platform Analytics.
+
+## The NIIS console (docs/sql/niis-console.sql, 10 Nov 2026)
+
+The system behind the site, run from `/admin` (niis/console.js, niis/console-views.js):
+
+- `niis_batches`: every intake (file, paste, link, open data, provider API, form, provider portal), with its original file's SHA-256 and where the file is kept (`disk:` locally, `storage:` in the private `niis-raw` bucket when hosted). Status `mapping` (columns to confirm), `received`, `processed`, `archived`. Provider sign-off (Q10) is recorded here.
+- `niis_raw_rows`: the rows as received (text kept beside what was recognised), with notes and status `ok`, `flagged`, `rejected`, `used`.
+- `niis_runs`: each "Process new data" run and its stage-by-stage log (niis/pipeline.js: Validate, Clean, Integrate, Transform, Analyse, Enrich; checks Q01 to Q12 of MOU Schedule 3).
+- `niis_staged`: the values a run produced, with their checks and severity, through `draft` → `approved` → `released` (or `rejected`, `suppressed`, `superseded`). Release writes `data_points` through `bulk_publish`; the release rule (`settings.niis_release_rule`, default `two_person`) decides whether the approver may also release.
+- `niis_revisions`: every change to a published figure (Q12). `niis_denominators`: the agreed population table (Q04). `niis_sources`: linked sources pulled on demand. `niis_reports`: generated or uploaded reports (published ones join `/reports`; PDFs in the public `niis-reports` bucket). `niis_audit`: who did what. `niis_api_keys`: provider API keys (only a SHA-256 is kept) for `POST /api/v1/intake`.
+- `data_submissions.batch_id`: a portal submission once gathered into a batch.
+- `niis_coverage()`: values per indicator and year (read in pages of 1,000).

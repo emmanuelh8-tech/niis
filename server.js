@@ -10,6 +10,7 @@ const sdb = require('./supadb');
 const seedance = require('./seedance');
 const imagestore = require('./imagestore');
 const views = require('./views');
+const createConsole = require('./niis/console');
 
 const PORT = process.env.PORT || 4310;
 const SESSION_HOURS = 12;
@@ -371,6 +372,19 @@ function serveStatic(res, relPath) {
 // ---------- router ----------
 // One handler serves both ways the site runs: `node server.js` listens with it (below), and on
 // Vercel api/index.js hands every non-static request to it.
+// ---------- the NIIS console (niis/): intake, processing and release, analytics, reports, submissions, users
+const niis = createConsole({
+  sdb, cache, views, send, json, redirect, parseForm, readBody, readBodyBuffer, hasPerm, refreshIndicators, refreshYears, getSetting, setSetting,
+  parseMultipart: imagestore.parseMultipart, DOMAIN_LABELS, DOMAIN_ORDER, ROOT: __dirname,
+  siteContent: () => ({
+    hero_title: getContent('hero_title'), hero_sub: getContent('hero_sub'), about_mission: getContent('about_mission'), key_numbers: getContent('key_numbers'),
+    home_video: getContent('home_video'), home_video_title: getContent('home_video_title'), home_video_caption: getContent('home_video_caption'),
+    home_video_playlist: getContent('home_video_playlist'),
+  }),
+  seedanceReady: () => seedance.isConfigured(),
+  policySettings: () => ({ registration_mode: getSetting('registration_mode'), stakeholder_provisioning: getSetting('stakeholder_provisioning'), messaging_model: getSetting('messaging_model') }),
+});
+
 async function handler(req, res) {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const p = url.pathname;
@@ -410,6 +424,16 @@ async function handler(req, res) {
       const pend = await sdb.sel('papers?select=id&status=eq.submitted&deleted=eq.false');
       ctx.paperReview = pend.length;
     }
+    // badge: values waiting for review or release (the NIIS console)
+    if (user && hasPerm(user, 'manage_users')) {
+      try { ctx.reviewBadge = (await sdb.sel('niis_staged?select=id&status=in.(draft,approved)&limit=1000')).length; } catch { ctx.reviewBadge = 0; }
+    }
+
+    // the provider API: rows pushed by a provider's system with its own key (niis/console.js)
+    if (p === '/api/v1/intake' || p.startsWith('/api/v1/intake/')) { await niis.apiIntake(req, res, p); return; }
+    // an uploaded report's PDF on a development machine (hosted, it sits in the public niis-reports bucket)
+    const repFile = /^\/reports\/file\/([A-Za-z0-9._-]+\.pdf)$/.exec(p);
+    if (repFile) { if (niis.serveReportFile(res, repFile[1])) return; return send(res, 404, views.notFound(ctx)); }
 
     // ================= PUBLIC API v1 =================
     if (p.startsWith('/api/v1/')) {
@@ -684,12 +708,13 @@ async function handler(req, res) {
       }
       if (p === '/reports') {
         logEvent('page_view', p, user);
-        return send(res, 200, views.reports(ctx, { indicators: listIndicators(user), domainLabels: DOMAIN_LABELS }));
+        return send(res, 200, views.reports(ctx, { indicators: listIndicators(user), domainLabels: DOMAIN_LABELS, niisReports: await niis.publishedReports() }));
       }
       // one report on its own page, with its PDF
       const repM = /^\/reports\/([a-z0-9-]+)$/.exec(p);
       if (repM) {
-        const html = views.reportPage(ctx, { slug: repM[1], indicators: listIndicators(user), domainLabels: DOMAIN_LABELS });
+        let html = views.reportPage(ctx, { slug: repM[1], indicators: listIndicators(user), domainLabels: DOMAIN_LABELS });
+        if (!html) { const r = await niis.reportBySlug(repM[1]); if (r) html = views.niisReportPage(ctx, r); }
         if (!html) return send(res, 404, views.notFound(ctx));
         logEvent('page_view', p, user);
         return send(res, 200, html);
@@ -1056,6 +1081,9 @@ async function handler(req, res) {
     // ----- admin area -----
     if (p.startsWith('/admin')) {
       if (!hasPerm(user, 'manage_users')) return send(res, 403, views.forbidden(ctx));
+      ctx._indicators = cache.indicatorByCode; ctx._counties = cache.counties;
+      await niis.handle(req, res, ctx, p, url);
+      if (res.headersSent || res.writableEnded) return;
 
       if (p === '/admin/images' && req.method === 'GET') {
         if (!hasPerm(user, 'manage_content')) return send(res, 403, views.forbidden(ctx));
@@ -1207,12 +1235,12 @@ async function handler(req, res) {
         if (p === '/admin/users/status') {
           await sdb.upd('users', `id=eq.${Number(f.id)}&role=neq.admin`, { status: ['active', 'suspended'].includes(f.status) ? f.status : 'active' });
           cache.sessions.clear();
-          return redirect(res, '/admin#users');
+          return redirect(res, '/admin/users');
         }
         if (p === '/admin/users/role') {
           if (ctx.roles.includes(f.role)) await sdb.upd('users', `id=eq.${Number(f.id)}`, { role: f.role });
           cache.sessions.clear();
-          return redirect(res, '/admin#users');
+          return redirect(res, '/admin/users');
         }
         if (p === '/admin/users/create') {
           const email = (f.email || '').trim().toLowerCase();
@@ -1222,7 +1250,7 @@ async function handler(req, res) {
               await sdb.ins('users', [{ email, name: f.name.trim(), organization: (f.organization || '').trim(), password_hash: hashPassword(f.password), role: ctx.roles.includes(f.role) ? f.role : 'stakeholder', status: 'active' }]);
             }
           }
-          return redirect(res, '/admin#users');
+          return redirect(res, '/admin/users');
         }
         // access requests: approve -> create account; reject -> close
         if (p === '/admin/requests/action') {
@@ -1230,17 +1258,17 @@ async function handler(req, res) {
           const ar = reqs[0];
           if (ar) {
             if (f.action === 'approve') {
-              if (!f.password || f.password.length < 8) return redirect(res, '/admin?notice=' + encodeURIComponent('Temporary password must be at least 8 characters.') + '#requests');
+              if (!f.password || f.password.length < 8) return redirect(res, '/admin/users?notice=' + encodeURIComponent('Temporary password must be at least 8 characters.') + '#requests');
               const existing = await sdb.sel(`users?select=id&email=eq.${sdb.enc(ar.email)}`);
-              if (existing.length) return redirect(res, '/admin?notice=' + encodeURIComponent('A user with that email already exists.') + '#requests');
+              if (existing.length) return redirect(res, '/admin/users?notice=' + encodeURIComponent('A user with that email already exists.') + '#requests');
               const role = ctx.roles.filter((r) => r !== 'admin').includes(f.role) ? f.role : ar.role_requested;
               await sdb.ins('users', [{ email: ar.email, name: ar.name, organization: ar.organization, password_hash: hashPassword(f.password), role, status: 'active' }]);
               await sdb.upd('access_requests', `id=eq.${ar.id}`, { status: 'approved', reviewed_by: user.id, reviewed_at: new Date().toISOString() });
-              return redirect(res, '/admin?notice=' + encodeURIComponent(`Account created for ${ar.email} (${role}). Share the temporary password with the applicant.`) + '#requests');
+              return redirect(res, '/admin/users?notice=' + encodeURIComponent(`Account created for ${ar.email} (${role}). Share the temporary password with the applicant.`) + '#requests');
             }
             await sdb.upd('access_requests', `id=eq.${ar.id}`, { status: 'rejected', reviewed_by: user.id, reviewed_at: new Date().toISOString() });
           }
-          return redirect(res, '/admin#requests');
+          return redirect(res, '/admin/users#requests');
         }
         if (p === '/admin/review') {
           const subs = await sdb.sel(`data_submissions?select=*&id=eq.${Number(f.id)}&status=eq.pending`);
@@ -1252,7 +1280,7 @@ async function handler(req, res) {
             }
             await sdb.upd('data_submissions', `id=eq.${sub.id}`, { status: f.action === 'approve' ? 'approved' : 'rejected', reviewed_by: user.id, reviewed_at: new Date().toISOString() });
           }
-          return redirect(res, '/admin#review');
+          return redirect(res, '/admin/submissions');
         }
         if (p === '/admin/submissions/create') {
           const v = validateSubmission(f.indicator_code, f.value);
@@ -1261,18 +1289,7 @@ async function handler(req, res) {
             year: Number(f.year), value: Number(f.value), source: f.source || 'Manual upload template',
             submitted_by: user.id, channel: 'manual', status: 'pending', validation_note: v.note,
           }]);
-          return redirect(res, '/admin#review');
-        }
-        // Content Studio: bulk CSV publish (goes straight to published data_points)
-        if (p === '/admin/data/bulk') {
-          const { rows, errors } = parseBulkCsv(f.csv);
-          let published = 0;
-          if (rows.length) {
-            published = await sdb.rpc('bulk_publish', { p_rows: rows });
-            await Promise.all([refreshIndicators(), refreshYears()]);
-          }
-          const notice = `Published ${published} data point(s).` + (errors.length ? ` Skipped ${errors.length}: ${errors.slice(0, 3).join(' · ')}${errors.length > 3 ? ' …' : ''}` : '');
-          return redirect(res, '/admin?notice=' + encodeURIComponent(notice) + '#studio');
+          return redirect(res, '/admin/submissions');
         }
         // Content Studio: front-end text blocks + key numbers
         if (p === '/admin/content') {
@@ -1291,26 +1308,32 @@ async function handler(req, res) {
           if (f.home_video_title != null) await setContent('home_video_title', f.home_video_title.trim().slice(0, 140));
           if (f.home_video_caption != null) await setContent('home_video_caption', f.home_video_caption.trim().slice(0, 600));
           if (f.home_video_playlist != null) await setContent('home_video_playlist', f.home_video_playlist.trim().slice(0, 2000));
-          return redirect(res, '/admin?notice=' + encodeURIComponent('Front-end content saved and live.') + '#studio');
+          return redirect(res, '/admin/studio?notice=' + encodeURIComponent('Front-end content saved and live.'));
         }
         if (p === '/admin/updates/create') {
           if (f.title && f.body) await sdb.ins('updates', [{ title: f.title.trim(), category: ['news', 'data_refresh', 'announcement'].includes(f.category) ? f.category : 'news', body: f.body.trim(), published_on: new Date().toISOString().slice(0, 10) }]);
-          return redirect(res, '/admin#studio');
+          return redirect(res, '/admin/studio');
         }
         if (p === '/admin/updates/delete') {
           await sdb.del('updates', `id=eq.${Number(f.id)}`);
-          return redirect(res, '/admin#studio');
+          return redirect(res, '/admin/studio');
         }
         // paper management, usable from the Content Studio and the Research Papers tab
-        const paperBack = (req.headers.referer || '').includes('/research') ? '/research' : '/admin#studio';
+        const paperBack = (req.headers.referer || '').includes('/research') ? '/research' : '/admin/studio';
+        // from the console's Research Papers page, the answer goes back there, on the same tab
+        const refUrl = (() => { try { return new URL(req.headers.referer || '', 'http://x'); } catch { return null; } })();
+        const fromConsole = !!(refUrl && refUrl.pathname === '/admin/papers');
+        const consoleBack = (msg) => redirect(res, '/admin/papers?' + (refUrl.searchParams.get('tab') ? 'tab=' + encodeURIComponent(refUrl.searchParams.get('tab')) + '&' : '') + 'notice=' + encodeURIComponent(msg));
         if (p === '/admin/papers/create') {
           if (!hasPerm(user, 'manage_content')) return send(res, 403, views.forbidden(ctx));
+          if (fromConsole && !(f.title && f.abstract)) return consoleBack('Give the paper a title and an abstract.');
           if (f.title && f.abstract) await sdb.ins('papers', [{
             title: f.title.trim(), authors: (f.authors || 'NIIP').trim(), abstract: f.abstract.trim(),
             published_on: new Date().toISOString().slice(0, 10), tag: f.tag || 'Report', body: f.body || '',
             status: 'published', visible: true, deleted: false, downloadable: f.downloadable !== '0',
           }]);
-          return redirect(res, paperBack === '/research' ? '/research?notice=' + encodeURIComponent('Paper published.') : '/admin#studio');
+          if (fromConsole) return consoleBack('Paper published.');
+          return redirect(res, paperBack === '/research' ? '/research?notice=' + encodeURIComponent('Paper published.') : '/admin/studio');
         }
         if (p === '/admin/papers/review') {
           if (!hasPerm(user, 'manage_content')) return send(res, 403, views.forbidden(ctx));
@@ -1319,6 +1342,7 @@ async function handler(req, res) {
             status: approve ? 'published' : 'rejected', visible: approve,
             reviewed_by: user.id, reviewed_at: new Date().toISOString(),
           });
+          if (fromConsole) return consoleBack(approve ? 'Paper approved and published.' : 'Submission rejected.');
           return redirect(res, '/research?notice=' + encodeURIComponent(approve ? 'Paper approved and published.' : 'Submission rejected.'));
         }
         if (p === '/admin/papers/visibility') {
@@ -1329,17 +1353,20 @@ async function handler(req, res) {
           else if (f.action === 'lock') patch.downloadable = false;
           else if (f.action === 'unlock') patch.downloadable = true;
           if (Object.keys(patch).length) await sdb.upd('papers', `id=eq.${Number(f.id)}`, patch);
+          if (fromConsole) return consoleBack('Paper updated.');
           return redirect(res, '/research?notice=' + encodeURIComponent('Paper updated.'));
         }
         if (p === '/admin/papers/delete') {
           if (!hasPerm(user, 'manage_content')) return send(res, 403, views.forbidden(ctx));
           // soft delete so it can be recovered
           await sdb.upd('papers', `id=eq.${Number(f.id)}`, { deleted: true });
-          return redirect(res, paperBack === '/research' ? '/research?notice=' + encodeURIComponent('Paper moved to Deleted, recoverable.') : '/admin#studio');
+          if (fromConsole) return consoleBack('Paper moved to Deleted. It can be recovered.');
+          return redirect(res, paperBack === '/research' ? '/research?notice=' + encodeURIComponent('Paper moved to Deleted, recoverable.') : '/admin/studio');
         }
         if (p === '/admin/papers/recover') {
           if (!hasPerm(user, 'manage_content')) return send(res, 403, views.forbidden(ctx));
           await sdb.upd('papers', `id=eq.${Number(f.id)}`, { deleted: false });
+          if (fromConsole) return consoleBack('Paper recovered.');
           return redirect(res, '/research?notice=' + encodeURIComponent('Paper recovered.'));
         }
         if (p === '/admin/media/create') {
@@ -1352,18 +1379,18 @@ async function handler(req, res) {
               access_level: ['public', 'registered', 'stakeholder'].includes(f.access_level) ? f.access_level : 'public',
             }]);
           }
-          return redirect(res, '/admin#studio');
+          return redirect(res, '/admin/studio');
         }
         if (p === '/admin/media/delete') {
           await sdb.del('media', `id=eq.${Number(f.id)}`);
-          return redirect(res, '/admin#studio');
+          return redirect(res, '/admin/studio');
         }
         if (p === '/admin/settings') {
           if (!hasPerm(user, 'manage_settings')) return send(res, 403, views.forbidden(ctx));
           if (['verified', 'open', 'closed'].includes(f.registration_mode)) await setSetting('registration_mode', f.registration_mode);
           if (['admin_only', 'request'].includes(f.stakeholder_provisioning)) await setSetting('stakeholder_provisioning', f.stakeholder_provisioning);
           if (['inbox', 'realtime'].includes(f.messaging_model)) await setSetting('messaging_model', f.messaging_model);
-          return redirect(res, '/admin#settings');
+          return redirect(res, '/admin/settings');
         }
         if (p === '/admin/permissions') {
           if (!hasPerm(user, 'manage_settings')) return send(res, 403, views.forbidden(ctx));
@@ -1377,39 +1404,8 @@ async function handler(req, res) {
             }
           }
           await refreshPerms();
-          return redirect(res, '/admin#settings');
+          return redirect(res, '/admin/settings');
         }
-      }
-
-      if (p === '/admin' && req.method === 'GET') {
-        logEvent('page_view', p, user);
-        const [users, pending, reviewed, accessRequests, papersList, updatesList, mediaList, unreadRow, generations] = await Promise.all([
-          sdb.sel('users?select=id,email,name,organization,role,status,created_at&order=status.desc,created_at.desc'),
-          sdb.sel("submissions_view?select=*&status=eq.pending&order=created_at"),
-          sdb.sel("submissions_view?select=*&status=neq.pending&order=reviewed_at.desc&limit=5"),
-          sdb.sel("access_requests?select=*&status=eq.pending&order=created_at"),
-          sdb.sel('papers?select=id,title,published_on,tag&order=published_on.desc'),
-          sdb.sel('updates?select=id,title,category,published_on&order=published_on.desc'),
-          sdb.sel('media?select=id,title,kind,access_level&order=kind,id'),
-          sdb.rpc('user_badges', { p_user_id: user.id, p_is_admin: true }),
-          sdb.sel('media_generations?select=id,prompt,model,quality_tier,status,local_path,created_at&order=created_at.desc&limit=8'),
-        ]);
-        const settings = { registration_mode: getSetting('registration_mode'), stakeholder_provisioning: getSetting('stakeholder_provisioning'), messaging_model: getSetting('messaging_model') };
-        const siteContent = {
-          hero_title: getContent('hero_title'), hero_sub: getContent('hero_sub'),
-          about_mission: getContent('about_mission'), key_numbers: getContent('key_numbers'),
-          home_video: getContent('home_video'), home_video_title: getContent('home_video_title'),
-          home_video_caption: getContent('home_video_caption'),
-          home_video_playlist: getContent('home_video_playlist'),
-        };
-        return send(res, 200, views.admin(ctx, {
-          users, pending, reviewed, accessRequests, papersList, updatesList, mediaList, siteContent,
-          indicators: cache.indicators.map(({ code, name, unit }) => ({ code, name, unit })),
-          counties: cache.counties.map(({ id, name }) => ({ id, name })),
-          settings, rolePerms: cache.rolePermRows || [], unreadInbox: unreadRow.unreadInbox || 0,
-          generations, seedanceReady: seedance.isConfigured(),
-          notice: url.searchParams.get('notice') || '',
-        }));
       }
     }
 

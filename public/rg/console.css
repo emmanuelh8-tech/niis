@@ -1,0 +1,259 @@
+/* The NIIS console (niis/console-views.js): the workspace's Hushkey keys and wells (public/rg/ws.css), with the parts a
+   data system needs: the pipeline, the process key, quality-check chips, review groups, intake methods and coverage. */
+
+/* anything the page hides stays hidden, whatever display a rule below gives it */
+.hk-native [hidden] { display: none !important; }
+
+/* page head: the title, and the page's own actions beside it */
+.hk-native .cx-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: end; margin-bottom: 30px; }
+.hk-native .cx-head .lede-sm { margin-bottom: 0; }
+.hk-native .cx-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: flex-end; }
+.hk-native .cx-actions .inline-form { margin: 0; }
+.hk-native .page-body h2 { margin-top: 56px; }
+.hk-native .cx-h3 { margin: 32px 0 10px; }
+.hk-native .cx-more { margin: 14px 4px 0; font-size: 14px; }
+.hk-native .cx-sub { margin: 10px 0 -4px; font-size: 11.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--hk-8); }
+.hk-native .alert { margin-bottom: 24px; }
+
+/* tabs: a well holding keys; the one you are on is raised */
+.hk-native .cx-tabs { display: flex; flex-wrap: wrap; gap: 6px; inline-size: fit-content; max-inline-size: 100%; margin: 0 0 22px; padding: 7px; border-radius: 30px; background: var(--hk-1); box-shadow: var(--hk-shadow-2); }
+.hk-native .cx-tab { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 18px; border-radius: 999px; color: var(--hk-5); font-size: 14px; font-weight: 600; text-decoration: none; }
+.hk-native .cx-tab:hover { background: color-mix(in srgb, var(--hk-3) 70%, transparent); }
+.hk-native .cx-tab.on { background: var(--hk-key); box-shadow: var(--hk-shadow-1); color: var(--hk-2); }
+.hk-native .cx-tab .n { min-width: 22px; padding: 1px 7px; border-radius: 999px; background: var(--hk-1); box-shadow: var(--hk-shadow-2); font-size: 12px; text-align: center; color: var(--hk-5); font-variant-numeric: tabular-nums; }
+
+/* pills: a dot and a word */
+.hk-native .cx-pill { display: inline-flex; align-items: center; gap: 7px; padding: .26rem .72rem; border-radius: 999px; background: var(--hk-1); box-shadow: var(--hk-shadow-2);
+  font-size: 11.5px; font-weight: 600; letter-spacing: .04em; white-space: nowrap; color: var(--hk-2); }
+.hk-native .cx-pill::before { content: ""; inline-size: 8px; block-size: 8px; border-radius: 50%; background: var(--dot, var(--hk-8)); flex: none; }
+.hk-native .cx-ok { --dot: #138a4f; } .hk-native .cx-warn { --dot: #d08a00; } .hk-native .cx-fail { --dot: #c8102e; } .hk-native .cx-info { --dot: var(--hk-7); } .hk-native .cx-mute { --dot: var(--hk-4); color: var(--hk-8); }
+
+/* the pipeline: five keys on a groove, the full ones raised in blue */
+.hk-native .cx-flow { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 22px 0 18px; padding: 0; list-style: none; }
+.hk-native .cx-flow::before { content: ""; position: absolute; z-index: 0; top: 34px; left: 10%; right: 10%; block-size: 6px; border-radius: 6px; background: var(--hk-1); box-shadow: var(--hk-shadow-2); }
+.hk-native .cx-flow li { position: relative; z-index: 1; }
+.hk-native .cx-step { display: grid; justify-items: center; gap: 6px; padding: 0 4px; text-align: center; text-decoration: none; color: var(--hk-2); }
+.hk-native .cx-step-key { display: grid; place-items: center; inline-size: 74px; block-size: 74px; border-radius: 50%; background: var(--hk-key); box-shadow: var(--hk-shadow-1);
+  font-family: var(--hk-font-1); font-stretch: 75%; font-weight: 700; font-size: 30px; line-height: 1; color: var(--hk-2); font-variant-numeric: tabular-nums; transition: box-shadow .25s ease; }
+.hk-native .cx-step.hot .cx-step-key { background: var(--hk-blue-key); color: #fff; box-shadow: var(--hk-shadow-4); }
+.hk-native .cx-step:hover .cx-step-key { box-shadow: var(--hk-shadow-2); }
+.hk-native .cx-step.hot:hover .cx-step-key { box-shadow: var(--hk-shadow-5); }
+.hk-native .cx-step-l { margin-top: 6px; font-size: 11.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--hk-5); }
+.hk-native .cx-step-s { font-size: 13px; color: var(--hk-8); }
+
+/* the process panel: what is waiting, and the round key that runs it */
+.hk-native .cx-run { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 36px; align-items: center; }
+.hk-native .cx-run h3 { margin-bottom: 8px; }
+.hk-native .cx-last { margin: 4px 0 0; font-size: 14px; }
+.hk-native .cx-go-form { display: grid; justify-items: center; gap: 18px; margin: 0; }
+.hk-native .cx-go { position: relative; display: grid; place-content: center; gap: 10px; inline-size: 232px; block-size: 232px; margin: 14px; padding: 26px; border: 0; border-radius: 50%;
+  background: var(--hk-blue-key); color: #fff; box-shadow: var(--hk-shadow-4); text-align: center; font-family: var(--hk-font-2); cursor: pointer; transition: box-shadow .25s ease, transform .1s ease; }
+.hk-native .cx-go::before { content: ""; position: absolute; inset: -14px; border: 1.5px solid var(--hk-4); border-radius: 50%; pointer-events: none; }
+.hk-native .cx-go b { font-family: var(--hk-font-1); font-stretch: 75%; font-weight: 700; font-size: 34px; line-height: .92; letter-spacing: .01em; }
+.hk-native .cx-go span { font-size: 13px; line-height: 1.35; opacity: .88; }
+.hk-native .cx-go:hover { box-shadow: var(--hk-shadow-5); }
+.hk-native .cx-go:active { transform: translateY(1px); }
+.hk-native .cx-go:focus-visible { outline: 3px solid var(--hk-7); outline-offset: 18px; }
+.hk-native .cx-go[disabled] { background: var(--hk-key); color: var(--hk-8); box-shadow: var(--hk-shadow-1); cursor: default; }
+.hk-native .cx-go.is-running { cursor: progress; }
+.hk-native .cx-go.is-running::after { content: ""; position: absolute; inset: -14px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--hk-7); animation: cx-spin 1.1s linear infinite; }
+@keyframes cx-spin { to { transform: rotate(1turn); } }
+@media (prefers-reduced-motion: reduce) { .hk-native .cx-go.is-running::after { animation: none; border-color: var(--hk-7); } }
+.hk-native .cx-stages { display: grid; gap: 8px; inline-size: 100%; margin: 0; padding: 0; list-style: none; }
+.hk-native .cx-stages li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; align-items: start; padding: 8px 12px; border-radius: 18px; background: var(--hk-1); box-shadow: var(--hk-shadow-2); font-size: 13px; line-height: 1.35; }
+.hk-native .cx-stages .dot { display: grid; place-items: center; inline-size: 30px; block-size: 30px; border-radius: 50%; background: var(--hk-key); box-shadow: var(--hk-shadow-1); font-weight: 700; color: var(--hk-5); }
+.hk-native .cx-stages em { font-style: normal; font-size: 11px; color: var(--hk-8); letter-spacing: .04em; }
+.hk-native .cx-stages .sum { display: block; color: var(--hk-8); }
+.hk-native .cx-stages li.on .dot { background: var(--hk-blue-key); color: #fff; box-shadow: var(--hk-shadow-4); animation: cx-pulse 1s ease-in-out infinite alternate; }
+.hk-native .cx-stages li.done .dot { background: var(--hk-blue-key); color: #fff; box-shadow: var(--hk-shadow-4); }
+@keyframes cx-pulse { to { opacity: .55; } }
+.hk-native .cx-run-out { margin: 0; font-size: 14px; text-align: center; }
+
+/* key numbers that open their page */
+.hk-native a.cx-kpi-link { text-decoration: none; color: inherit; }
+.hk-native a.cx-kpi-link:hover { background: var(--hk-dent); box-shadow: var(--hk-shadow-2); }
+.hk-native .cx-kpi-note { font-size: 12px; color: var(--hk-8); }
+
+/* what needs attention: a count on a key, a line, an arrow */
+.hk-native .cx-todo { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.hk-native .cx-todo a { display: grid; grid-template-columns: 52px minmax(0, 1fr) 20px; gap: 14px; align-items: center; padding: 9px 18px 9px 9px; border-radius: 999px;
+  background: var(--hk-key); box-shadow: var(--hk-shadow-1); color: var(--hk-2); font-size: 15px; font-weight: 600; text-decoration: none; }
+.hk-native .cx-todo a:hover { background: var(--hk-dent); box-shadow: var(--hk-shadow-2); }
+.hk-native .cx-todo .n { display: grid; place-items: center; inline-size: 52px; block-size: 52px; border-radius: 50%; background: var(--hk-blue-key); box-shadow: var(--hk-shadow-4);
+  font-family: var(--hk-font-1); font-stretch: 75%; font-weight: 700; font-size: 23px; color: #fff; }
+.hk-native .cx-todo .icn { inline-size: 20px; block-size: 20px; color: var(--hk-5); }
+
+/* the activity feed */
+.hk-native .cx-feed { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.hk-native .cx-feed li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; padding: 11px 2px; border-top: 1px solid color-mix(in srgb, var(--hk-4) 40%, transparent); font-size: 14.5px; line-height: 1.4; }
+.hk-native .cx-feed li:first-child { border-top: 0; }
+.hk-native .cx-feed time { font-size: 12px; white-space: nowrap; }
+.hk-native .cx-target { color: var(--hk-5); font-weight: 600; overflow-wrap: anywhere; }
+
+/* empty states: a pressed well with a sentence */
+.hk-native .cx-empty { padding: 26px 28px; border-radius: 26px; background: var(--hk-1); box-shadow: var(--hk-shadow-2); color: var(--hk-8); text-align: center; }
+.hk-native .cx-empty p { margin: 0; text-align: center; }
+
+/* notices about the data itself */
+.hk-native .cx-demo { position: relative; margin: 0 0 26px; padding: 16px 22px 16px 48px; border-radius: 26px; background: var(--hk-surface); box-shadow: var(--hk-shadow-8); font-size: 15px; line-height: 1.5; }
+.hk-native .cx-demo::before { content: ""; position: absolute; left: 21px; top: 22px; inline-size: 12px; block-size: 12px; border-radius: 50%; background: #d08a00; box-shadow: 0 0 0 4px rgb(208 138 0 / .2); }
+.hk-native .cx-draftview { margin: 22px 0 6px; }
+
+/* key-value facts */
+.hk-native .cx-meta { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px 26px; margin: 0 0 30px; }
+.hk-native .cx-meta div { display: grid; gap: 5px; align-content: start; padding-top: 11px; border-top: 1.5px solid var(--hk-4); }
+.hk-native .cx-meta dt { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--hk-5); }
+.hk-native .cx-meta dd { margin: 0; font-size: 15.5px; overflow-wrap: anywhere; }
+
+/* forms in a panel: a grid of fields */
+.hk-native .cx-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px 20px; align-items: end; }
+.hk-native .cx-form .wide { grid-column: 1 / -1; }
+.hk-native .cx-form .cx-span2 { grid-column: span 2; }
+.hk-native .cx-form p { margin: 0; }
+.hk-native .page-body .cx-form label.check, .hk-native .page-body .cx-radios label.check { display: flex; gap: 12px; align-items: center; font-size: 14.5px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--hk-2); }
+.hk-native .cx-radios { display: grid; gap: 14px; }
+.hk-native .cx-radios label.check { align-items: flex-start !important; line-height: 1.45; }
+.hk-native .cx-radios input { margin-top: 3px; inline-size: 20px; block-size: 20px; accent-color: var(--hk-5); flex: none; }
+.hk-native .cx-radios .btn { justify-self: start; }
+.hk-native .cx-btns { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 8px; }
+.hk-native .cx-btns .inline-form { margin: 0; }
+.hk-native .cx-filter { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: end; margin: 0 0 20px; }
+.hk-native .cx-filter label { min-inline-size: 220px; }
+.hk-native .cx-search { display: block; max-inline-size: 460px; margin: 0 0 18px; font-size: 11.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--hk-5); }
+
+/* intake: the ways in, as keys */
+.hk-native .cx-methods { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 16px; margin: 0 0 28px; }
+.hk-native .cx-method { display: grid; align-content: start; gap: 6px; min-block-size: 132px; padding: 18px 18px 16px; border-radius: 28px; background: var(--hk-key); box-shadow: var(--hk-shadow-1); color: var(--hk-2); text-decoration: none; transition: box-shadow .25s ease, background .25s ease; }
+.hk-native .cx-method .icn { inline-size: 40px; block-size: 40px; margin-bottom: 6px; padding: 9px; border-radius: 50%; background: var(--hk-1); box-shadow: var(--hk-shadow-2); color: var(--hk-5); }
+.hk-native .cx-method b { font-size: 15.5px; line-height: 1.2; }
+.hk-native .cx-method span { font-size: 12.5px; line-height: 1.35; color: var(--hk-8); }
+.hk-native .cx-method:hover { box-shadow: var(--hk-shadow-1), inset 0 2px 5px color-mix(in srgb, var(--hk-2) 10%, transparent); }
+.hk-native .cx-method.on { background: var(--hk-dent); box-shadow: var(--hk-shadow-2); }
+.hk-native .cx-method.on .icn { background: var(--hk-blue-key); box-shadow: var(--hk-shadow-4); color: #fff; }
+/* the drop zone: a deep well with a dashed rim */
+.hk-native .page-body label.cx-drop { display: grid; justify-items: center; gap: 8px; padding: 34px 24px 26px; border: 2px dashed color-mix(in srgb, var(--hk-4) 80%, transparent); border-radius: 30px;
+  background: var(--hk-1); box-shadow: var(--hk-shadow-2); text-align: center; text-transform: none; letter-spacing: 0; color: var(--hk-2); font-size: 15px; cursor: pointer; transition: border-color .2s ease, background .2s ease; }
+.hk-native .cx-drop > .icn { inline-size: 56px; block-size: 56px; padding: 13px; border-radius: 50%; background: var(--hk-key); box-shadow: var(--hk-shadow-1); color: var(--hk-5); }
+.hk-native .cx-drop b { font-size: 17px; }
+.hk-native .cx-drop span { font-weight: 400; font-size: 13.5px; }
+.hk-native .cx-drop input[type="file"] { max-inline-size: 440px; margin-top: 6px; }
+.hk-native .cx-drop.over { border-color: var(--hk-7); background: color-mix(in srgb, var(--hk-7) 8%, var(--hk-1)); }
+.hk-native .cx-drop-name { font-weight: 600 !important; color: var(--hk-5); }
+.hk-native .cx-url { overflow-wrap: anywhere; font-size: 12.5px; }
+.hk-native .cx-api p { max-inline-size: 52em; }
+.hk-native .cx-api h3 { margin-top: 18px; }
+.hk-native .cx-code { display: block; margin: 10px 0 14px; padding: 18px 22px; border-radius: 22px; background: #0c2236; color: #e2e8ee; box-shadow: var(--hk-shadow-2);
+  font-family: var(--mono, ui-monospace, monospace); font-size: 13px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.hk-native .page-body code.cx-code { padding: 18px 22px; border-radius: 22px; background: #0c2236; }
+
+/* tables */
+.hk-native .cx-table td, .hk-native .cx-table th { vertical-align: top; }
+.hk-native .cx-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hk-native .cx-table .muted { font-size: 13.5px; }
+.hk-native .cx-notes { font-size: 13px; line-height: 1.4; }
+.hk-native .cx-tiny { font-size: 12.5px; }
+.hk-native .cx-row-actions { white-space: nowrap; }
+.hk-native .cx-row-actions .inline-form { display: inline-block; margin: 0 6px 6px 0; }
+.hk-native .cx-rows td { font-size: 14px; }
+.hk-native .cx-how { font-size: 13px; max-inline-size: 180px; }
+.hk-native .cx-plain { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
+.hk-native details.cx-abs summary, .hk-native details.cx-edit summary { cursor: pointer; color: var(--hk-5); font-size: 13.5px; font-weight: 600; }
+.hk-native details.cx-abs p { margin: 6px 0 0; font-size: 14px; max-inline-size: 60em; }
+.hk-native details.cx-edit { padding-block: 18px; }
+.hk-native details.cx-edit[open] summary { margin-bottom: 18px; }
+
+/* review: groups by indicator and year, a checkbox on every row, the actions held at the bottom */
+.hk-native .cx-review .cx-cb { inline-size: 44px; text-align: center; }
+.hk-native .cx-review input[type="checkbox"] { inline-size: 20px; block-size: 20px; accent-color: var(--hk-5); }
+.hk-native .cx-review tr.cx-group td { padding-top: 16px; background: color-mix(in srgb, var(--hk-6) 32%, transparent); border-top: 1.5px solid var(--hk-4); font-size: 14.5px; }
+.hk-native .cx-review tbody:first-of-type tr.cx-group td { border-top: 0; }
+.hk-native .cx-review sup { margin-left: 2px; color: #d08a00; font-weight: 700; }
+.hk-native .cx-sticky { position: sticky; bottom: 14px; z-index: 6; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 18px; padding: 10px 12px 10px 24px; border-radius: 34px;
+  background: var(--hk-surface); box-shadow: var(--hk-shadow-8), 0 18px 34px -16px color-mix(in srgb, var(--hk-9) 35%, transparent); }
+.hk-native .cx-picked { font-size: 14px; font-weight: 600; color: var(--hk-5); min-inline-size: 110px; }
+.hk-native .page-body .cx-sticky .cx-note { flex: 1 1 260px; display: flex; gap: 10px; align-items: center; }
+.hk-native .page-body .cx-sticky .cx-note input { margin-top: 0; min-height: 44px; }
+
+/* quality-check chips: the MOU's codes, coloured by result; open one to read why */
+.hk-native .cx-q { display: inline-flex; align-items: center; justify-content: center; min-inline-size: 34px; block-size: 21px; margin: 0 3px 3px 0; padding: 0 6px; border-radius: 999px;
+  font-family: var(--mono, ui-monospace, monospace); font-size: 10.5px; font-weight: 700; letter-spacing: .02em; }
+.hk-native .cx-q-pass { background: #dcefe3; color: #0e5a35; }
+.hk-native .cx-q-warn { background: #fbedc6; color: #6d4700; }
+.hk-native .cx-q-fail { background: #f9d9de; color: #9b0c26; }
+.hk-native .cx-q-na { background: transparent; color: var(--hk-8); box-shadow: inset 0 0 0 1px var(--hk-4); }
+.hk-native details.cx-why summary { list-style: none; cursor: pointer; }
+.hk-native details.cx-why summary::-webkit-details-marker { display: none; }
+.hk-native details.cx-why summary::after { content: "Why"; margin-left: 4px; font-size: 11.5px; font-weight: 600; color: var(--hk-5); text-decoration: underline; text-underline-offset: 2px; }
+.hk-native details.cx-why[open] summary::after { content: "Hide"; }
+.hk-native details.cx-why ul { margin: 8px 0 2px; padding-left: 1.1em; display: grid; gap: 6px; font-size: 13px; line-height: 1.4; max-inline-size: 440px; }
+.hk-native details.cx-why em { color: var(--hk-8); font-style: normal; }
+
+/* a run's log, stage by stage */
+.hk-native .cx-log { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.hk-native .cx-log > li { margin-bottom: 20px; }
+.hk-native .cx-log h3 { display: flex; align-items: center; gap: 14px; }
+.hk-native .cx-log-n { display: grid; place-items: center; inline-size: 40px; block-size: 40px; border-radius: 50%; background: var(--hk-blue-key); box-shadow: var(--hk-shadow-4); color: #fff; font-family: var(--hk-font-2); font-size: 16px; }
+.hk-native .cx-log p { font-size: 16px; }
+.hk-native .cx-tallies { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 8px 0 0; font-size: 13.5px; color: var(--hk-8); }
+.hk-native .cx-tally { display: inline-flex; align-items: center; gap: 4px; }
+.hk-native .cx-log-notes { margin: 12px 0 0; padding-left: 1.2em; display: grid; gap: 6px; font-size: 14px; color: var(--hk-2); }
+
+/* analytics */
+.hk-native .cx-an-head { margin-top: 26px; }
+.hk-native .cx-an-head h2 { margin: 0 0 6px; }
+.hk-native .cx-find { margin: 18px 0 22px; padding-left: 1.2em; display: grid; gap: 9px; font-size: 16.5px; line-height: 1.5; max-inline-size: 60em; }
+.hk-native .cx-charts { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; margin: 6px 0 22px; }
+.hk-native .cx-charts figure { margin: 0; padding: 18px 18px 10px; border-radius: 26px; background: #fff; box-shadow: var(--hk-shadow-2); }
+.hk-native .cx-charts figcaption { margin-bottom: 6px; font-size: 11.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--hk-5); }
+.hk-native .an-chart { display: block; inline-size: 100%; block-size: auto; font-family: var(--hk-font-2); }
+.hk-native .an-empty { color: var(--hk-8); }
+.hk-native .cx-heat-wrap { overflow-x: auto; padding: 14px; border-radius: 26px; background: var(--hk-1); box-shadow: var(--hk-shadow-2); }
+.hk-native .cx-heat { inline-size: 100%; border-collapse: separate; border-spacing: 4px; font-size: 12.5px; }
+.hk-native .cx-heat th { padding: 4px 8px; font-weight: 600; color: var(--hk-5); text-align: left; white-space: nowrap; }
+.hk-native .cx-heat th.num { text-align: center; }
+.hk-native .cx-heat td { min-inline-size: 54px; block-size: 34px; border-radius: 9px; background: rgb(0 96 143 / var(--a)); color: var(--hk-2); text-align: center; font-variant-numeric: tabular-nums; }
+.hk-native .cx-heat td.dark { color: #fff; }
+.hk-native .cx-heat td.real { box-shadow: inset 0 0 0 2.5px #C8102E; font-weight: 700; }
+.hk-native .cx-heat sup { margin-left: 1px; opacity: .8; }
+
+/* reports: the four kinds to generate */
+.hk-native .cx-gen { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 22px; margin-bottom: 26px; }
+.hk-native .cx-gen-card { display: grid; align-content: start; gap: 12px; margin: 0 !important; }
+.hk-native .cx-gen-card h3 { margin: 0 !important; }
+.hk-native .cx-gen-card p { margin: 0; font-size: 14.5px; }
+.hk-native .cx-gen-card .cx-form { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.hk-native .cx-gen-card .btn { justify-self: start; }
+.hk-native .cx-gen-card.on { box-shadow: var(--hk-shadow-8), 0 0 0 3px var(--hk-7); }
+.hk-native .rpt-frame { margin-top: 26px; }
+.hk-native .cx-pdf { display: block; inline-size: 100%; block-size: 80vh; border-radius: 22px; box-shadow: var(--hk-shadow-2); background: #fff; }
+
+/* a key shown once */
+.hk-native .cx-newkey { margin-bottom: 18px; padding: 16px 18px; border-radius: 22px; background: color-mix(in srgb, var(--hk-7) 10%, var(--hk-1)); box-shadow: var(--hk-shadow-2); }
+.hk-native .cx-newkey p { margin: 0 0 4px; font-size: 14.5px; }
+
+@media (max-width: 1100px) {
+  .hk-native .cx-run { grid-template-columns: minmax(0, 1fr); }
+  .hk-native .cx-go-form { justify-self: center; }
+}
+@media (max-width: 900px) {
+  .hk-native .cx-head { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .hk-native .cx-actions { justify-content: flex-start; }
+  /* the pipeline stands upright on a phone: each key beside its words, on a vertical groove */
+  .hk-native .cx-flow { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .hk-native .cx-flow::before { top: 10px; bottom: 10px; left: 25px; right: auto; inline-size: 6px; block-size: auto; }
+  .hk-native .cx-step { grid-template-columns: 56px minmax(0, 1fr); grid-template-rows: auto auto; justify-items: start; align-items: center; column-gap: 14px; row-gap: 0; text-align: left; }
+  .hk-native .cx-step-key { grid-row: 1 / 3; inline-size: 56px; block-size: 56px; font-size: 22px; }
+  .hk-native .cx-step-l { margin-top: 0; align-self: end; }
+  .hk-native .cx-step-s { align-self: start; }
+  .hk-native .cx-charts { grid-template-columns: minmax(0, 1fr); }
+  .hk-native .cx-go { inline-size: 196px; block-size: 196px; }
+  .hk-native .cx-go b { font-size: 28px; }
+  .hk-native .cx-methods { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .hk-native .cx-method { min-block-size: 0; padding: 14px; border-radius: 24px; }
+  .hk-native .cx-form .cx-span2 { grid-column: 1 / -1; }
+  .hk-native .cx-tabs { border-radius: 24px; }
+  .hk-native .cx-sticky { border-radius: 26px; padding: 10px 12px; }
+  .hk-native .cx-feed li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .hk-native .cx-todo a { grid-template-columns: 44px minmax(0, 1fr) 18px; font-size: 14px; }
+  .hk-native .cx-todo .n { inline-size: 44px; block-size: 44px; font-size: 20px; }
+}

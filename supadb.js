@@ -136,5 +136,11 @@ async function storageDel(bucket, objectPath) {
   if (!res.ok && res.status !== 404) throw new Error(`storage delete ${bucket}/${objectPath} failed: ${res.status}`);
 }
 const storagePublicUrl = (bucket, objectPath) => `${BASE}/storage/v1/object/public/${bucket}/${objectPath}`;
+// read a private object back (an original data file, a CV): the secret key reads past the bucket's policies
+async function storageGet(bucket, objectPath) {
+  const res = await fetch(objectUrl(bucket, objectPath), { headers: AUTH_HEADERS });
+  if (!res.ok) throw new Error(`storage read ${bucket}/${objectPath} failed: ${res.status}`);
+  return Buffer.from(await res.arrayBuffer());
+}
 
-module.exports = { sel, ins, ups, upd, del, rpc, enc, inList, CFG, remoteFiles: REMOTE_FILES, storagePut, storageDel, storagePublicUrl };
+module.exports = { sel, ins, ups, upd, del, rpc, enc, inList, CFG, remoteFiles: REMOTE_FILES, storagePut, storageDel, storageGet, storagePublicUrl };

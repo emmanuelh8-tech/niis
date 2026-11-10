@@ -451,11 +451,11 @@ exports.home = (ctx, { headlines, papers, keyStats, dashboards, indicatorsForSea
 const HOME_BANNERS = {
   // the owner's, 9 Nov 2026, right under the hero slider; one wide picture, which phones show too until a tall one is added
   collect: { slot: 'collect', label: 'Collecting Liberia’s ICT data across 15 counties for the first time ever', mw: 1920, mh: 1080,
-    alt: 'Collecting Liberia’s ICT data across 15 counties for the first time ever. Every day we dedicate our lives to owning our data, to step into the future of data-driven decisions with NIIP. A man leans out of a blue minibus beside a red car on a misty road, under the National ICT Intelligence Program seal. www.niip.org, info@niip.org, 0888 771 973 / 0777 129 261.' },
+    alt: 'Collecting Liberia’s ICT data across 15 counties for the first time ever. Every day we dedicate our lives to owning our data, to step into the future of data-driven decisions with NIIP. A man leans out of a blue minibus beside a red car on a misty road, under the National ICT Intelligence Program seal. www.niiplr.org, info@niiplr.org, 0888 771 973 / 0777 129 261.' },
   quality: { slot: 'home', label: 'Quality data makes you stand out',
-    alt: 'Quality data makes you stand out. Collecting Liberia’s ICT data. A blue pawn steps out of a row of black pawns, beside the National ICT Intelligence Program seal. www.niip.org, info@niip.org, 0888 771 973 / 0777 129 261.' },
+    alt: 'Quality data makes you stand out. Collecting Liberia’s ICT data. A blue pawn steps out of a row of black pawns, beside the National ICT Intelligence Program seal. www.niiplr.org, info@niiplr.org, 0888 771 973 / 0777 129 261.' },
   hope: { slot: 'hope', label: 'Our future has hope',
-    alt: 'Our future has hope. NIIP is telling our story with every indicator. Two smiling children carry water containers along a path through green fields, beside the National ICT Intelligence Program seal. For enquiries: 0888 771 973 / 0777 129 261, info@niip.org, www.niip.org.' },
+    alt: 'Our future has hope. NIIP is telling our story with every indicator. Two smiling children carry water containers along a path through green fields, beside the National ICT Intelligence Program seal. For enquiries: 0888 771 973 / 0777 129 261, info@niiplr.org, www.niiplr.org.' },
 };
 function homeBanner(id = 'quality') {
   const b = HOME_BANNERS[id];
@@ -2637,7 +2637,7 @@ const rsMeta = (p) => `<span class="bbc-meta"><time datetime="${esc(p.published_
 // research areas, and the site's Submit a Paper page (anyone can submit; a reviewer reads every paper).
 // The photos are slots in the Image Library (researchGroup). The site keeps no sign-up list yet, so the
 // form writes the request out as an email to the program.
-const RG_CONTACT = { email: 'info@niip.org', phones: ['0888 771 973', '0777 129 261'], office: 'Monrovia, Liberia' };
+const RG_CONTACT = { email: 'info@niiplr.org', phones: ['0888 771 973', '0777 129 261'], office: 'Monrovia, Liberia' };
 // The six research areas (from the program deck), each with its own page. The groups were written at the
 // owner's request (29 October 2026) to show the page until the first real groups form; their invented
 // members and contacts were deleted when the site went live (9 Nov 2026), and each group reads "Under

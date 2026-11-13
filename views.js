@@ -4078,8 +4078,7 @@ exports.partners = (ctx, { partners = [] }) => {
     ${withLogo.length
       ? `<ul class="pt-wall" role="list">${withLogo.map(partnerTile).join('')}</ul>`
       : '<p class="pt-note">Partner institutions will be listed here.</p>'}
-    <p class="pt-note">Logos are the property of their respective organisations and are shown to identify
-      them. Partnership is at various stages of discussion and is confirmed institution by institution.</p>
+    <p class="pt-note">Logos are the property of their respective organisations and are shown to identify them.</p>
   </section>
   <script>
   ${partnerBookScript}

@@ -29,3 +29,6 @@ brag-output*/
 
 # half-size previews of the About slides
 design/about-slides/prev/
+
+# the owner's signature image: never commit it
+concept/assets/signature*.png

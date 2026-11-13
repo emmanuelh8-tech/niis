@@ -165,12 +165,12 @@ const ADDED_PARTNERS = [
   { slug: 'dw-consultancy', name: 'D & W Consultancy' },
   { slug: 'afriktech', name: 'Afriktech Solutions' },
   { slug: 'gonet', name: 'Gonet Academy' },
-  { slug: 'ul', name: 'University of Liberia' },
 ];
-// Government bodies are not shown on Our Partners: NIIP intends to work with the Government of Liberia and
-// is in talks ahead of its official launch in 2027, so no ministry or agency is presented as a partner (the
-// owner, 9 Nov 2026). Their rows and logos stay in the database and the Image Library, for when that changes.
-const GOVERNMENT_BODIES = new Set(['mopt', 'lta', 'lisgis', 'cbl', 'moe', 'moh', 'moa', 'epa', 'lra', 'nic', 'moys', 'nir', 'cert']);
+// Our Partners shows only the partners NIIP has signed with (the owner, 13 Nov 2026: Prinstine, Afriktech, Gonet and
+// D & W Consulting; "we have not signed with any one" else). Every other row and logo stays in the database and the
+// Image Library, so an institution can be shown again by adding its slug here once it signs. The government bodies
+// were already off the page (9 Nov 2026): NIIP intends to work with the Government of Liberia, in talks ahead of 2027.
+const SIGNED_PARTNERS = new Set(['prinstine', 'afriktech', 'gonet', 'dw-consultancy']);
 const notSeeded = (kind, rows) => (rows || []).filter((r) => !SEEDED[kind].has(String(r.title || '').trim()));
 const APPLY_DIR = path.join(__dirname, 'data', 'applications');
 const CV_MAX = 4 * 1024 * 1024;   // under the 4.5 MB request limit of a hosted function (Vercel)
@@ -748,7 +748,7 @@ async function handler(req, res) {
         logEvent('page_view', p, user);
         const listed = await sdb.sel('partners?select=*&visible=eq.true&order=sort_order,name');
         const partners = listed.concat(ADDED_PARTNERS.filter((a) => !listed.some((p) => p.slug === a.slug)))
-          .filter((p) => !GOVERNMENT_BODIES.has(p.slug));
+          .filter((p) => SIGNED_PARTNERS.has(p.slug));
         return send(res, 200, views.partners(ctx, { partners }));
       }
       // Dashboards was replaced by Our Partners in the navigation. The page itself is kept
